@@ -1,14 +1,17 @@
-import { DiscordMessage, DiscordChannel, DiscordAttachment, DiscordChannelTypes } from "../channel";
+import { DiscordApplication } from "../application";
+import { DiscordMessage, DiscordChannel, DiscordAttachment, DiscordChannelTypes, DiscordAllowedMentions, DiscordEmbed } from "../channel";
+import { DiscordCommandOptionChoice } from "../command";
 import { DiscordEmoji } from "../emoji";
 import { DiscordGuildMember } from "../guild";
 import { DiscordRole } from "../permissions";
 import { DiscordUser } from "../user";
 
-export type DiscordInteraction = {
+
+export abstract class DiscordInteraction {
     id: string;
     application_id: string;
     type: DiscordInteractionTypes;
-    data?: DiscordInteractionData;
+    data?: DiscordApplicationCommandInteractionData | DiscordMessageComponentInteractionData | Partial<DiscordApplicationCommandInteractionData> | DiscordModalInteractionData;
     guild_id?: string;
     channel_id?: string;
     member?: DiscordGuildMember;
@@ -19,6 +22,76 @@ export type DiscordInteraction = {
     app_permissions?: string;
     locale?: string;
     guild_locale?: string;
+
+    constructor({ id, application_id, type, data, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale }: DiscordInteraction) {
+        this.id = id;
+        this.application_id = application_id;
+        this.type = type;
+        this.data = data;
+        this.guild_id = guild_id;
+        this.channel_id = channel_id;
+        this.member = member;
+        this.user = user;
+        this.token = token;
+        this.version = version;
+        this.message = message;
+        this.app_permissions = app_permissions;
+        this.locale = locale;
+        this.guild_locale = guild_locale;
+    }
+}
+
+export class DiscordInteractionPing extends DiscordInteraction {
+    type: DiscordInteractionTypes.PING;
+
+    constructor(args: DiscordInteractionPing) {
+        super(args);
+        this.type = args.type;
+    }
+}
+
+export class DiscordInteractionApplicationCommand extends DiscordInteraction {
+    type: DiscordInteractionTypes.APPLICATION_COMMAND;
+    data: DiscordApplicationCommandInteractionData
+
+    constructor(args: DiscordInteractionApplicationCommand) {
+        super(args);
+        this.type = args.type;
+        this.data = args.data;
+    }
+}
+
+export class DiscordInteractionMessageComponent extends DiscordInteraction {
+    type: DiscordInteractionTypes.MESSAGE_COMPONENT;
+    data: DiscordMessageComponentInteractionData;
+
+    constructor(args: DiscordInteractionMessageComponent) {
+        super(args);
+        this.type = args.type;
+        this.data = args.data;
+    }
+}
+
+export class DiscordInteractionApplicationCommandAutocomplete extends DiscordInteraction {
+    type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+    data: Partial<DiscordApplicationCommandInteractionData>;
+
+    constructor(args: DiscordInteractionApplicationCommandAutocomplete) {
+        super(args);
+        this.type = args.type;
+        this.data = args.data;
+    }
+}
+
+export class DiscordInteractionModalSubmit extends DiscordInteraction {
+    type: DiscordInteractionTypes.MODAL_SUBMIT;
+    data: DiscordModalInteractionData;
+
+    constructor(args: DiscordInteractionModalSubmit) {
+        super(args);
+        this.type = args.type;
+        this.data = args.data;
+    }
 }
 
 export enum DiscordInteractionTypes {
@@ -29,7 +102,7 @@ export enum DiscordInteractionTypes {
     MODAL_SUBMIT = 5,
 }
 
-export type DiscordInteractionData = {
+export type DiscordApplicationCommandInteractionData = {
     id: string;
     name: string;
     type: DiscordInteractionTypes;
@@ -37,6 +110,11 @@ export type DiscordInteractionData = {
     options?: DiscordInteractionDataOption[];
     guild_id?: string;
     target_id?: string;
+}
+
+export type DiscordModalInteractionData = {
+    custom_id: string;
+    components: DiscordMessageComponent[];
 }
 
 export type DiscordInteractionDataResolved = {
@@ -56,12 +134,10 @@ export type DiscordInteractionDataOption = {
     focused?: boolean;
 }
 
-export type DiscordMessageInteraction = {
-    id: string;
-    type: DiscordInteractionTypes;
-    name: string;
-    user: DiscordUser;
-    member?: DiscordGuildMember;
+export type DiscordMessageComponentInteractionData = {
+    custom_id: string;
+    component_type: DiscordComponentTypes;
+    values?: DiscordSelectMenuOption[];
 }
 
 export type DiscordMessageComponent = DiscordButton | DiscordSelectMenu | DiscordTextInput | DiscordActionRow;
@@ -134,4 +210,41 @@ export type DiscordTextInput = {
 export enum DiscordTextInputStyles {
     SHORT = 1,
     PARAGRAPH = 2,
+}
+
+export type DiscordInteractionResponse = {
+    type: DiscordInteractionResponseTypes;
+    data?: DiscordInteractionResponseData;
+}
+
+export enum DiscordInteractionResponseTypes {
+    PONG = 1,
+    CHANNEL_MESSAGE_WITH_SOURCE = 4,
+    DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5,
+    DEFERRED_UPDATE_MESSAGE = 6,
+    UPDATE_MESSAGE = 7,
+    APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8,
+    MODAL = 9,
+}
+
+export type DiscordInteractionResponseData = {
+    tts?: boolean;
+    content?: string;
+    embeds?: DiscordEmbed[];
+    allowed_mentions?: DiscordAllowedMentions;
+    flags?: number;
+    components?: DiscordMessageComponent[];
+    attachments?: DiscordAttachment[];
+}
+
+export type DiscordAutocompleteInteractionResponseData = {
+    choices: DiscordCommandOptionChoice[];
+}
+
+export type DiscordMessageInteraction = {
+    id: string;
+    type: DiscordInteractionTypes;
+    name: string;
+    user: DiscordUser;
+    member?: DiscordGuildMember;
 }

@@ -2,9 +2,9 @@ import { DiscordChannelTypes } from "../channel";
 import { DiscordLocalesDictionary } from "../locales";
 import { DiscordBitwisePermissionFlags } from "../permissions";
 
-export type DiscordCommand = {
+export abstract class DiscordCommand {
     id: string;
-    type?: DiscordCommandTypes;
+    type: DiscordCommandTypes | DiscordCommandTypes.CHAT_INPUT;
     application_id: string;
     guild_id?: string;
     name: string;
@@ -17,12 +17,58 @@ export type DiscordCommand = {
     default_permission?: boolean;
     nsfw?: boolean;
     version: string;
+
+    constructor({ id, type, application_id, guild_id, name, name_localizations, description, description_localizations, options, default_member_permissions, dm_permission, default_permission, nsfw, version }: DiscordCommand) {
+        this.id = id;
+        this.type = type;
+        this.application_id = application_id;
+        this.guild_id = guild_id;
+        this.name = name;
+        this.name_localizations = name_localizations;
+        this.description = description;
+        this.description_localizations = description_localizations;
+        this.options = options;
+        this.default_member_permissions = default_member_permissions;
+        this.dm_permission = dm_permission;
+        this.default_permission = default_permission;
+        this.nsfw = nsfw;
+        this.version = version;
+    }
+}
+
+export class DiscordCommandChatInput extends DiscordCommand {
+    type: DiscordCommandTypes.CHAT_INPUT;
+    options: DiscordCommandOption[];
+
+    constructor(args: DiscordCommandChatInput) {
+        super(args);
+        this.type = args.type;
+        this.options = args.options;
+    }
+}
+
+export class DiscordCommandUser extends DiscordCommand {
+    type: DiscordCommandTypes.USER;
+
+    constructor(args: DiscordCommandUser) {
+        super(args);
+        this.type = args.type;
+    }
+}
+
+export class DiscordCommandMessage extends DiscordCommand {
+    type: DiscordCommandTypes.MESSAGE;
+
+    constructor(args: DiscordCommandMessage) {
+        super(args);
+        this.type = args.type;
+    }
 }
 
 export enum DiscordCommandTypes {
-    CHAT_INPUT = 1,
-    USER = 2,
-    MESSAGE = 3,
+    CHAT_INPUT = 1, // Slash command
+    USER = 2, // User context menu
+    MESSAGE = 3, // Message context menu
 }
 
 export type DiscordCommandOption = {

@@ -1,8 +1,7 @@
 import { DiscordApplication } from "../application";
 import { DiscordEmoji } from "../emoji";
 import { DiscordGuildMember } from "../guild";
-import { DiscordMessageInteraction } from "../interactions";
-import { DiscordMessageComponent } from "../interactions/messageComponents";
+import { DiscordMessageComponent, DiscordMessageInteraction } from "../interactions";
 import { DiscordRoleTags } from "../permissions";
 import { DiscordSticker } from "../sticker";
 import { DiscordUser } from "../user";
@@ -153,6 +152,19 @@ export enum DiscordMessageActivityTypes {
     SPECTATE = 2,
     LISTEN = 3,
     JOIN_REQUEST = 5,
+}
+
+export enum DiscordMessageFlags {
+    CROSSPOSTED = 1 << 0,
+    IS_CROSSPOST = 1 << 1,
+    SUPPRESS_EMBEDS = 1 << 2,
+    SOURCE_MESSAGE_DELETED = 1 << 3,
+    URGENT = 1 << 4,
+    HAS_THREAD = 1 << 5,
+    EPHEMERAL = 1 << 6,
+    LOADING = 1 << 7,
+    FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8,
+    SUPPRESS_NOTIFICATIONS = 1 << 12,
 }
 
 export type DiscordMessageReference = {
