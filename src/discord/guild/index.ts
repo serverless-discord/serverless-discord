@@ -2,7 +2,7 @@ import { DiscordChannel } from "../channel";
 import { DiscordEmoji } from "../emoji";
 import { DiscordRole } from "../permissions";
 import { DiscordSticker } from "../sticker";
-import { DiscordUser } from "../../user";
+import { DiscordUser } from "../user";
 
 export type DiscordGuild = {
     id: string;

@@ -1,4 +1,4 @@
-import { DiscordUser } from "../../user";
+import { DiscordUser } from "../user";
 
 export type DiscordSticker = {
     id: string;

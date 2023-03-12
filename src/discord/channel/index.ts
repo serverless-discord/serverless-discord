@@ -5,7 +5,7 @@ import { DiscordMessageInteraction } from "../interactions";
 import { DiscordMessageComponent } from "../interactions/messageComponents";
 import { DiscordRoleTags } from "../permissions";
 import { DiscordSticker } from "../sticker";
-import { DiscordUser } from "../../user";
+import { DiscordUser } from "../user";
 
 export type DiscordChannel = {
     id: string;

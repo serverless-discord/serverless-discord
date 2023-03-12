@@ -1,6 +1,6 @@
 import { DiscordChannelTypes } from "../channel";
 import { DiscordLocalesDictionary } from "../locales";
-import { DiscordBitwisePermissionFlags } from "../../permissions";
+import { DiscordBitwisePermissionFlags } from "../permissions";
 
 export type DiscordCommand = {
     id: string;
