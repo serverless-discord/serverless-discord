@@ -13,7 +13,12 @@ export abstract class ServerlessDiscordCommand {
         guildCommand,
         type,
         name,
-        }: ServerlessDiscordCommand) {
+        }: {
+        globalCommand: boolean;
+        guildCommand: boolean;
+        type: DiscordCommandTypes;
+        name: string;
+        }) {
         this.globalCommand = globalCommand;
         this.guildCommand = guildCommand;
         this.type = type;
@@ -26,25 +31,67 @@ export abstract class ServerlessDiscordCommand {
 export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscordCommand {
     readonly options: DiscordCommandOption[];
 
-    constructor(data: ServerlessDiscordCommandChatInput) {
-        super(data);
-        this.options = data.options;
+    constructor({
+        globalCommand,
+        guildCommand,
+        type,
+        name,
+        options,
+    }: {
+        globalCommand: boolean;
+        guildCommand: boolean;
+        type: DiscordCommandTypes;
+        name: string;
+        options: DiscordCommandOption[];
+    }) {
+        super({ globalCommand, guildCommand, type, name });
+        this.options = options;
     }
 
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
 }
 
 export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordCommand {
-    constructor(data: ServerlessDiscordCommandUser) {
-        super(data);
+    constructor({
+        globalCommand,
+        guildCommand,
+        type,
+        name,
+    }: {
+        globalCommand: boolean;
+        guildCommand: boolean;
+        type: DiscordCommandTypes;
+        name: string;
+    }) {
+        super({
+            globalCommand,
+            guildCommand,
+            type,
+            name,
+        });
     }
 
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
 }
 
 export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordCommand {
-    constructor(data: ServerlessDiscordCommandMessage) {
-        super(data);
+    constructor({ 
+        globalCommand,
+        guildCommand,
+        type,
+        name,
+    }: {
+        globalCommand: boolean;
+        guildCommand: boolean;
+        type: DiscordCommandTypes;
+        name: string;
+    }) {
+        super({
+            globalCommand,
+            guildCommand,
+            type,
+            name,
+        });
     }
     
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
