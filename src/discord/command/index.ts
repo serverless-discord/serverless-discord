@@ -2,6 +2,9 @@ import { DiscordChannelTypes } from "../channel";
 import { DiscordLocalesDictionary } from "../locales";
 import { DiscordBitwisePermissionFlags } from "../permissions";
 
+/**
+ * https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
+ */
 export abstract class DiscordCommand {
     id: string;
     type: DiscordCommandTypes | DiscordCommandTypes.CHAT_INPUT;

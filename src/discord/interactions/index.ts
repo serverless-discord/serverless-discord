@@ -1,3 +1,4 @@
+import { HighlightSpanKind } from "typescript";
 import { DiscordApplication } from "../application";
 import { DiscordMessage, DiscordChannel, DiscordAttachment, DiscordChannelTypes, DiscordAllowedMentions, DiscordEmbed } from "../channel";
 import { DiscordCommandOptionChoice } from "../command";
@@ -11,7 +12,7 @@ export abstract class DiscordInteraction {
     id: string;
     application_id: string;
     type: DiscordInteractionTypes;
-    data?: DiscordApplicationCommandInteractionData | DiscordMessageComponentInteractionData | Partial<DiscordApplicationCommandInteractionData> | DiscordModalInteractionData;
+    data?: DiscordApplicationCommandInteractionData | Partial<DiscordApplicationCommandInteractionData> | DiscordMessageComponentInteractionData | DiscordModalInteractionData;
     guild_id?: string;
     channel_id?: string;
     member?: DiscordGuildMember;
@@ -44,9 +45,35 @@ export abstract class DiscordInteraction {
 export class DiscordInteractionPing extends DiscordInteraction {
     type: DiscordInteractionTypes.PING;
 
-    constructor(args: DiscordInteractionPing) {
-        super(args);
-        this.type = args.type;
+    constructor({
+        id,
+        application_id,
+        guild_id,
+        channel_id,
+        member,
+        user,
+        token,
+        version,
+        message,
+        app_permissions,
+        locale,
+        guild_locale,
+    }: {
+        id: string;
+        application_id: string;
+        guild_id?: string;
+        channel_id?: string;
+        member?: DiscordGuildMember;
+        user?: DiscordUser;
+        token: string;
+        version: number;
+        message?: DiscordMessage;
+        app_permissions?: string;
+        locale?: string;
+        guild_locale?: string;
+    }) {
+        super({ id, application_id, type: DiscordInteractionTypes.PING, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+        this.type = DiscordInteractionTypes.PING;
     }
 }
 
@@ -54,10 +81,38 @@ export class DiscordInteractionApplicationCommand extends DiscordInteraction {
     type: DiscordInteractionTypes.APPLICATION_COMMAND;
     data: DiscordApplicationCommandInteractionData
 
-    constructor(args: DiscordInteractionApplicationCommand) {
-        super(args);
-        this.type = args.type;
-        this.data = args.data;
+    constructor({
+        id,
+        application_id,
+        guild_id,
+        channel_id,
+        member,
+        user,
+        token,
+        version,
+        message,
+        app_permissions,
+        locale,
+        guild_locale,
+        data,
+    }: {
+        id: string;
+        application_id: string;
+        guild_id?: string;
+        channel_id?: string;
+        member?: DiscordGuildMember;
+        user?: DiscordUser;
+        token: string;
+        version: number;
+        message?: DiscordMessage;
+        app_permissions?: string;
+        locale?: string;
+        guild_locale?: string;
+        data: DiscordApplicationCommandInteractionData;
+     }) {
+        super({ id, application_id, type: DiscordInteractionTypes.APPLICATION_COMMAND, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+        this.type = DiscordInteractionTypes.APPLICATION_COMMAND;
+        this.data = data;
     }
 }
 
@@ -65,10 +120,38 @@ export class DiscordInteractionMessageComponent extends DiscordInteraction {
     type: DiscordInteractionTypes.MESSAGE_COMPONENT;
     data: DiscordMessageComponentInteractionData;
 
-    constructor(args: DiscordInteractionMessageComponent) {
-        super(args);
-        this.type = args.type;
-        this.data = args.data;
+    constructor({
+        id,
+        application_id,
+        guild_id,
+        channel_id,
+        member,
+        user,
+        token,
+        version,
+        message,
+        app_permissions,
+        locale,
+        guild_locale,
+        data,
+    }: {
+        id: string;
+        application_id: string;
+        guild_id?: string;
+        channel_id?: string;
+        member?: DiscordGuildMember;
+        user?: DiscordUser;
+        token: string;
+        version: number;
+        message?: DiscordMessage;
+        app_permissions?: string;
+        locale?: string;
+        guild_locale?: string;
+        data: DiscordMessageComponentInteractionData;
+    }) {
+        super({ id, application_id, type: DiscordInteractionTypes.MESSAGE_COMPONENT, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+        this.type = DiscordInteractionTypes.MESSAGE_COMPONENT;
+        this.data = data;
     }
 }
 
@@ -76,10 +159,38 @@ export class DiscordInteractionApplicationCommandAutocomplete extends DiscordInt
     type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
     data: Partial<DiscordApplicationCommandInteractionData>;
 
-    constructor(args: DiscordInteractionApplicationCommandAutocomplete) {
-        super(args);
-        this.type = args.type;
-        this.data = args.data;
+    constructor({
+        id,
+        application_id,
+        guild_id,
+        channel_id,
+        member,
+        user,
+        token,
+        version,
+        message,
+        app_permissions,
+        locale,
+        guild_locale,
+        data,
+    }: {
+        id: string;
+        application_id: string;
+        guild_id?: string;
+        channel_id?: string;
+        member?: DiscordGuildMember;
+        user?: DiscordUser;
+        token: string;
+        version: number;
+        message?: DiscordMessage;
+        app_permissions?: string;
+        locale?: string;
+        guild_locale?: string;
+        data: Partial<DiscordApplicationCommandInteractionData>;
+    }) {
+        super({ id, application_id, type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+        this.type = DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+        this.data = data;
     }
 }
 
@@ -87,10 +198,38 @@ export class DiscordInteractionModalSubmit extends DiscordInteraction {
     type: DiscordInteractionTypes.MODAL_SUBMIT;
     data: DiscordModalInteractionData;
 
-    constructor(args: DiscordInteractionModalSubmit) {
-        super(args);
-        this.type = args.type;
-        this.data = args.data;
+    constructor({
+        id,
+        application_id,
+        guild_id,
+        channel_id,
+        member,
+        user,
+        token,
+        version,
+        message,
+        app_permissions,
+        locale,
+        guild_locale,
+        data,
+    }: {
+        id: string;
+        application_id: string;
+        guild_id?: string;
+        channel_id?: string;
+        member?: DiscordGuildMember;
+        user?: DiscordUser;
+        token: string;
+        version: number;
+        message?: DiscordMessage;
+        app_permissions?: string;
+        locale?: string;
+        guild_locale?: string;
+        data: DiscordModalInteractionData;
+    }) {
+        super({ id, application_id, type: DiscordInteractionTypes.MODAL_SUBMIT, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+        this.type = DiscordInteractionTypes.MODAL_SUBMIT;
+        this.data = data;
     }
 }
 

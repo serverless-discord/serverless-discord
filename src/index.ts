@@ -1,101 +1,6 @@
-import { DiscordCommandOption, DiscordCommandTypes } from "./discord/command";
-import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionApplicationCommandAutocomplete, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseTypes } from "./discord/interactions";
+import { ServerlessDiscordCommand } from "./command";
+import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes } from "./discord/interactions";
 import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError } from "./errors";
-
-export abstract class ServerlessDiscordCommand {
-    readonly globalCommand: boolean;
-    readonly guildCommand: boolean;
-    readonly type: DiscordCommandTypes;
-    readonly name: string;
-
-    constructor({
-        globalCommand,
-        guildCommand,
-        type,
-        name,
-        }: {
-        globalCommand: boolean;
-        guildCommand: boolean;
-        type: DiscordCommandTypes;
-        name: string;
-        }) {
-        this.globalCommand = globalCommand;
-        this.guildCommand = guildCommand;
-        this.type = type;
-        this.name = name;
-    }
-
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
-}
-
-export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscordCommand {
-    readonly options: DiscordCommandOption[];
-
-    constructor({
-        globalCommand,
-        guildCommand,
-        type,
-        name,
-        options,
-    }: {
-        globalCommand: boolean;
-        guildCommand: boolean;
-        type: DiscordCommandTypes;
-        name: string;
-        options: DiscordCommandOption[];
-    }) {
-        super({ globalCommand, guildCommand, type, name });
-        this.options = options;
-    }
-
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
-}
-
-export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordCommand {
-    constructor({
-        globalCommand,
-        guildCommand,
-        type,
-        name,
-    }: {
-        globalCommand: boolean;
-        guildCommand: boolean;
-        type: DiscordCommandTypes;
-        name: string;
-    }) {
-        super({
-            globalCommand,
-            guildCommand,
-            type,
-            name,
-        });
-    }
-
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
-}
-
-export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordCommand {
-    constructor({ 
-        globalCommand,
-        guildCommand,
-        type,
-        name,
-    }: {
-        globalCommand: boolean;
-        guildCommand: boolean;
-        type: DiscordCommandTypes;
-        name: string;
-    }) {
-        super({
-            globalCommand,
-            guildCommand,
-            type,
-            name,
-        });
-    }
-    
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
-}
 
 export class ServerlessDiscordRouter {
     commands: ServerlessDiscordCommand[];
@@ -103,6 +8,54 @@ export class ServerlessDiscordRouter {
     constructor({ commands }: { commands: ServerlessDiscordCommand[] }) {
         this.commands = commands;
     } 
+
+    handleRawInteraction(interactionRaw: any): DiscordInteractionResponse {
+        // Validate interaction type
+        if (interactionRaw.type === undefined) {
+            throw new InvalidInteractionTypeError();
+        }
+        if (interactionRaw.type === DiscordInteractionTypes.PING) {
+            try {
+                const interaction = new DiscordInteractionPing(interactionRaw);
+                return this.handleInteraction(interaction);
+            } catch (error) {
+                throw new InvalidInteractionTypeError();
+            }
+        }
+        if (interactionRaw.type === DiscordInteractionTypes.APPLICATION_COMMAND) {
+            try {
+                const interaction = new DiscordInteractionApplicationCommand(interactionRaw);
+                return this.handleInteraction(interaction);
+            } catch (error) {
+                throw new InvalidInteractionTypeError();
+            }
+        }
+        if (interactionRaw.type === DiscordInteractionTypes.MESSAGE_COMPONENT) {
+            try {
+                const interaction = new DiscordInteractionMessageComponent(interactionRaw);
+                return this.handleInteraction(interaction);
+            } catch (error) {
+                throw new InvalidInteractionTypeError();
+            }
+        }
+        if (interactionRaw.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE) {
+            try {
+                const interaction = new DiscordInteractionApplicationCommand(interactionRaw);
+                return this.handleInteraction(interaction);
+            } catch (error) {
+                throw new InvalidInteractionTypeError();
+            }
+        }
+        if (interactionRaw.type === DiscordInteractionTypes.MODAL_SUBMIT) {
+            try {
+                const interaction = new DiscordInteractionModalSubmit(interactionRaw);
+                return this.handleInteraction(interaction);
+            } catch (error) {
+                throw new InvalidInteractionTypeError();
+            }
+        }
+        throw new InvalidInteractionTypeError();
+    }
 
     handleInteraction(interaction: DiscordInteraction): DiscordInteractionResponse {
         if (interaction instanceof DiscordInteractionPing) {
@@ -114,7 +67,7 @@ export class ServerlessDiscordRouter {
         if (interaction instanceof DiscordInteractionMessageComponent) {
             throw new NotImplementedError();
         }
-        if (interaction instanceof DiscordInteractionApplicationCommandAutocomplete) {
+        if (interaction.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE) {
             throw new NotImplementedError();
         }
         if (interaction instanceof DiscordInteractionModalSubmit) {
