@@ -1,3 +1,5 @@
+.github
+node_modules/
 *.seed
 *.log
 *.csv
@@ -32,16 +34,4 @@ bower_components
 # OS metadata
 .DS_Store
 Thumbs.db
-
-# Ignore built ts files
-dist/**/*
-
-# ignore yarn.lock
-yarn.locks
-
-*.map
-*.d.ts
-*.js
-dist/
-
 tsconfig.tsbuildinfo
