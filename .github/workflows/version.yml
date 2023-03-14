@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     if: "!startsWith(github.event.head_commit.message, '[RELEASE]')"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: git config --global user.name 'Mitch McAffee'
-      - run: git config --global user.email 'github@mitchmcaffee.com'
+      - run: git config --global user.email 'themcaffee@users.noreply.github.com'
       - run: npm version patch -m "[RELEASE] %s"
       - run: git push
