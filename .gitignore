@@ -39,5 +39,9 @@ dist/**/*
 # ignore yarn.lock
 yarn.locks
 
+*.map
+*.d.ts
 *.js
 dist/
+
+tsconfig.tsbuildinfo
