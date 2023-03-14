@@ -38,3 +38,6 @@ dist/**/*
 
 # ignore yarn.lock
 yarn.locks
+
+*.js
+dist/
