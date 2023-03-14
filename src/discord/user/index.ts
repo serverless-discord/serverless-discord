@@ -17,7 +17,7 @@ export type DiscordUser = {
     flags?: DiscordUserFlags;
     premium_type?: DiscordPremiumTypes;
     public_flags?: DiscordUserFlags;
-}
+};
 
 export enum DiscordUserFlags {
     STAFF = 1 << 0,
