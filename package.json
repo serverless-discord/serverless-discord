@@ -1,6 +1,6 @@
 {
   "name": "serverless-discord",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
     "@types/jest": "^29.4.0",
@@ -14,6 +14,7 @@
   },
   "description": "Typescript library for creating a serverless discord bot with slash commands",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc",
