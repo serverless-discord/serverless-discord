@@ -88,3 +88,7 @@ export class ServerlessDiscordRouter {
         return command.handleInteraction(interaction);
     }
 }
+
+export * from "./command";
+export * from "./errors";
+export * from "./discord";
