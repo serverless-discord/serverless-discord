@@ -25,7 +25,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                     options: [],
                 });
             }
-            handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse {
+            handleInteraction(): DiscordInteractionResponse {
                 return {
                     type: 1,
                     data: {
@@ -130,7 +130,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                     options: [],
                 });
             }
-            handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse {
+            handleInteraction(): DiscordInteractionResponse {
                 return {
                     type: 1,
                     data: {
