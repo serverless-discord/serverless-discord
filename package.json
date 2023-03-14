@@ -1,5 +1,5 @@
 {
-  "name": "serverless-discord",
+  "name": "@themcaffee/serverless-discord",
   "version": "1.0.0",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
