@@ -1,9 +1,35 @@
 import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { ServerlessDiscordCommandChatInput } from "./command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionPing, DiscordInteractionResponse } from "../discord/interactions";
-import { CommandNotFoundError, NotImplementedError } from "./errors";
+import { CommandNotFoundError, NotImplementedError, UnauthorizedError } from "./errors";
 import { MockProxy, mock } from "jest-mock-extended";
 import { ServerlessDiscordAuthorizationHandler } from "./auth";
+
+class TestCommand extends ServerlessDiscordCommandChatInput {
+    constructor() {
+        super({
+            name: "test",
+            options: [],
+        });
+    }
+    async handleInteraction(): Promise<DiscordInteractionResponse> {
+        return {
+            type: 1,
+            data: {
+                tts: false,
+                content: "test",
+                embeds: [],
+                allowed_mentions: {
+                    parse: [],
+                    roles: [],
+                    users: [],
+                    replied_user: false,
+                },
+                components: [],
+            },
+        }
+    }
+}
 
 describe("ServerlessDiscordRouter.handleInteraction", () => {
     const defaultMockHeaders: ServerlessDiscordRouterRequestHeaders = {
@@ -14,10 +40,10 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
 
     beforeEach(() => {
         authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
     });
 
     it("should handle ping", async () => {
-        authHandlerMock.handleAuthorization.mockReturnValue(true);
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock,
@@ -32,37 +58,6 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         expect(response).toEqual({ type: 1 });
     });
     it("should handle application command", async () => {
-        class TestCommand extends ServerlessDiscordCommandChatInput {
-            constructor() {
-                super({
-                    name: "test",
-                    options: [],
-                });
-            }
-            async handleInteraction(): Promise<DiscordInteractionResponse> {
-                return {
-                    type: 1,
-                    data: {
-                        tts: false,
-                        content: "test",
-                        embeds: [],
-                        allowed_mentions: {
-                            parse: [],
-                            roles: [],
-                            users: [],
-                            replied_user: false,
-                        },
-                        components: [],
-                    },
-                }
-            }
-        }
-        const testCommand = new TestCommand();
-        authHandlerMock.handleAuthorization.mockReturnValue(true);
-        const router = new ServerlessDiscordRouter({
-            commands: [testCommand],
-            authHandler: authHandlerMock,
-        });
         const interaction = new DiscordInteractionApplicationCommand({
             id: "123",
             application_id: "123",
@@ -75,25 +70,23 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 type: 1,
             },
         });
-        const response = await router.handleInteraction(interaction, defaultMockHeaders);
-        expect(response).toEqual({
+        const testCommandMock: MockProxy<TestCommand> = mock<TestCommand>({ name: "test", options: [] });
+        const interactionResponse = {
             type: 1,
             data: {
-                tts: false,
                 content: "test",
-                embeds: [],
-                allowed_mentions: {
-                    parse: [],
-                    roles: [],
-                    users: [],
-                    replied_user: false,
-                },
-                components: [],
             }
+        };
+        testCommandMock.handleInteraction.mockResolvedValue(interactionResponse);
+        const router = new ServerlessDiscordRouter({
+            commands: [testCommandMock],
+            authHandler: authHandlerMock,
         });
+        const response = await router.handleInteraction(interaction, defaultMockHeaders);
+        expect(testCommandMock.handleInteraction).toBeCalledWith(interaction);
+        expect(response).toEqual(interactionResponse);
     });
     it("should throw error if command not found", async () => {
-        authHandlerMock.handleAuthorization.mockReturnValue(true);
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock
@@ -115,7 +108,6 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(CommandNotFoundError);
     });
     it("should throw error if interaction type is not supported", async () => {
-        authHandlerMock.handleAuthorization.mockReturnValue(true);
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock
@@ -132,6 +124,21 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             }
         });
         expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(NotImplementedError);
+    });
+    it("should throw error if authorization fails", async () => {
+        const router = new ServerlessDiscordRouter({
+            commands: [],
+            authHandler: authHandlerMock
+        });
+
+        const interaction = new DiscordInteractionPing({
+            id: "123",
+            application_id: "123",
+            token: "123",
+            version: 1,
+        });
+        authHandlerMock.handleAuthorization.mockReturnValue(false);
+        expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(UnauthorizedError);
     });
 });
         
