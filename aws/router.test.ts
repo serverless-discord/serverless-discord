@@ -1,6 +1,6 @@
 import { MockProxy, mock } from "jest-mock-extended";
 import { ServerlessDiscordAuthorizationHandler } from "../core/auth";
-import { BadRequestResponse, ServerlessDiscordLambdaRouter, UnauthorizedResponse } from "./router";
+import { BadRequestResponse, MethodNotAllowedResponse, ServerlessDiscordLambdaRouter, UnauthorizedResponse } from "./router";
 import { APIGatewayEvent } from "aws-lambda";
 import { DiscordInteractionApplicationCommand, DiscordInteractionPing, DiscordInteractionResponse } from "../discord";
 import { ServerlessDiscordCommandChatInput } from "../core/command";
@@ -153,5 +153,14 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
       });
       const result = await router.handleLambdaInteraction(lambdaEventMock);
       expect(result).toEqual(BadRequestResponse);
+    });
+
+    it("should handle invalid request method", async () => {
+      lambdaEventMock.httpMethod = "GET";
+      const router = new ServerlessDiscordLambdaRouter({
+        router: coreRouterMock,
+      });
+      const result = await router.handleLambdaInteraction(lambdaEventMock);
+      expect(result).toEqual(MethodNotAllowedResponse);
     });
 });

@@ -21,6 +21,11 @@ export const UnauthorizedResponse: APIGatewayProxyResult = {
   body: "Unauthorized",
 }
 
+export const MethodNotAllowedResponse: APIGatewayProxyResult = {
+  statusCode: 405,
+  body: "Method Not Allowed",
+}
+
 export class ServerlessDiscordLambdaRouter {
   private router: ServerlessDiscordRouter;
 
@@ -34,10 +39,7 @@ export class ServerlessDiscordLambdaRouter {
 
   async handleLambdaInteraction(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
       if (event.httpMethod !== "POST") {
-          return {
-              statusCode: 405,
-              body: "Method Not Allowed",
-          }
+          return MethodNotAllowedResponse; 
       }
       const headers = event.headers;
       if (headers["content-type"] !== "application/json" || event.body == null) {
@@ -55,7 +57,7 @@ export class ServerlessDiscordLambdaRouter {
         }
       } catch (e) {
         if (e instanceof UnauthorizedError) {
-          return UnauthorizedResponse
+          return UnauthorizedResponse;
         }
         throw e;
       }
