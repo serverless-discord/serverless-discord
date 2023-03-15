@@ -9,7 +9,7 @@ export class ServerlessDiscordRouter {
         this.commands = commands;
     } 
 
-    handleRawInteraction(interactionRaw: any): DiscordInteractionResponse {
+    async handleRawInteraction(interactionRaw: any): Promise<DiscordInteractionResponse> {
         // Validate interaction type
         if (interactionRaw.type === undefined) {
             throw new InvalidInteractionTypeError();
@@ -57,12 +57,12 @@ export class ServerlessDiscordRouter {
         throw new InvalidInteractionTypeError();
     }
 
-    handleInteraction(interaction: DiscordInteraction): DiscordInteractionResponse {
+    async handleInteraction(interaction: DiscordInteraction): Promise<DiscordInteractionResponse> {
         if (interaction instanceof DiscordInteractionPing) {
             return this.handlePing();
         }
         if (interaction instanceof DiscordInteractionApplicationCommand) {
-            return this.handleApplicationCommand(interaction);
+            return await this.handleApplicationCommand(interaction);
         }
         if (interaction instanceof DiscordInteractionMessageComponent) {
             throw new NotImplementedError();
@@ -80,12 +80,12 @@ export class ServerlessDiscordRouter {
         return { type: DiscordInteractionResponseTypes.PONG };
     }
 
-    handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse {
+    async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
         const command = this.commands.find(command => command.name === interaction.data.name);
         if (command === undefined) {
             throw new CommandNotFoundError();
         }
-        return command.handleInteraction(interaction);
+        return await command.handleInteraction(interaction);
     }
 }
 

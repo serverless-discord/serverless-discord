@@ -24,7 +24,7 @@ export abstract class ServerlessDiscordCommand {
         this.name = name;
     }
 
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
+    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
 
 export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscordCommand {
@@ -45,7 +45,7 @@ export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscor
         this.options = options;
     }
 
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
+    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
 
 export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordCommand {
@@ -66,7 +66,7 @@ export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordComm
         });
     }
 
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
+    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
 
 export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordCommand {
@@ -87,5 +87,5 @@ export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordC
         });
     }
     
-    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse
+    abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
