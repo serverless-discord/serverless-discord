@@ -1,6 +1,6 @@
-import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from ".";
+import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "..";
 import { ServerlessDiscordCommandChatInput } from "./command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionPing, DiscordInteractionResponse } from "./discord/interactions";
+import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionPing, DiscordInteractionResponse } from "../discord/interactions";
 import { CommandNotFoundError, NotImplementedError } from "./errors";
 import { MockProxy, mock } from "jest-mock-extended";
 import { ServerlessDiscordAuthorizationHandler } from "./auth";
