@@ -14,7 +14,7 @@ npm install serverless-discord
 
 Next, create a simple command like this one:
 
-typescript```
+```
 import { ServerlessDiscordCommandChatInput, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes } from "serverless-discord";
 import { initLambdaRouter } from "serverless-discord/aws";
 
