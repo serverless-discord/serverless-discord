@@ -4,7 +4,7 @@ import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponen
 import { CommandNotFoundError, NotImplementedError } from "./errors";
 
 describe("ServerlessDiscordRouter.handleInteraction", () => {
-    it("should handle ping", () => {
+    it("should handle ping", async () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
         });
@@ -17,7 +17,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         const response = router.handleInteraction(interaction);
         expect(response).toEqual({ type: 1 });
     });
-    it("should handle application command", () => {
+    it("should handle application command", async () => {
         class TestCommand extends ServerlessDiscordCommandChatInput {
             constructor() {
                 super({
@@ -25,7 +25,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                     options: [],
                 });
             }
-            handleInteraction(): DiscordInteractionResponse {
+            async handleInteraction(): Promise<DiscordInteractionResponse> {
                 return {
                     type: 1,
                     data: {
@@ -59,7 +59,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 type: 1,
             },
         });
-        const response = router.handleInteraction(interaction);
+        const response = await router.handleInteraction(interaction);
         expect(response).toEqual({
             type: 1,
             data: {
@@ -76,7 +76,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             }
         });
     });
-    it("should throw error if command not found", () => {
+    it("should throw error if command not found", async () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
         });
@@ -95,7 +95,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         });
         expect(() => router.handleInteraction(interaction)).toThrow(CommandNotFoundError);
     });
-    it("should throw error if interaction type is not supported", () => {
+    it("should throw error if interaction type is not supported", async () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
         });
@@ -112,7 +112,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         });
         expect(() => router.handleInteraction(interaction)).toThrow(NotImplementedError);
     });
-    it("should handle raw ping", () => {
+    it("should handle raw ping", async () => {
         const router = new ServerlessDiscordRouter({ commands: [] });
         const rawInteraction = {
             id: "123",
@@ -122,7 +122,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         const response = router.handleRawInteraction(rawInteraction);
         expect(response).toEqual({ type: 1 });
     });
-    it("should handle raw application command", () => {
+    it("should handle raw application command", async () => {
         class TestCommand extends ServerlessDiscordCommandChatInput {
             constructor() {
                 super({
@@ -130,7 +130,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                     options: [],
                 });
             }
-            handleInteraction(): DiscordInteractionResponse {
+            async handleInteraction(): Promise<DiscordInteractionResponse> {
                 return {
                     type: 1,
                     data: {
@@ -162,7 +162,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 type: 1,
             },
         };
-        const response = router.handleRawInteraction(rawInteraction);
+        const response = await router.handleRawInteraction(rawInteraction);
         expect(response).toEqual({
             type: 1,
             data: {
