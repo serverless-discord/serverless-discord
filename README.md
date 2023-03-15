@@ -2,21 +2,21 @@
 
 Serverless-discord is a Typescript library designed to facilitate the creation of serverless Discord bots with slash commands. It can be found on [npm](https://www.npmjs.com/package/serverless-discord).
 
-## Lambda Quick Start
+## AWS Lambda Quickstart
 
 Please note that this library is still in pre-release status and is not production-ready. We are still making large changes to the API, so please come back for a more polished project.
 
 To get started, install the serverless-discord package from npm:
 
 ```
-npm install serverless-discord
+npm install serverless-discord serverless-discord-lambda
 ```
 
 Next, create a simple command like this one:
 
 ```
 import { ServerlessDiscordCommandChatInput, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes } from "serverless-discord";
-import { initLambdaRouter } from "serverless-discord/aws";
+import { initLambdaRouter } from "serverless-discord-lambda";
 
 // You can get this from the Discord Developer Portal
 const DISCORD_PUBLIC_KEY = process.env?.DISCORD_PUBLIC_KEY || "";
@@ -46,6 +46,8 @@ Replace the DISCORD_PUBLIC_KEY with a secure credential handling method of your 
 You can now host this on Lambda behind an ApiGateway to create a fully functioning Discord bot.
 
 For a complete example that can be used as a template, see [here](https://github.com/themcaffee/serverless-discord-template).
+
+For more information about the Lambda integration, see [serverless-discord-lambda](https://github.com/themcaffee/serverless-discord-lambda).
 
 ## Development
 
