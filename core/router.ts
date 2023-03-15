@@ -1,5 +1,5 @@
 import { ServerlessDiscordCommand } from "./command";
-import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes } from "../discord/interactions";
+import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionApplicationCommandAutocomplete, instanceofDiscordInteractionMessageComponent, instanceofDiscordInteractionModalSubmit, instanceofDiscordInteractionPing } from "../discord/interactions";
 import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 import { ServerlessDiscordAuthorizationHandler } from "./auth";
 import { DiscordAuthenticationRequestHeaders } from "../discord";
@@ -33,19 +33,19 @@ export class ServerlessDiscordRouter {
         if (!this.authHandler.handleAuthorization(interaction, requestHeaders)) {
             throw new UnauthorizedError();
         }
-        if (interaction instanceof DiscordInteractionPing) {
+        if (instanceofDiscordInteractionPing(interaction)) {
             return this.handlePing();
         }
-        if (interaction instanceof DiscordInteractionApplicationCommand) {
+        if (instanceofDiscordInteractionApplicationCommand(interaction)) {
             return await this.handleApplicationCommand(interaction);
         }
-        if (interaction instanceof DiscordInteractionMessageComponent) {
+        if (instanceofDiscordInteractionMessageComponent(interaction)) {
             throw new NotImplementedError();
         }
         if (interaction.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE) {
             throw new NotImplementedError();
         }
-        if (interaction instanceof DiscordInteractionModalSubmit) {
+        if (instanceofDiscordInteractionModalSubmit(interaction)) {
             throw new NotImplementedError();
         }
         throw new InvalidInteractionTypeError();
