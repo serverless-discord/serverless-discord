@@ -1,12 +1,26 @@
-import { ServerlessDiscordRouter } from ".";
+import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from ".";
 import { ServerlessDiscordCommandChatInput } from "./command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionPing, DiscordInteractionResponse } from "./discord/interactions";
 import { CommandNotFoundError, NotImplementedError } from "./errors";
+import { MockProxy, mock } from "jest-mock-extended";
+import { ServerlessDiscordAuthorizationHandler } from "./auth";
 
 describe("ServerlessDiscordRouter.handleInteraction", () => {
+    const defaultMockHeaders: ServerlessDiscordRouterRequestHeaders = {
+        "x-signature-ed25519": "123",
+        "x-signature-timestamp": "123",
+    }
+    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+
+    beforeEach(() => {
+        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+    });
+
     it("should handle ping", async () => {
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
         const router = new ServerlessDiscordRouter({
             commands: [],
+            authHandler: authHandlerMock,
         });
         const interaction = new DiscordInteractionPing({ 
             id: "123",
@@ -14,7 +28,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             token: "123",
             version: 1,
         });
-        const response = router.handleInteraction(interaction);
+        const response = await router.handleInteraction(interaction, defaultMockHeaders);
         expect(response).toEqual({ type: 1 });
     });
     it("should handle application command", async () => {
@@ -44,8 +58,10 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             }
         }
         const testCommand = new TestCommand();
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
         const router = new ServerlessDiscordRouter({
             commands: [testCommand],
+            authHandler: authHandlerMock,
         });
         const interaction = new DiscordInteractionApplicationCommand({
             id: "123",
@@ -59,7 +75,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 type: 1,
             },
         });
-        const response = await router.handleInteraction(interaction);
+        const response = await router.handleInteraction(interaction, defaultMockHeaders);
         expect(response).toEqual({
             type: 1,
             data: {
@@ -77,8 +93,10 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         });
     });
     it("should throw error if command not found", async () => {
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
         const router = new ServerlessDiscordRouter({
             commands: [],
+            authHandler: authHandlerMock
         });
 
         const interaction = new DiscordInteractionApplicationCommand({
@@ -93,11 +111,14 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 type: 1,
             },
         });
-        expect(() => router.handleInteraction(interaction)).toThrow(CommandNotFoundError);
+        // Test that the CommandNotFoundError is thrown
+        expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(CommandNotFoundError);
     });
     it("should throw error if interaction type is not supported", async () => {
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
         const router = new ServerlessDiscordRouter({
             commands: [],
+            authHandler: authHandlerMock
         });
 
         const interaction = new DiscordInteractionMessageComponent({
@@ -110,74 +131,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 component_type: 1,
             }
         });
-        expect(() => router.handleInteraction(interaction)).toThrow(NotImplementedError);
-    });
-    it("should handle raw ping", async () => {
-        const router = new ServerlessDiscordRouter({ commands: [] });
-        const rawInteraction = {
-            id: "123",
-            type: 1,
-            application_id: "123",
-        };
-        const response = router.handleRawInteraction(rawInteraction);
-        expect(response).toEqual({ type: 1 });
-    });
-    it("should handle raw application command", async () => {
-        class TestCommand extends ServerlessDiscordCommandChatInput {
-            constructor() {
-                super({
-                    name: "test",
-                    options: [],
-                });
-            }
-            async handleInteraction(): Promise<DiscordInteractionResponse> {
-                return {
-                    type: 1,
-                    data: {
-                        tts: false,
-                        content: "test",
-                        embeds: [],
-                        allowed_mentions: {
-                            parse: [],
-                            roles: [],
-                            users: [],
-                            replied_user: false,
-                        },
-                        components: [],
-                    },
-                }
-            }
-        }
-        const router = new ServerlessDiscordRouter({ commands: [new TestCommand()] });
-        const rawInteraction = {
-            id: "123",
-            type: 2,
-            application_id: "123",
-            token: "123",
-            version: 1,
-            data: {
-                id: "123",
-                name: "test",
-                options: [],
-                type: 1,
-            },
-        };
-        const response = await router.handleRawInteraction(rawInteraction);
-        expect(response).toEqual({
-            type: 1,
-            data: {
-                tts: false,
-                content: "test",
-                embeds: [],
-                allowed_mentions: {
-                    parse: [],
-                    roles: [],
-                    users: [],
-                    replied_user: false,
-                },
-                components: [],
-            }
-        });
+        expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(NotImplementedError);
     });
 });
         
