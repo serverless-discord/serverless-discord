@@ -1,37 +1,9 @@
 import { MockProxy, mock } from "jest-mock-extended";
-import { ServerlessDiscordAuthorizationHandler } from "../core/auth";
 import { BadRequestResponse, MethodNotAllowedResponse, ServerlessDiscordLambdaRouter, UnauthorizedResponse } from "./router";
 import { APIGatewayEvent } from "aws-lambda";
-import { DiscordInteractionApplicationCommand, DiscordInteractionPing, DiscordInteractionResponse } from "../discord";
-import { ServerlessDiscordCommandChatInput } from "../core/command";
+import { DiscordInteractionApplicationCommand, DiscordInteractionPing } from "../discord";
 import { CommandNotFoundError, UnauthorizedError } from "../core/errors";
 import { ServerlessDiscordRouter } from "../core/router";
-
-class TestCommand extends ServerlessDiscordCommandChatInput {
-    constructor() {
-        super({
-            name: "test",
-            options: [],
-        });
-    }
-    async handleInteraction(): Promise<DiscordInteractionResponse> {
-        return {
-            type: 1,
-            data: {
-                tts: false,
-                content: "test",
-                embeds: [],
-                allowed_mentions: {
-                    parse: [],
-                    roles: [],
-                    users: [],
-                    replied_user: false,
-                },
-                components: [],
-            },
-        }
-    }
-}
 
 describe("ServerlessDiscordRouter.handleInteraction", () => {
     let lambdaEventMock: MockProxy<APIGatewayEvent>;
