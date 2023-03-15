@@ -1,6 +1,6 @@
 {
   "name": "serverless-discord",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.112",
