@@ -67,3 +67,4 @@ export class ServerlessDiscordRouter {
 export * from "./command";
 export * from "./errors";
 export * from "./discord";
+export * from "./auth";
