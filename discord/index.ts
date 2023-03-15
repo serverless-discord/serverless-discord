@@ -1,13 +1,8 @@
 export const DISCORD_API_VERSION = 9;
 export const DISCORD_API_BASE_URL = `https://discord.com/api/v${DISCORD_API_VERSION}`;
-export interface DiscordAuthenticationRequestHeaders {
-    "x-signature-ed25519": string;
-    "x-signature-timestamp": string;
-}
-export function instanceOfDiscordInteractionApplicationCommand(object: any): object is DiscordAuthenticationRequestHeaders {
-    return "x-signature-ed25519" in object && "x-signature-timestamp" in object;
-}
+
 export * from "./application";
+export * from "./auth";
 export * from "./channel";
 export * from "./command";
 export * from "./emoji";

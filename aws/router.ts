@@ -2,7 +2,7 @@ import { ServerlessDiscordAuthorizationHandler } from "../core/auth";
 import { ServerlessDiscordCommand } from "../core/command";
 import { ServerlessDiscordRouter } from "../core/router";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { instanceOfDiscordInteractionApplicationCommand } from "../discord";
+import { DiscordInteraction, instanceOfDiscordAuthenticationRequestHeaders } from "../discord";
 
 export function initLambdaRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
     const authHandler = new ServerlessDiscordAuthorizationHandler({ applicationPublicKey });
@@ -34,13 +34,14 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
                 body: "Bad Request",
             }
         }
-        if (!instanceOfDiscordInteractionApplicationCommand(headers)) {
+        if (!instanceOfDiscordAuthenticationRequestHeaders(headers)) {
             return {
                 statusCode: 401,
                 body: "Unauthorized",
             }
         }
-        const result = await this.handleInteraction(JSON.parse(event.body), headers);
+        const interaction = JSON.parse(event.body) as DiscordInteraction;
+        const result = await this.handleInteraction(interaction, headers);
         return {
             statusCode: 200,
             body: JSON.stringify(result),

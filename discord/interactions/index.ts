@@ -1,5 +1,3 @@
-import { HighlightSpanKind } from "typescript";
-import { DiscordApplication } from "../application";
 import { DiscordMessage, DiscordChannel, DiscordAttachment, DiscordChannelTypes, DiscordAllowedMentions, DiscordEmbed } from "../channel";
 import { DiscordCommandOptionChoice } from "../command";
 import { DiscordEmoji } from "../emoji";
@@ -77,6 +75,10 @@ export class DiscordInteractionPing extends DiscordInteraction {
     }
 }
 
+export function instanceofDiscordInteractionPing(object: any): object is DiscordInteractionPing {
+    return object.type === DiscordInteractionTypes.PING;
+}
+
 export class DiscordInteractionApplicationCommand extends DiscordInteraction {
     type: DiscordInteractionTypes.APPLICATION_COMMAND;
     data: DiscordApplicationCommandInteractionData
@@ -114,6 +116,10 @@ export class DiscordInteractionApplicationCommand extends DiscordInteraction {
         this.type = DiscordInteractionTypes.APPLICATION_COMMAND;
         this.data = data;
     }
+}
+
+export function instanceofDiscordInteractionApplicationCommand(object: any): object is DiscordInteractionApplicationCommand {
+    return object.type === DiscordInteractionTypes.APPLICATION_COMMAND;
 }
 
 export class DiscordInteractionMessageComponent extends DiscordInteraction {
@@ -155,6 +161,10 @@ export class DiscordInteractionMessageComponent extends DiscordInteraction {
     }
 }
 
+export function instanceofDiscordInteractionMessageComponent(object: any): object is DiscordInteractionMessageComponent {
+    return object.type === DiscordInteractionTypes.MESSAGE_COMPONENT;
+}
+
 export class DiscordInteractionApplicationCommandAutocomplete extends DiscordInteraction {
     type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
     data: Partial<DiscordApplicationCommandInteractionData>;
@@ -194,6 +204,10 @@ export class DiscordInteractionApplicationCommandAutocomplete extends DiscordInt
     }
 }
 
+export function instanceofDiscordInteractionApplicationCommandAutocomplete(object: any): object is DiscordInteractionApplicationCommandAutocomplete {
+    return object.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+}
+
 export class DiscordInteractionModalSubmit extends DiscordInteraction {
     type: DiscordInteractionTypes.MODAL_SUBMIT;
     data: DiscordModalInteractionData;
@@ -231,6 +245,10 @@ export class DiscordInteractionModalSubmit extends DiscordInteraction {
         this.type = DiscordInteractionTypes.MODAL_SUBMIT;
         this.data = data;
     }
+}
+
+export function instanceofDiscordInteractionModalSubmit(object: any): object is DiscordInteractionModalSubmit {
+    return object.type === DiscordInteractionTypes.MODAL_SUBMIT;
 }
 
 export enum DiscordInteractionTypes {
