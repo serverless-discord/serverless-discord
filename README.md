@@ -2,24 +2,9 @@
 
 Typescript library for creating a serverless discord bot with slash commands
 
-## Quick start
+## Lambda Quick start
 
 ```
-// import
-// create slash command handler
-const handleHello = ({ arguments: })
-
-class HelloCommand extends DiscordCommand {
-    constructor ()
-}
-
-// initialize library
-const requestBodyJson = ''
-const router = DiscordRouter({
-    routes: [
-        { interaction: Interaction }
-    ]
-})
 ```
 
 TODO: Guide to setup discord bot and authentication
