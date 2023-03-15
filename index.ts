@@ -1,68 +1,43 @@
 import { ServerlessDiscordCommand } from "./command";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes } from "./discord/interactions";
-import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError } from "./errors";
+import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
+import { ServerlessDiscordAuthorizationHandler } from "./auth";
+import { DiscordAuthenticationRequestHeaders } from "./discord";
+
+export function initRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordRouter {
+    const authHandler = new ServerlessDiscordAuthorizationHandler({ applicationPublicKey });
+    return new ServerlessDiscordRouter({ commands, authHandler });
+}
+
+export interface ServerlessDiscordRouterRequestHeaders {
+    "x-signature-ed25519": string;
+    "x-signature-timestamp": string;
+}
 
 export class ServerlessDiscordRouter {
     commands: ServerlessDiscordCommand[];
+    authHandler: ServerlessDiscordAuthorizationHandler;
 
-    constructor({ commands }: { commands: ServerlessDiscordCommand[] }) {
+    constructor({ 
+        commands, 
+        authHandler 
+    }: { 
+        commands: ServerlessDiscordCommand[], 
+        authHandler: ServerlessDiscordAuthorizationHandler 
+    }) {
         this.commands = commands;
+        this.authHandler = authHandler;
     } 
 
-    handleRawInteraction(interactionRaw: any): DiscordInteractionResponse {
-        // Validate interaction type
-        if (interactionRaw.type === undefined) {
-            throw new InvalidInteractionTypeError();
+    async handleInteraction(interaction: DiscordInteraction, requestHeaders: DiscordAuthenticationRequestHeaders): Promise<DiscordInteractionResponse> {
+        if (!this.authHandler.handleAuthorization(interaction, requestHeaders)) {
+            throw new UnauthorizedError();
         }
-        if (interactionRaw.type === DiscordInteractionTypes.PING) {
-            try {
-                const interaction = new DiscordInteractionPing(interactionRaw);
-                return this.handleInteraction(interaction);
-            } catch (error) {
-                throw new InvalidInteractionTypeError();
-            }
-        }
-        if (interactionRaw.type === DiscordInteractionTypes.APPLICATION_COMMAND) {
-            try {
-                const interaction = new DiscordInteractionApplicationCommand(interactionRaw);
-                return this.handleInteraction(interaction);
-            } catch (error) {
-                throw new InvalidInteractionTypeError();
-            }
-        }
-        if (interactionRaw.type === DiscordInteractionTypes.MESSAGE_COMPONENT) {
-            try {
-                const interaction = new DiscordInteractionMessageComponent(interactionRaw);
-                return this.handleInteraction(interaction);
-            } catch (error) {
-                throw new InvalidInteractionTypeError();
-            }
-        }
-        if (interactionRaw.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE) {
-            try {
-                const interaction = new DiscordInteractionApplicationCommand(interactionRaw);
-                return this.handleInteraction(interaction);
-            } catch (error) {
-                throw new InvalidInteractionTypeError();
-            }
-        }
-        if (interactionRaw.type === DiscordInteractionTypes.MODAL_SUBMIT) {
-            try {
-                const interaction = new DiscordInteractionModalSubmit(interactionRaw);
-                return this.handleInteraction(interaction);
-            } catch (error) {
-                throw new InvalidInteractionTypeError();
-            }
-        }
-        throw new InvalidInteractionTypeError();
-    }
-
-    handleInteraction(interaction: DiscordInteraction): DiscordInteractionResponse {
         if (interaction instanceof DiscordInteractionPing) {
             return this.handlePing();
         }
         if (interaction instanceof DiscordInteractionApplicationCommand) {
-            return this.handleApplicationCommand(interaction);
+            return await this.handleApplicationCommand(interaction);
         }
         if (interaction instanceof DiscordInteractionMessageComponent) {
             throw new NotImplementedError();
@@ -76,16 +51,16 @@ export class ServerlessDiscordRouter {
         throw new InvalidInteractionTypeError();
     }
 
-    handlePing(): DiscordInteractionResponse {
+    private handlePing(): DiscordInteractionResponse {
         return { type: DiscordInteractionResponseTypes.PONG };
     }
 
-    handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): DiscordInteractionResponse {
+    private async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
         const command = this.commands.find(command => command.name === interaction.data.name);
         if (command === undefined) {
             throw new CommandNotFoundError();
         }
-        return command.handleInteraction(interaction);
+        return await command.handleInteraction(interaction);
     }
 }
 

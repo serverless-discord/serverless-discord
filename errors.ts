@@ -15,3 +15,9 @@ export class InvalidInteractionTypeError extends Error {
         super("Invalid interaction type");
     }
 }
+
+export class UnauthorizedError extends Error {
+    constructor() {
+        super("Unauthorized");
+    }
+}

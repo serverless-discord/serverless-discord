@@ -1,6 +1,6 @@
 {
   "name": "serverless-discord",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
     "@types/jest": "^29.4.0",
@@ -32,5 +32,8 @@
   "bugs": {
     "url": "https://github.com/themcaffee/serverless-discord/issues"
   },
-  "homepage": "https://github.com/themcaffee/serverless-discord#readme"
+  "homepage": "https://github.com/themcaffee/serverless-discord#readme",
+  "dependencies": {
+    "tweetnacl": "^1.0.3"
+  }
 }
