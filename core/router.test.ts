@@ -1,4 +1,4 @@
-import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "..";
+import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { ServerlessDiscordCommandChatInput } from "./command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionPing, DiscordInteractionResponse } from "../discord/interactions";
 import { CommandNotFoundError, NotImplementedError } from "./errors";

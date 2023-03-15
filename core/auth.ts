@@ -1,5 +1,5 @@
 import * as nacl from "tweetnacl";
-import { ServerlessDiscordRouterRequestHeaders } from "..";
+import { ServerlessDiscordRouterRequestHeaders } from "./router";
 import { DiscordInteraction } from "../discord";
 
 export class ServerlessDiscordAuthorizationHandler {
