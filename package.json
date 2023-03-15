@@ -3,7 +3,6 @@
   "version": "1.0.21",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.112",
     "@types/jest": "^29.4.0",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
@@ -35,7 +34,6 @@
   },
   "homepage": "https://github.com/themcaffee/serverless-discord#readme",
   "dependencies": {
-    "aws-lambda": "^1.0.7",
     "tweetnacl": "^1.0.3"
   }
 }
