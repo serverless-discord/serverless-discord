@@ -374,6 +374,20 @@ export type DiscordInteractionResponse = {
     data?: DiscordInteractionResponseData;
 }
 
+export type DiscordInteractionResponsePong = {
+    type: DiscordInteractionResponseTypes.PONG;
+}
+
+export type DiscordInteractionResponseChannelMessageWithSource = {
+    type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE;
+    data: DiscordInteractionResponseData;
+}
+
+export type DiscordInteractionResponseDeferredChannelMessageWithSource = {
+    type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
+    data?: DiscordInteractionResponseData;
+}
+
 export enum DiscordInteractionResponseTypes {
     PONG = 1,
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
