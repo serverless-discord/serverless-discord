@@ -1,5 +1,5 @@
-import { DiscordCommandTypes, DiscordCommandOption } from "./discord/command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "./discord/interactions";
+import { DiscordCommandTypes, DiscordCommandOption } from "../discord/command";
+import { DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
 
 export abstract class ServerlessDiscordCommand {
     readonly globalCommand: boolean;

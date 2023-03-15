@@ -4,6 +4,9 @@ export interface DiscordAuthenticationRequestHeaders {
     "x-signature-ed25519": string;
     "x-signature-timestamp": string;
 }
+export function instanceOfDiscordInteractionApplicationCommand(object: any): object is DiscordAuthenticationRequestHeaders {
+    return "x-signature-ed25519" in object && "x-signature-timestamp" in object;
+}
 export * from "./application";
 export * from "./channel";
 export * from "./command";
