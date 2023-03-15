@@ -47,6 +47,8 @@ You can now host this on Lambda behind an ApiGateway to create a fully functioni
 
 For a complete example that can be used as a template, see [here](https://github.com/themcaffee/serverless-discord-template).
 
+For more information about the Lambda integration, see [serverless-discord-lambda](https://github.com/themcaffee/serverless-discord-lambda).
+
 ## Development
 
 ### Linting
