@@ -1,5 +1,8 @@
-import { DiscordUser } from "../user";
+import { DiscordUser } from "./user";
 
+/**
+ * @see https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-structure
+ */
 export type DiscordSticker = {
     id: string;
     pack_id?: string;
@@ -15,17 +18,17 @@ export type DiscordSticker = {
     sort_value?: number;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types
+ */
 export enum DiscordStickerTypes {
     STANDARD = 1,
     GUILD = 2,
 }
 
-export type DiscordStickerItem = {
-    id: string;
-    name: string;
-    format_type: DiscordStickerFormatTypes;
-}
-
+/**
+ * @see https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types
+ */
 export enum DiscordStickerFormatTypes {
     PNG = 1,
     APNG = 2,
@@ -33,6 +36,18 @@ export enum DiscordStickerFormatTypes {
     GIF = 4,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/sticker#sticker-item-object-sticker-item-structure
+ */
+export type DiscordStickerItem = {
+    id: string;
+    name: string;
+    format_type: DiscordStickerFormatTypes;
+}
+
+/**
+ * @see https://discord.com/developers/docs/resources/sticker#sticker-pack-object-sticker-pack-structure
+ */
 export type DiscordStickerPack = {
     id: string;
     stickers: DiscordSticker[];

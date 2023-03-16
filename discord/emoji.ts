@@ -1,5 +1,8 @@
-import { DiscordUser } from "../user";
+import { DiscordUser } from "./user";
 
+/**
+ * @see https://discord.com/developers/docs/resources/emoji#emoji-object
+ */
 export type DiscordEmoji = {
     id: string;
     name: string;

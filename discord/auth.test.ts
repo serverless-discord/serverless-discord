@@ -1,4 +1,4 @@
-import { instanceOfDiscordAuthenticationRequestHeaders } from ".";
+import { instanceOfDiscordAuthenticationRequestHeaders } from "./auth";
 
 describe("instanceOfDiscordAuthenticationRequestHeaders", () => {
     it("should return true for valid headers", () => {

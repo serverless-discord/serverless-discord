@@ -1,6 +1,6 @@
 import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { ServerlessDiscordCommandChatInput } from "./command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionPing, DiscordInteractionResponse } from "../discord/interactions";
+import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionTypes } from "../discord/interactions";
 import { CommandNotFoundError, NotImplementedError, UnauthorizedError } from "./errors";
 import { MockProxy, mock } from "jest-mock-extended";
 import { ServerlessDiscordAuthorizationHandler } from "./auth";
@@ -113,7 +113,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             authHandler: authHandlerMock
         });
 
-        const interaction = new DiscordInteractionMessageComponent({
+        const messageInteraction = new DiscordInteractionMessageComponent({
             id: "123",
             application_id: "123",
             token: "123",
@@ -123,7 +123,18 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 component_type: 1,
             }
         });
-        expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(NotImplementedError);
+        expect(router.handleInteraction(messageInteraction, defaultMockHeaders)).rejects.toThrowError(NotImplementedError);
+        const modalInteraction = new DiscordInteractionModalSubmit({
+            id: "123",
+            application_id: "123",
+            token: "123",
+            version: 1,
+            data: {
+                custom_id: "123",
+                components: [],
+            }
+        });
+        expect(router.handleInteraction(modalInteraction, defaultMockHeaders)).rejects.toThrowError(NotImplementedError);
     });
     it("should throw error if authorization fails", async () => {
         const router = new ServerlessDiscordRouter({

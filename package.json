@@ -1,6 +1,6 @@
 {
   "name": "serverless-discord",
-  "version": "1.0.22",
+  "version": "1.0.24",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
     "@types/jest": "^29.4.0",
@@ -17,8 +17,10 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "jest",
+    "test:cov": "jest --coverage",
     "build": "tsc",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "repository": {
     "type": "git",
