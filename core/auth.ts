@@ -1,4 +1,3 @@
-import * as nacl from "tweetnacl";
 import { ServerlessDiscordRouterRequestHeaders } from "./router";
 import { DiscordInteraction } from "../discord";
 
@@ -9,14 +8,16 @@ import { DiscordInteraction } from "../discord";
  */
 export class ServerlessDiscordAuthorizationHandler {
     private applicationPublicKey: string;
+    private verifyFunc: (msg: Uint8Array, sig: Uint8Array, key: Uint8Array) => boolean
 
     /**
      * Initializes a new ServerlessDiscordAuthorizationHandler
      * 
      * @param applicationPublicKey The public key of the Discord application
      */
-    constructor ({ applicationPublicKey }: { applicationPublicKey: string }) {
+    constructor ({ applicationPublicKey, verifyFunc }: { applicationPublicKey: string, verifyFunc: (msg: Uint8Array, sig: Uint8Array, key: Uint8Array) => boolean }) {
         this.applicationPublicKey = applicationPublicKey;
+        this.verifyFunc = verifyFunc;
     }
 
     /**
@@ -27,7 +28,7 @@ export class ServerlessDiscordAuthorizationHandler {
      * @returns true if the request is authorized
      */
     handleAuthorization(body: DiscordInteraction, headers: ServerlessDiscordRouterRequestHeaders): boolean {
-        return nacl.sign.detached.verify(
+        return this.verifyFunc(
             Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
             Buffer.from(headers["x-signature-ed25519"], "hex"),
             Buffer.from(this.applicationPublicKey, "hex")

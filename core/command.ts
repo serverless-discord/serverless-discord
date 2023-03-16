@@ -1,5 +1,5 @@
 import { DiscordCommandTypes, DiscordCommandOption } from "../discord/command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
+import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
 
 /**
  * A ServerlessDiscordCommand is a command that can be executed by a Discord user.
@@ -45,6 +45,19 @@ export abstract class ServerlessDiscordCommand {
      * @param interaction The interaction that was received
      */
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
+}
+
+export abstract class ServerlessDiscordCommandAsync extends ServerlessDiscordCommand {
+    handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
+        this.handleInteractionAsync(interaction)
+        return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({
+            data: {
+                content: "..."
+            }
+        }));
+    }
+
+    abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void>
 }
 
 /**

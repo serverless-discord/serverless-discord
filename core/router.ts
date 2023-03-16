@@ -3,6 +3,7 @@ import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordIntera
 import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 import { ServerlessDiscordAuthorizationHandler } from "./auth";
 import { DiscordAuthenticationRequestHeaders } from "../discord";
+import nacl from "tweetnacl";
 
 /**
  * Initializes a new ServerlessDiscordRouter.
@@ -11,7 +12,7 @@ import { DiscordAuthenticationRequestHeaders } from "../discord";
  * @returns ServerlessDiscordRouter
  */
 export function initRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordRouter {
-    const authHandler = new ServerlessDiscordAuthorizationHandler({ applicationPublicKey });
+    const authHandler = new ServerlessDiscordAuthorizationHandler({ applicationPublicKey, verifyFunc: nacl.sign.detached.verify });
     return new ServerlessDiscordRouter({ commands, authHandler });
 }
 

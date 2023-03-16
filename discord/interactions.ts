@@ -408,6 +408,7 @@ export enum DiscordTextInputStyles {
 /**
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type
  */
+
 export enum DiscordInteractionResponseTypes {
     PONG = 1,
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
@@ -416,6 +417,7 @@ export enum DiscordInteractionResponseTypes {
     UPDATE_MESSAGE = 7,
     APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8,
     MODAL = 9,
+    ACKNOWLEDGE_WITH_SOURCE
 }
 
 /**
@@ -425,7 +427,7 @@ export class DiscordInteractionResponse {
     type: DiscordInteractionResponseTypes;
     data?: DiscordInteractionResponseData | DiscordAutocompleteInteractionResponseData;
 
-    constructor({ type, data }: { type: DiscordInteractionResponseTypes; data?: DiscordInteractionResponseData }) {
+    constructor({ type, data }: { type: DiscordInteractionResponseTypes; data?: DiscordInteractionResponseData | DiscordAutocompleteInteractionResponseData }) {
         this.type = type;
         this.data = data;
     }

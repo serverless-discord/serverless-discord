@@ -1,7 +1,7 @@
 import { DiscordApplication } from "./application";
 import { DiscordEmoji } from "./emoji";
 import { DiscordGuildMember } from "./guild";
-import { DiscordMessageComponent, DiscordMessageInteraction } from "./interactions/interactions";
+import { DiscordMessageComponent, DiscordMessageInteraction } from "./interactions";
 import { DiscordRoleTags } from "./permissions";
 import { DiscordSticker } from "./sticker";
 import { DiscordUser } from "./user";
