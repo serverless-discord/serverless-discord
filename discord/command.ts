@@ -3,7 +3,9 @@ import { DiscordLocalesDictionary } from "./locales";
 import { DiscordBitwisePermissionFlags } from "./permissions";
 
 /**
- * https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
+ * A DiscordCommand is a command that can be executed on a Discord server.
+ * 
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
  */
 export abstract class DiscordCommand {
     id: string;
@@ -39,6 +41,11 @@ export abstract class DiscordCommand {
     }
 }
 
+/**
+ * A DiscordCommandChatInput is a slash command that can be executed on a Discord server.
+ * 
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
+ */
 export class DiscordCommandChatInput extends DiscordCommand {
     type: DiscordCommandTypes.CHAT_INPUT;
     options: DiscordCommandOption[];
@@ -50,6 +57,10 @@ export class DiscordCommandChatInput extends DiscordCommand {
     }
 }
 
+/**
+ * A DiscordCommandUser is a user context menu command that can be executed on a Discord server.
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
+ */
 export class DiscordCommandUser extends DiscordCommand {
     type: DiscordCommandTypes.USER;
 
@@ -59,6 +70,11 @@ export class DiscordCommandUser extends DiscordCommand {
     }
 }
 
+/**
+ * A DiscordCommandMessage is a message context menu command that can be executed on a Discord server.
+ * 
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
+ */
 export class DiscordCommandMessage extends DiscordCommand {
     type: DiscordCommandTypes.MESSAGE;
 
@@ -68,12 +84,22 @@ export class DiscordCommandMessage extends DiscordCommand {
     }
 }
 
+/**
+ * The possible types of Discord commands.
+ * 
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
+ */
 export enum DiscordCommandTypes {
     CHAT_INPUT = 1, // Slash command
     USER = 2, // User context menu
     MESSAGE = 3, // Message context menu
 }
 
+/**
+ * The options that can be passed to the Discord API when creating a command.
+ * 
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+ */
 export type DiscordCommandOption = {
     type: DiscordCommandOptionTypes;
     name: string;
@@ -91,6 +117,11 @@ export type DiscordCommandOption = {
     autocomplete?: boolean;
 }
 
+/**
+ * The type of options that can be passed to the Discord API when creating a command.
+ * 
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+ */
 export enum DiscordCommandOptionTypes {
     SUB_COMMAND = 1,
     SUB_COMMAND_GROUP = 2,
@@ -111,6 +142,9 @@ export type DiscordCommandOptionChoice = {
     value: string | number;
 }
 
+/**
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure
+ */
 export type GuildApplicationCommandPermissions = {
     id: string;
     application_id: string;
@@ -118,12 +152,18 @@ export type GuildApplicationCommandPermissions = {
     permissions: ApplicationCommandPermission[];
 }
 
+/**
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure
+ */
 export type ApplicationCommandPermission = {
     id: string;
     type: ApplicationCommandPermissionType;
     permission: boolean;
 }
 
+/**
+ * @see https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type
+ */
 export enum ApplicationCommandPermissionType {
     ROLE = 1,
     USER = 2,

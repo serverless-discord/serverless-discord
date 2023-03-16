@@ -1,6 +1,21 @@
 import { DiscordCommandTypes, DiscordCommandOption } from "../discord/command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
 
+/**
+ * A ServerlessDiscordCommand is a command that can be executed by a Discord user.
+ * 
+ * A ServerlessDiscordCommand can be of type:
+ * - CHAT_INPUT: A slash command
+ * - USER: A user command
+ * - MESSAGE: A message command
+ * 
+ * A ServerlessDiscordCommand can be global or guild specific.
+ * 
+ * @param globalCommand Whether the command is global or not
+ * @param guildCommand Whether the command is guild specific or not
+ * @param type The type of the command
+ * @param name The name of the command
+ */
 export abstract class ServerlessDiscordCommand {
     readonly globalCommand: boolean;
     readonly guildCommand: boolean;
@@ -24,9 +39,24 @@ export abstract class ServerlessDiscordCommand {
         this.name = name;
     }
 
+    /**
+     * Handle a Discord interaction. This method is called when a Discord interaction is received.
+     * 
+     * @param interaction The interaction that was received
+     */
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
 
+/**
+ * A ServerlessDiscordCommandChatInput is a slash command that can be executed by a Discord user.
+ * 
+ * A ServerlessDiscordCommandChatInput can be global or guild specific.
+ * 
+ * @param globalCommand Whether the command is global or not
+ * @param guildCommand Whether the command is guild specific or not
+ * @param name The name of the command
+ * @param options The options of the command
+ */
 export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscordCommand {
     readonly options: DiscordCommandOption[];
 
@@ -45,9 +75,23 @@ export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscor
         this.options = options;
     }
 
+    /**
+     * Handle a Discord interaction. This method is called when a Discord interaction is received.
+     * 
+     * @param interaction The interaction that was received
+     */
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
 
+/**
+ * A ServerlessDiscordCommandUser is a user command that can be executed on a Discord user through the right click menu.
+ * 
+ * A ServerlessDiscordCommandUser can be global or guild specific.
+ * 
+ * @param globalCommand Whether the command is global or not
+ * @param guildCommand Whether the command is guild specific or not
+ * @param name The name of the command
+ */
 export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordCommand {
     constructor({
         globalCommand,
@@ -69,6 +113,15 @@ export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordComm
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
 
+/**
+ * A ServerlessDiscordCommandMessage is a message command that can be executed on a Discord message through the right click menu.
+ * 
+ * A ServerlessDiscordCommandMessage can be global or guild specific.
+ * 
+ * @param globalCommand Whether the command is global or not
+ * @param guildCommand Whether the command is guild specific or not
+ * @param name The name of the command
+ */
 export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordCommand {
     constructor({ 
         globalCommand,

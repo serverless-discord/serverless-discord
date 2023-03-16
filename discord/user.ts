@@ -1,6 +1,9 @@
 import { DiscordIntegration } from "./guild";
 import { DiscordLocales } from "./locales";
 
+/**
+ * @see https://discord.com/developers/docs/resources/user#user-object-user-structure
+ */
 export type DiscordUser = {
     id: string;
     username: string;
@@ -19,6 +22,9 @@ export type DiscordUser = {
     public_flags?: DiscordUserFlags;
 };
 
+/**
+ * @see https://discord.com/developers/docs/resources/user#user-object-user-flags
+ */
 export enum DiscordUserFlags {
     STAFF = 1 << 0,
     PARTNER = 1 << 1,
@@ -37,6 +43,9 @@ export enum DiscordUserFlags {
     ACTIVE_DEVELOPER = 1 << 22,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/user#user-object-premium-types
+ */
 export enum DiscordPremiumTypes {
     NONE = 0,
     NITRO_CLASSIC = 1,
@@ -44,6 +53,9 @@ export enum DiscordPremiumTypes {
     NITRO_BASIC = 3,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/user#connection-object-connection-structure
+ */
 export type DiscordUserConnection = {
     id: string;
     name: string;
@@ -57,11 +69,17 @@ export type DiscordUserConnection = {
     visibility: DiscordUserConnectionVisibility;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/user#connection-object-visibility-types
+ */
 export enum DiscordUserConnectionVisibility {
     NONE = 0,
     EVERYONE = 1,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/user#application-role-connection-object-application-role-connection-structure
+ */
 export type ApplicationRoleConnection = {
     platform_name?: string;
     platform_username?: string;

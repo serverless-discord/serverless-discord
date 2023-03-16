@@ -1,6 +1,33 @@
 import { DiscordTeam } from './teams';
 import { DiscordUser } from './user';
 
+/**
+ * DiscordApplicationInstallParams is the install parameters for a Discord application.
+ * 
+ * @param id the id of the app
+ * @param name the name of the app
+ * @param icon the icon hash of the app
+ * @param description the description of the app
+ * @param rpc_origins the rpc origins of the app
+ * @param bot_public whether the bot is public or not
+ * @param bot_require_code_grant whether the bot requires code grant or not
+ * @param terms_of_service_url the terms of service url of the app
+ * @param privacy_policy_url the privacy policy url of the app
+ * @param owner the owner of the app
+ * @param summary the summary of the app
+ * @param verify_key the verify key of the app
+ * @param team the team of the app
+ * @param guild_id the guild id of the app
+ * @param primary_sku_id the primary sku id of the app
+ * @param slug the slug of the app
+ * @param cover_image the cover image hash of the app
+ * @param flags the flags of the app
+ * @param install_params the install parameters of the app
+ * @param custom_install_url the custom install url of the app
+ * @param role_connections_verification_url the role connections verification url of the app
+ * 
+ * @see https://discord.com/developers/docs/resources/application#application-object 
+ */
 export type DiscordApplication = {
     id: string;
     name: string;
@@ -25,6 +52,11 @@ export type DiscordApplication = {
     role_connections_verification_url?: string;
 }
 
+/**
+ * DiscordApplicationFlags is the flags for a Discord application.
+ * 
+ * @see https://discord.com/developers/docs/resources/application#application-object-application-flags 
+ */
 export enum DiscordApplicationFlags {
     GATEWAY_PRESENCE = 1 << 12,
     GATEWAY_PRESENCE_LIMITED = 1 << 13,
@@ -37,6 +69,11 @@ export enum DiscordApplicationFlags {
     APPLICATION_COMMAND_BADGES = 1 << 23,
 }
 
+/**
+ * The install parameters for a Discord application.
+ * 
+ * @see https://discord.com/developers/docs/resources/application#application-object-application-flags
+ */
 export type DiscordApplicationInstallParams = {
     scopes: string[];
     permissions: string;

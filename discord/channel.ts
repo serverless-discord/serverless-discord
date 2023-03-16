@@ -6,6 +6,11 @@ import { DiscordRoleTags } from "./permissions";
 import { DiscordSticker } from "./sticker";
 import { DiscordUser } from "./user";
 
+/**
+ * Represents a guild or DM channel within Discord. This can be any type of channel (text, voice, category, etc.). See DiscordChannelTypes for a list of all channel types.
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#channel-object-channel-structure
+ */
 export type DiscordChannel = {
     id: string;
     type: DiscordChannelTypes;
@@ -43,6 +48,11 @@ export type DiscordChannel = {
     default_forum_layout?: DiscordForumLayoutTypes;
 }
 
+/**
+ * The types of Discord channels.
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#channel-object-channel-types
+ */
 export enum DiscordChannelTypes {
     GUILD_TEXT = 0,
     DM = 1,
@@ -58,22 +68,42 @@ export enum DiscordChannelTypes {
     GUILD_FORUM = 15,
 }
 
+/**
+ * The possible types of streaming discord video quality
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes
+ */
 export enum DiscordVideoQualityModes {
     AUTO = 1,
     FULL = 2,
 }
 
+/**
+ * Sort order of forum posts
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types
+ */
 export enum DiscordSortOrderTypes {
     LATEST_ACTIVITY = 0,
     CREATION_DATE = 1,
 }
 
+/**
+ * The types of Discord forum layouts 
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#channel-object-forum-layout-types
+ */
 export enum DiscordForumLayoutTypes {
     NOT_SET = 0,
     LIST_VIEW = 1,
     GALLERY_VIEW = 2,
 }
 
+/**
+ * Represents a message in a Discord channel. See DiscordMessageTypes for a list of all message types.
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#message-object-message-structure
+ */
 export type DiscordMessage = {
     id: string;
     channel_id: string;
@@ -108,6 +138,11 @@ export type DiscordMessage = {
     role_subscription_data?: DiscordRoleSubscriptionData;
 }
 
+/**
+ * The type of Discord message (e.g. DEFAULT, RECIPIENT_ADD, etc.)
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#message-object-message-types
+ */
 export enum DiscordMessageTypes {
     DEFAULT = 0,
     RECIPIENT_ADD = 1,
@@ -142,11 +177,19 @@ export enum DiscordMessageTypes {
     GUILD_APPLICATION_PREMIUM_SUBSCRIPTION = 32,
 }
 
+/**
+ * Indicates the type of message activity.
+ * 
+ * @see https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
+ */
 export type DiscordMessageActivity = {
     type: DiscordMessageActivityTypes;
     party_id?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
+ */
 export enum DiscordMessageActivityTypes {
     JOIN = 1,
     SPECTATE = 2,
@@ -154,6 +197,9 @@ export enum DiscordMessageActivityTypes {
     JOIN_REQUEST = 5,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#message-object-message-flags
+ */
 export enum DiscordMessageFlags {
     CROSSPOSTED = 1 << 0,
     IS_CROSSPOST = 1 << 1,
@@ -167,6 +213,9 @@ export enum DiscordMessageFlags {
     SUPPRESS_NOTIFICATIONS = 1 << 12,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure
+ */
 export type DiscordMessageReference = {
     message_id?: string;
     channel_id?: string;
@@ -174,17 +223,26 @@ export type DiscordMessageReference = {
     fail_if_not_exists?: boolean;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#followed-channel-object-followed-channel-structure
+ */
 export type DiscordFollowedChannel = {
     channel_id: string;
     webhook_id: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#reaction-object-reaction-structure
+*/
 export type DiscordReaction = {
     count: number;
     me: boolean;
     emoji: DiscordEmoji;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure
+ */
 export type DiscordOverwrite = {
     id: string;
     type: DiscordOverwriteTypes;
@@ -197,6 +255,9 @@ export enum DiscordOverwriteTypes {
     MEMBER = 1,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure
+ */
 export type DiscordThreadMetadata = {
     archived: boolean;
     auto_archive_duration: number;
@@ -206,6 +267,9 @@ export type DiscordThreadMetadata = {
     created_timestamp?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#thread-member-object-thread-member-structure
+ */
 export type DiscordThreadMember = {
     id?: string;
     user_id?: string;
@@ -214,11 +278,17 @@ export type DiscordThreadMember = {
     member?: DiscordGuildMember;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#default-reaction-object-default-reaction-structure
+ */
 export type DiscordDefaultReactionEmoji = {
     emoji_id?: string;
     emoji_name?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#forum-tag-object-forum-tag-structure
+ */
 export type DiscordForumTag = {
     id: string;
     name: string;
@@ -227,6 +297,9 @@ export type DiscordForumTag = {
     emoji_name?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-structure
+ */
 export type DiscordEmbed = {
     title?: string;
     type?: DiscordEmbedTypes;
@@ -243,6 +316,9 @@ export type DiscordEmbed = {
     fields?: DiscordEmbedField[];
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-types
+ */
 export enum DiscordEmbedTypes {
     RICH = "rich",
     IMAGE = "image",
@@ -252,6 +328,9 @@ export enum DiscordEmbedTypes {
     LINK = "link",
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
+ */
 export type DiscordEmbedThumbnail = {
     url?: string;
     proxy_url?: string;
@@ -259,6 +338,9 @@ export type DiscordEmbedThumbnail = {
     width?: number;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
+ */
 export type DiscordEmbedVideo = {
     url?: string;
     proxy_url?: string;
@@ -266,6 +348,9 @@ export type DiscordEmbedVideo = {
     width?: number;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+ */
 export type DiscordEmbedImage = {
     url?: string;
     proxy_url?: string;
@@ -273,11 +358,17 @@ export type DiscordEmbedImage = {
     width?: number;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
+ */
 export type DiscordEmbedProvider = {
     name?: string;
     url?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
+ */
 export type DiscordEmbedAuthor = {
     name: string;
     url?: string;
@@ -285,18 +376,27 @@ export type DiscordEmbedAuthor = {
     proxy_icon_url?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+ */
 export type DiscordEmbedFooter = {
     text: string;
     icon_url?: string;
     proxy_icon_url?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+ */
 export type DiscordEmbedField = {
     name: string;
     value: string;
     inline?: boolean;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
+ */
 export type DiscordAttachment = {
     id: string;
     filename: string;
@@ -310,6 +410,9 @@ export type DiscordAttachment = {
     ephemeral?: boolean;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types
+ */
 export type DiscordChannelMention = {
     id: string;
     guild_id: string;
@@ -317,6 +420,9 @@ export type DiscordChannelMention = {
     name: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mentions-structure
+ */
 export type DiscordAllowedMentions = {
     parse: string[];
     roles: string[];
@@ -324,6 +430,9 @@ export type DiscordAllowedMentions = {
     replied_user: boolean;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/channel#role-subscription-data-object-role-subscription-data-object-structure
+ */
 export type DiscordRoleSubscriptionData = {
     role_subscription_listing_id: string;
     tier_name: string;

@@ -4,6 +4,11 @@ import { DiscordRole } from "./permissions";
 import { DiscordSticker } from "./sticker";
 import { DiscordUser } from "./user";
 
+/**
+ * A DiscordGuild is a Discord server.
+ * 
+ * @see https://discord.com/developers/docs/resources/guild#guild-object
+ */
 export type DiscordGuild = {
     id: string;
     name: string;
@@ -48,22 +53,34 @@ export type DiscordGuild = {
     premium_progress_bar_enabled: boolean;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level
+ */
 export enum DiscordDefaultMessageNotificationLevel {
     ALL_MESSAGES = 0,
     ONLY_MENTIONS = 1,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level
+ */
 export enum DiscordExplicitContentFilterLevel {
     DISABLED = 0,
     MEMBERS_WITHOUT_ROLES = 1,
     ALL_MEMBERS = 2,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-object-mfa-level
+ */
 export enum DiscordMFALevel {
     NONE = 0,
     ELEVATED = 1,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-object-verification-level
+ */
 export enum DiscordVerificationLevel {
     NONE = 0,
     LOW = 1,
@@ -72,6 +89,9 @@ export enum DiscordVerificationLevel {
     VERY_HIGH = 4,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level
+ */
 export enum DiscordNSFWLevel {
     DEFAULT = 0,
     EXPLICIT = 1,
@@ -79,6 +99,9 @@ export enum DiscordNSFWLevel {
     AGE_RESTRICTED = 3,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-object-premium-tier
+ */
 export enum DiscordPremiumTier {
     NONE = 0,
     TIER_1 = 1,
@@ -86,6 +109,9 @@ export enum DiscordPremiumTier {
     TIER_3 = 3,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-object-system-channel-flags
+ */
 export enum DiscordSystemChannelFlags {
     SUPPRESS_JOIN_NOTIFICATIONS = 1 << 0,
     SUPPRESS_PREMIUM_SUBSCRIPTIONS = 1 << 1,
@@ -95,6 +121,9 @@ export enum DiscordSystemChannelFlags {
     SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATIONS_REPLIES = 1 << 5,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-preview-object-guild-preview-structure
+ */
 export type DiscordGuildPreview = {
     id: string;
     name: string;
@@ -109,11 +138,17 @@ export type DiscordGuildPreview = {
     stickers: DiscordSticker[];
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-widget-settings-object-guild-widget-settings-structure
+ */
 export type DiscordGuildWidgetSettings = {
     enabled: boolean;
     channel_id?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-widget-object-guild-widget-structure
+ */
 export type DiscordGuildWidget = {
     id: string;
     name: string;
@@ -123,6 +158,9 @@ export type DiscordGuildWidget = {
     presence_count: number;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
+ */
 export type DiscordGuildMember = {
     user?: DiscordUser;
     nick?: string;
@@ -138,6 +176,9 @@ export type DiscordGuildMember = {
     communications_disabled_until?: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
+ */
 export enum DiscordGuildMemberFlags {
     DID_REJOIN = 1 << 0,
     COMPLETED_ONBOARDING = 1 << 1,
@@ -145,6 +186,9 @@ export enum DiscordGuildMemberFlags {
     STARTED_ONBOARDING = 1 << 3,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
+ */
 export type DiscordIntegration = {
     id: string;
     name: string;
@@ -164,16 +208,25 @@ export type DiscordIntegration = {
     scopes: string[];
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#integration-object-integration-expire-behaviors
+ */
 export enum DiscordIntegrationExpireBehavior {
     REMOVE_ROLE = 0,
     KICK = 1,
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#integration-account-object-integration-account-structure
+ */
 export type DiscordIntegrationAccount = {
     id: string;
     name: string;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#integration-application-object-integration-application-structure
+ */
 export type DiscordIntegrationApplication = {
     id: string;
     name: string;
@@ -182,16 +235,25 @@ export type DiscordIntegrationApplication = {
     bot?: DiscordUser;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#ban-object-ban-structure
+ */
 export type DiscordBan = {
     reason?: string;
     user: DiscordUser;
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-structure
+ */
 export type DiscordWelcomeScreen = {
     description: string;
     welcome_channels: DiscordWelcomeScreenChannel[];
 }
 
+/**
+ * @see https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
+ */
 export type DiscordWelcomeScreenChannel = {
     channel_id: string;
     description: string;
