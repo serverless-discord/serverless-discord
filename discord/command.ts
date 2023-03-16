@@ -1,6 +1,6 @@
-import { DiscordChannelTypes } from "../channel";
-import { DiscordLocalesDictionary } from "../locales";
-import { DiscordBitwisePermissionFlags } from "../permissions";
+import { DiscordChannelTypes } from "./channel";
+import { DiscordLocalesDictionary } from "./locales";
+import { DiscordBitwisePermissionFlags } from "./permissions";
 
 /**
  * https://discord.com/developers/docs/interactions/slash-commands#applicationcommand

@@ -1,5 +1,5 @@
-import { DiscordIntegration } from "../guild";
-import { DiscordLocales } from "../locales";
+import { DiscordIntegration } from "./guild";
+import { DiscordLocales } from "./locales";
 
 export type DiscordUser = {
     id: string;

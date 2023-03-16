@@ -1,10 +1,10 @@
-import { DiscordApplication } from "../application";
-import { DiscordEmoji } from "../emoji";
-import { DiscordGuildMember } from "../guild";
-import { DiscordMessageComponent, DiscordMessageInteraction } from "../interactions";
-import { DiscordRoleTags } from "../permissions";
-import { DiscordSticker } from "../sticker";
-import { DiscordUser } from "../user";
+import { DiscordApplication } from "./application";
+import { DiscordEmoji } from "./emoji";
+import { DiscordGuildMember } from "./guild";
+import { DiscordMessageComponent, DiscordMessageInteraction } from "./interactions/interactions";
+import { DiscordRoleTags } from "./permissions";
+import { DiscordSticker } from "./sticker";
+import { DiscordUser } from "./user";
 
 export type DiscordChannel = {
     id: string;

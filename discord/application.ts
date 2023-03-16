@@ -1,5 +1,5 @@
-import { DiscordTeam } from '../teams';
-import { DiscordUser } from '../user';
+import { DiscordTeam } from './teams';
+import { DiscordUser } from './user';
 
 export type DiscordApplication = {
     id: string;

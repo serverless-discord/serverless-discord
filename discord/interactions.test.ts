@@ -1,4 +1,4 @@
-import { DiscordInteractionApplicationCommand, DiscordInteractionPing, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionPing } from ".";
+import { DiscordInteractionApplicationCommand, DiscordInteractionPing, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionPing } from "./interactions";
 
 describe("instanceofDiscordInteractionPing", () => {
   it("should return true for valid ping", () => {

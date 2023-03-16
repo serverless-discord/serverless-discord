@@ -1,9 +1,9 @@
-import { DiscordMessage, DiscordChannel, DiscordAttachment, DiscordChannelTypes, DiscordAllowedMentions, DiscordEmbed } from "../channel";
-import { DiscordCommandOptionChoice } from "../command";
-import { DiscordEmoji } from "../emoji";
-import { DiscordGuildMember } from "../guild";
-import { DiscordRole } from "../permissions";
-import { DiscordUser } from "../user";
+import { DiscordMessage, DiscordChannel, DiscordAttachment, DiscordChannelTypes, DiscordAllowedMentions, DiscordEmbed } from "./channel";
+import { DiscordCommandOptionChoice } from "./command";
+import { DiscordEmoji } from "./emoji";
+import { DiscordGuildMember } from "./guild";
+import { DiscordRole } from "./permissions";
+import { DiscordUser } from "./user";
 
 
 export abstract class DiscordInteraction {
