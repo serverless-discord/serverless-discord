@@ -1,9 +1,6 @@
 name: Run tests
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -19,4 +16,4 @@ jobs:
           node-version: '18.x'
           cache: 'npm'
       - run: npm ci
-      - run: npm run test
+      - uses: ArtiomTr/jest-coverage-report-action@v2
