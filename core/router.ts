@@ -1,9 +1,8 @@
-import { ServerlessDiscordCommand } from "./command";
+import { ServerlessDiscordCommand, ServerlessDiscordCommandAsync } from "./command";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionMessageComponent, instanceofDiscordInteractionModalSubmit, instanceofDiscordInteractionPing } from "../discord/interactions";
 import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
-import { ServerlessDiscordAuthorizationHandler } from "./auth";
+import { createServerlessDiscordAuthorizationHandler, ServerlessDiscordAuthorizationHandler } from "./auth";
 import { DiscordAuthenticationRequestHeaders } from "../discord";
-import nacl from "tweetnacl";
 
 /**
  * Initializes a new ServerlessDiscordRouter.
@@ -12,7 +11,7 @@ import nacl from "tweetnacl";
  * @returns ServerlessDiscordRouter
  */
 export function initRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordRouter {
-    const authHandler = new ServerlessDiscordAuthorizationHandler({ applicationPublicKey, verifyFunc: nacl.sign.detached.verify });
+    const authHandler = createServerlessDiscordAuthorizationHandler({ applicationPublicKey });
     return new ServerlessDiscordRouter({ commands, authHandler });
 }
 
@@ -94,5 +93,25 @@ export class ServerlessDiscordRouter {
             throw new CommandNotFoundError();
         }
         return await command.handleInteraction(interaction);
+    }
+
+    /**
+     * Handle an interaction that was sent asynchronously. This is used for interactions that are sent after the initial response.
+     * 
+     * @param interaction Discord Application Command Interaction
+     */
+    async handleAsyncApplicationCommand({
+        interaction,
+    } : {
+        interaction: DiscordInteractionApplicationCommand, 
+    }): Promise<void> {
+        const command = this.commands.find(command => command.name === interaction.data.name);
+        if (command === undefined) {
+            throw new CommandNotFoundError(interaction.data.name);
+        }
+        if (!(command instanceof ServerlessDiscordCommandAsync)) {
+            throw new CommandNotFoundError(interaction.data.name);
+        }
+        command.handleInteractionAsync(interaction);
     }
 }
