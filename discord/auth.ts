@@ -19,3 +19,5 @@ export interface DiscordAuthenticationRequestHeaders {
 export function instanceOfDiscordAuthenticationRequestHeaders(object: any): object is DiscordAuthenticationRequestHeaders {
     return "x-signature-ed25519" in object && "x-signature-timestamp" in object;
 }
+
+export type DiscordAuthenticationVerificationFunction = (msg: Uint8Array, sig: Uint8Array, key: Uint8Array) => boolean;

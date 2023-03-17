@@ -1,5 +1,14 @@
 import { ServerlessDiscordRouterRequestHeaders } from "./router";
-import { DiscordInteraction } from "../discord";
+import { DiscordAuthenticationVerificationFunction, DiscordInteraction } from "../discord";
+import nacl from "tweetnacl";
+
+export const createServerlessDiscordAuthorizationHandler = ({ 
+    applicationPublicKey, 
+}: { 
+    applicationPublicKey: string, 
+}) => {
+    return new ServerlessDiscordAuthorizationHandler({ applicationPublicKey, verifyFunc: nacl.sign.detached.verify });
+};
 
 /**
  * Handles the authorization of Discord interactions.
@@ -8,14 +17,20 @@ import { DiscordInteraction } from "../discord";
  */
 export class ServerlessDiscordAuthorizationHandler {
     private applicationPublicKey: string;
-    private verifyFunc: (msg: Uint8Array, sig: Uint8Array, key: Uint8Array) => boolean
+    private verifyFunc: DiscordAuthenticationVerificationFunction
 
     /**
      * Initializes a new ServerlessDiscordAuthorizationHandler
      * 
      * @param applicationPublicKey The public key of the Discord application
      */
-    constructor ({ applicationPublicKey, verifyFunc }: { applicationPublicKey: string, verifyFunc: (msg: Uint8Array, sig: Uint8Array, key: Uint8Array) => boolean }) {
+    constructor ({ 
+        applicationPublicKey, 
+        verifyFunc 
+    }: { 
+        applicationPublicKey: string, 
+        verifyFunc: DiscordAuthenticationVerificationFunction 
+    }) {
         this.applicationPublicKey = applicationPublicKey;
         this.verifyFunc = verifyFunc;
     }
@@ -27,7 +42,7 @@ export class ServerlessDiscordAuthorizationHandler {
      * @param headers Headers of the request
      * @returns true if the request is authorized
      */
-    handleAuthorization(body: DiscordInteraction, headers: ServerlessDiscordRouterRequestHeaders): boolean {
+    handleAuthorization({ body, headers } : { body: DiscordInteraction, headers: ServerlessDiscordRouterRequestHeaders }): boolean {
         return this.verifyFunc(
             Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
             Buffer.from(headers["x-signature-ed25519"], "hex"),

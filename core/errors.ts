@@ -11,8 +11,9 @@ export class NotImplementedError extends Error {
  * Thrown when a command is not found.
  */
 export class CommandNotFoundError extends Error {
-    constructor() {
-        super("Command not found");
+    constructor(name?: string) {
+        const message = name ? `Command ${name} not found` : "Command not found";
+        super(message);
     }
 }
 

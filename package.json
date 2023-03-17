@@ -1,6 +1,6 @@
 {
   "name": "serverless-discord",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
     "@types/jest": "^29.4.0",
@@ -17,7 +17,7 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "jest",
-    "test:cov": "jest --coverage",
+    "test:coverage": "jest --coverage",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/themcaffee/serverless-discord#readme",
   "dependencies": {
+    "@types/aws-lambda": "^8.10.113",
     "tweetnacl": "^1.0.3"
   }
 }
