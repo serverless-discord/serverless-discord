@@ -1,5 +1,5 @@
 import { DiscordInteractionPing } from "../discord";
-import { ServerlessDiscordAuthorizationHandler } from "./auth";
+import { createServerlessDiscordAuthorizationHandler, ServerlessDiscordAuthorizationHandler } from "./auth";
 import { ServerlessDiscordRouterRequestHeaders } from "./router";
 
 describe("ServerlessDiscordAuthorizationHandler", () => {
@@ -17,7 +17,7 @@ describe("ServerlessDiscordAuthorizationHandler", () => {
             "x-signature-ed25519": "123",
             "x-signature-timestamp": "123",
         };
-        const result = handler.handleAuthorization(body, headers)
+        const result = handler.handleAuthorization({ body, headers })
         expect(mockVerifyFunc).toBeCalledWith(
             Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
             Buffer.from(headers["x-signature-ed25519"], "hex"),
@@ -34,12 +34,19 @@ describe("ServerlessDiscordAuthorizationHandler", () => {
             "x-signature-ed25519": "123",
             "x-signature-timestamp": "123",
         };
-        const result = handler.handleAuthorization(body, headers)
+        const result = handler.handleAuthorization({ body, headers })
         expect(mockVerifyFunc).toBeCalledWith(
             Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
             Buffer.from(headers["x-signature-ed25519"], "hex"),
             Buffer.from("test", "hex")
         );
         expect(result).toBe(false);
+    });
+});
+
+describe("createServerlessDiscordAuthorizationHandler", () => {
+    it("should be able to create a default handler", () => {
+        const authHandler = createServerlessDiscordAuthorizationHandler({ applicationPublicKey: "test" });
+        expect(authHandler).toBeInstanceOf(ServerlessDiscordAuthorizationHandler);
     });
 });

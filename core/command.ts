@@ -48,8 +48,7 @@ export abstract class ServerlessDiscordCommand {
 }
 
 export abstract class ServerlessDiscordCommandAsync extends ServerlessDiscordCommand {
-    handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
-        this.handleInteractionAsync(interaction)
+    handleInteraction(): Promise<DiscordInteractionResponse> {
         return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({
             data: {
                 content: "..."

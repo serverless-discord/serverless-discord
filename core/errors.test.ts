@@ -14,6 +14,12 @@ describe("CommandNotFoundError", () => {
         expect(error).toBeDefined();
         expect(error.message).toBe("Command not found");
     });
+
+    it("should be able to create a CommandNotFoundError with a name", () => {
+        const error = new CommandNotFoundError("test");
+        expect(error).toBeDefined();
+        expect(error.message).toBe("Command test not found");
+    });
 });
 
 describe("InvalidInteractionTypeError", () => {

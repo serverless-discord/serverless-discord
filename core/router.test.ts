@@ -1,4 +1,4 @@
-import { ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
+import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { ServerlessDiscordCommandChatInput } from "./command";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionTypes } from "../discord/interactions";
 import { CommandNotFoundError, NotImplementedError, UnauthorizedError } from "./errors";
@@ -31,6 +31,51 @@ class TestCommand extends ServerlessDiscordCommandChatInput {
     }
 }
 
+describe("initRouter", () => {
+    it("should init router", () => {
+        const router = initRouter({
+            commands: [],
+            applicationPublicKey: "123",
+        });
+        expect(router).toBeInstanceOf(ServerlessDiscordRouter);
+    });
+});
+
+describe("ServerlessDiscordRouter.handle", () => {
+    const defaultMockHeaders: ServerlessDiscordRouterRequestHeaders = {
+        "x-signature-ed25519": "123",
+        "x-signature-timestamp": "123",
+    }
+    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+
+    beforeEach(() => {
+        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+    });
+
+    it("should handle authenticated", async () => {
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
+        const router = new ServerlessDiscordRouter({
+            commands: [],
+            authHandler: authHandlerMock,
+        });
+        const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
+        router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
+        const result = await router.handle({ interaction, requestHeaders: defaultMockHeaders });
+        expect(result).toEqual({ type: 1 });
+    });
+
+    it("should handle unauthorized", async () => {
+        authHandlerMock.handleAuthorization.mockReturnValue(false);
+        const router = new ServerlessDiscordRouter({
+            commands: [],
+            authHandler: authHandlerMock,
+        });
+        const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
+        router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
+        await expect(router.handle({ interaction, requestHeaders: defaultMockHeaders })).rejects.toThrow(UnauthorizedError);
+    });
+});
+
 describe("ServerlessDiscordRouter.handleInteraction", () => {
     const defaultMockHeaders: ServerlessDiscordRouterRequestHeaders = {
         "x-signature-ed25519": "123",
@@ -54,7 +99,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             token: "123",
             version: 1,
         });
-        const response = await router.handleInteraction(interaction, defaultMockHeaders);
+        const response = await router.handleInteraction(interaction);
         expect(response).toEqual({ type: 1 });
     });
     it("should handle application command", async () => {
@@ -82,7 +127,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             commands: [testCommandMock],
             authHandler: authHandlerMock,
         });
-        const response = await router.handleInteraction(interaction, defaultMockHeaders);
+        const response = await router.handleInteraction(interaction);
         expect(testCommandMock.handleInteraction).toBeCalledWith(interaction);
         expect(response).toEqual(interactionResponse);
     });
@@ -105,7 +150,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             },
         });
         // Test that the CommandNotFoundError is thrown
-        expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(CommandNotFoundError);
+        expect(router.handleInteraction(interaction)).rejects.toThrowError(CommandNotFoundError);
     });
     it("should throw error if interaction type is not supported", async () => {
         const router = new ServerlessDiscordRouter({
@@ -123,7 +168,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 component_type: 1,
             }
         });
-        expect(router.handleInteraction(messageInteraction, defaultMockHeaders)).rejects.toThrowError(NotImplementedError);
+        expect(router.handleInteraction(messageInteraction)).rejects.toThrowError(NotImplementedError);
         const modalInteraction = new DiscordInteractionModalSubmit({
             id: "123",
             application_id: "123",
@@ -134,22 +179,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 components: [],
             }
         });
-        expect(router.handleInteraction(modalInteraction, defaultMockHeaders)).rejects.toThrowError(NotImplementedError);
-    });
-    it("should throw error if authorization fails", async () => {
-        const router = new ServerlessDiscordRouter({
-            commands: [],
-            authHandler: authHandlerMock
-        });
-
-        const interaction = new DiscordInteractionPing({
-            id: "123",
-            application_id: "123",
-            token: "123",
-            version: 1,
-        });
-        authHandlerMock.handleAuthorization.mockReturnValue(false);
-        expect(router.handleInteraction(interaction, defaultMockHeaders)).rejects.toThrowError(UnauthorizedError);
+        expect(router.handleInteraction(modalInteraction)).rejects.toThrowError(NotImplementedError);
     });
 });
         

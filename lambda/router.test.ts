@@ -1,12 +1,38 @@
 import { MockProxy, mock } from "jest-mock-extended";
 import { APIGatewayEvent } from "aws-lambda";
 import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse, MethodNotAllowedResponse } from "./router";
-import { ServerlessDiscordRouter, CommandNotFoundError, UnauthorizedError } from "../core";
-import { DiscordInteractionPing, DiscordInteractionApplicationCommand } from "../discord";
+import { ServerlessDiscordRouter, CommandNotFoundError, UnauthorizedError, ServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandChatInput } from "../core";
+import { DiscordInteractionPing, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord";
 
-describe("ServerlessDiscordRouter.handleInteraction", () => {
+class TestCommand extends ServerlessDiscordCommandChatInput {
+    constructor() {
+        super({
+            name: "test",
+            options: [],
+        });
+    }
+    async handleInteraction(): Promise<DiscordInteractionResponse> {
+        return {
+            type: 1,
+            data: {
+                tts: false,
+                content: "test",
+                embeds: [],
+                allowed_mentions: {
+                    parse: [],
+                    roles: [],
+                    users: [],
+                    replied_user: false,
+                },
+                components: [],
+            },
+        }
+    }
+}
+
+describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
     let lambdaEventMock: MockProxy<APIGatewayEvent>;
-    let coreRouterMock: MockProxy<ServerlessDiscordRouter>;
+    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
 
     beforeEach(() => {
         lambdaEventMock = mock<APIGatewayEvent>();
@@ -16,7 +42,8 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             "x-signature-timestamp": "123", 
         }
         lambdaEventMock.httpMethod = "POST";
-        coreRouterMock = mock<ServerlessDiscordRouter>();
+        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
     });
 
     it("should handle ping", async () => {
@@ -27,11 +54,11 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
             version: 1,
         });
         lambdaEventMock.body = JSON.stringify(interaction);
-        coreRouterMock.handleInteraction.mockResolvedValue({ type: 1 });
         const router = new ServerlessDiscordLambdaRouter({
-          router: coreRouterMock,
+            commands: [],
+            authHandler: authHandlerMock,
         });
-        const result = await router.handleLambdaInteraction(lambdaEventMock);
+        const result = await router.handleLambda(lambdaEventMock);
         expect(result).toEqual({
             statusCode: 200,
             body: JSON.stringify({ type: 1 }),
@@ -55,28 +82,27 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         const resolvedValue = {
             type: 1,
             data: {
-                tts: false,
                 content: "test",
-                embeds: [],
-                allowed_mentions: {
-                    parse: [],
-                    roles: [],
-                    users: [],
-                    replied_user: false,
-                },
-                components: [],
             },
         }
-        coreRouterMock.handleInteraction.mockResolvedValue(resolvedValue);
+        const testCommandMock: MockProxy<TestCommand> = mock<TestCommand>({ name: "test", options: [] });
+        const interactionResponse = {
+            type: 1,
+            data: {
+                content: "test",
+            }
+        };
+        testCommandMock.handleInteraction.mockResolvedValue(interactionResponse);
         const router = new ServerlessDiscordLambdaRouter({
-          router: coreRouterMock,
+            commands: [testCommandMock],
+            authHandler: authHandlerMock,
         });
-        const result = await router.handleLambdaInteraction(lambdaEventMock);
+        const result = await router.handleLambda(lambdaEventMock);
         expect(result).toEqual({
             statusCode: 200,
             body: JSON.stringify(resolvedValue),
         });
-        expect(coreRouterMock.handleInteraction).toBeCalledWith(interaction, lambdaEventMock.headers);
+        expect(testCommandMock.handleInteraction).toBeCalledWith(interaction);
     });
 
     it("should handle application command with no matching command", async () => {
@@ -93,11 +119,11 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         },
       });
       lambdaEventMock.body = JSON.stringify(interaction);
-      coreRouterMock.handleInteraction.mockRejectedValue(new CommandNotFoundError());
       const router = new ServerlessDiscordLambdaRouter({
-        router: coreRouterMock,
+        commands: [],
+        authHandler: authHandlerMock,
       });
-      const result = router.handleLambdaInteraction(lambdaEventMock);
+      const result = router.handleLambda(lambdaEventMock);
       expect(result).rejects.toThrow(CommandNotFoundError);
     });
 
@@ -109,29 +135,32 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         token: "123",
       });
       lambdaEventMock.body = JSON.stringify(interaction);
-      coreRouterMock.handleInteraction.mockRejectedValue(new UnauthorizedError());
+      authHandlerMock.handleAuthorization.mockReturnValue(false);
       const router = new ServerlessDiscordLambdaRouter({
-        router: coreRouterMock,
+        commands: [],
+        authHandler: authHandlerMock,
       });
-      const result = await router.handleLambdaInteraction(lambdaEventMock);
+      const result = await router.handleLambda(lambdaEventMock);
       expect(result).toEqual(UnauthorizedResponse);
     });
 
     it("should handle invalid content type", async () => {
       lambdaEventMock.headers["content-type"] = "text/plain";
       const router = new ServerlessDiscordLambdaRouter({
-        router: coreRouterMock,
+        commands: [],
+        authHandler: authHandlerMock,
       });
-      const result = await router.handleLambdaInteraction(lambdaEventMock);
+      const result = await router.handleLambda(lambdaEventMock);
       expect(result).toEqual(BadRequestResponse);
     });
 
     it("should handle invalid request method", async () => {
       lambdaEventMock.httpMethod = "GET";
       const router = new ServerlessDiscordLambdaRouter({
-        router: coreRouterMock,
+        commands: [],
+        authHandler: authHandlerMock,
       });
-      const result = await router.handleLambdaInteraction(lambdaEventMock);
+      const result = await router.handleLambda(lambdaEventMock);
       expect(result).toEqual(MethodNotAllowedResponse);
     });
 });

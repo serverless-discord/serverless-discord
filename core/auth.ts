@@ -42,7 +42,7 @@ export class ServerlessDiscordAuthorizationHandler {
      * @param headers Headers of the request
      * @returns true if the request is authorized
      */
-    handleAuthorization(body: DiscordInteraction, headers: ServerlessDiscordRouterRequestHeaders): boolean {
+    handleAuthorization({ body, headers } : { body: DiscordInteraction, headers: ServerlessDiscordRouterRequestHeaders }): boolean {
         return this.verifyFunc(
             Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
             Buffer.from(headers["x-signature-ed25519"], "hex"),

@@ -85,7 +85,7 @@ describe("ServerlessDiscordCommandAsync", () => {
                 type: 1,
             }
         });
-        const response = await command.handleInteraction(interaction);
+        const response = await command.handleInteraction();
         expect(response).toEqual({
             type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
             data: {

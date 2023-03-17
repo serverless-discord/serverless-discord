@@ -1,11 +1,10 @@
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { ServerlessDiscordCommand, ServerlessDiscordAuthorizationHandler, ServerlessDiscordRouter, UnauthorizedError, createServerlessDiscordAuthorizationHandler } from "../core";
-import { instanceOfDiscordAuthenticationRequestHeaders, DiscordInteraction, DiscordInteractionApplicationCommand } from "../discord";
+import { ServerlessDiscordCommand, ServerlessDiscordAuthorizationHandler, ServerlessDiscordRouter, UnauthorizedError, createServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandAsync } from "../core";
+import { instanceOfDiscordAuthenticationRequestHeaders, DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord";
 
 export function initLambdaRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
     const authHandler = createServerlessDiscordAuthorizationHandler({ applicationPublicKey });
-    const router = new ServerlessDiscordRouter({ commands, authHandler });
-    return new ServerlessDiscordLambdaRouter({ router });
+    return new ServerlessDiscordLambdaRouter({ commands, authHandler });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
@@ -38,15 +37,15 @@ export type AsyncLambdaCommandEvent = {
  * immediately. The async handler should be run as a seperate Lambda function. This function will be called with the
  * interaction data as the event.
  */
-export class ServerlessDiscordLambdaRouter {
-  private router: ServerlessDiscordRouter;
-
+export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
   constructor({
-    router,
+    commands,
+    authHandler,
   }: {
-    router: ServerlessDiscordRouter,
+    commands: ServerlessDiscordCommand[],
+    authHandler: ServerlessDiscordAuthorizationHandler,
   }) {
-    this.router = router;
+    super({ commands, authHandler });
   }
 
   /**
@@ -55,7 +54,7 @@ export class ServerlessDiscordLambdaRouter {
    * @param event APIGatewayEvent from AWS Lambda
    * @returns APIGatewayProxyResult
    */
-  async handleLambdaInteraction(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
+  async handleLambda(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
       if (event.httpMethod !== "POST") {
           return MethodNotAllowedResponse; 
       }
@@ -68,7 +67,7 @@ export class ServerlessDiscordLambdaRouter {
       }
       const interaction = JSON.parse(event.body) as DiscordInteraction;
       try {
-        const result = await this.router.handleInteraction(interaction, headers);
+        const result = await super.handle({ interaction, requestHeaders: headers });
         return {
             statusCode: 200,
             body: JSON.stringify(result),
@@ -81,13 +80,21 @@ export class ServerlessDiscordLambdaRouter {
       }
   }
 
+  async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
+    const command = super.getCommand(interaction.data.name)
+    if (command instanceof ServerlessDiscordCommandAsync) {
+      // TODO invoke async command
+    }
+    return await command.handleInteraction(interaction);
+  }
+
   /**
    * Handler for AWS Lambda that handles async application commands. This should be invoked asynchronously by handleDiscordWebhook as a
    * seperate Lambda function.
    * 
    * @param event Interaction from handleDiscordWebhook
    */
-  async handleAsyncApplicationCommand(event: DiscordInteractionApplicationCommand) {
-    this.router.handleAsyncApplicationCommand({ interaction: event });
+  async handleLambdaAsyncApplicationCommand(event: DiscordInteractionApplicationCommand) {
+    super.handleAsyncApplicationCommand({ interaction: event });
   }
 }

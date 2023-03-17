@@ -29,19 +29,32 @@ export interface ServerlessDiscordRouterRequestHeaders {
  * @returns ServerlessDiscordRouter
  */
 export class ServerlessDiscordRouter {
-    commands: ServerlessDiscordCommand[];
-    authHandler: ServerlessDiscordAuthorizationHandler;
+    protected commands: ServerlessDiscordCommand[];
+    protected authHandler: ServerlessDiscordAuthorizationHandler;
 
     constructor({ 
         commands, 
-        authHandler 
+        authHandler
     }: { 
         commands: ServerlessDiscordCommand[], 
-        authHandler: ServerlessDiscordAuthorizationHandler 
+        authHandler: ServerlessDiscordAuthorizationHandler,
     }) {
         this.commands = commands;
         this.authHandler = authHandler;
     } 
+
+    async handle({
+        interaction,
+        requestHeaders
+    } : {
+        interaction: DiscordInteraction,
+        requestHeaders: DiscordAuthenticationRequestHeaders
+    }) {
+        if (!this.authHandler.handleAuthorization({ body: interaction, headers: requestHeaders })) {
+            throw new UnauthorizedError();
+        }
+        return await this.handleInteraction(interaction);
+    }
 
     /**
      * Handle an incoming Discord interaction.
@@ -50,10 +63,7 @@ export class ServerlessDiscordRouter {
      * @param requestHeaders Headers of the incoming request
      * @returns 
      */
-    async handleInteraction(interaction: DiscordInteraction, requestHeaders: DiscordAuthenticationRequestHeaders): Promise<DiscordInteractionResponse> {
-        if (!this.authHandler.handleAuthorization(interaction, requestHeaders)) {
-            throw new UnauthorizedError();
-        }
+    async handleInteraction(interaction: DiscordInteraction): Promise<DiscordInteractionResponse> {
         if (instanceofDiscordInteractionPing(interaction)) {
             return this.handlePing();
         }
@@ -81,16 +91,25 @@ export class ServerlessDiscordRouter {
         return { type: DiscordInteractionResponseTypes.PONG };
     }
 
+    protected getCommand(name: string) {
+        const command = this.commands.find(command => command.name === name);
+        if (command === undefined) {
+            throw new CommandNotFoundError();
+        }
+        return command;
+    }
+
     /**
      * Handle an application command interaction by finding a matching command and handling it.
      * 
      * @param interaction Discord Application Command Interaction
      * @returns response from command
      */
-    private async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
-        const command = this.commands.find(command => command.name === interaction.data.name);
-        if (command === undefined) {
-            throw new CommandNotFoundError();
+    async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
+        const command = this.getCommand(interaction.data.name);
+        // Call the async handler if the command is async
+        if (command instanceof ServerlessDiscordCommandAsync) {
+            command.handleInteractionAsync(interaction);
         }
         return await command.handleInteraction(interaction);
     }
