@@ -1,4 +1,4 @@
-import { ServerlessDiscordCommand, ServerlessDiscordCommandAsync } from "./command";
+import { ServerlessDiscordCommand, ServerlessDiscordCommandChatInputAsync } from "./command";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionMessageComponent, instanceofDiscordInteractionModalSubmit, instanceofDiscordInteractionPing } from "../discord/interactions";
 import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 import { createServerlessDiscordAuthorizationHandler, ServerlessDiscordAuthorizationHandler } from "./auth";
@@ -70,15 +70,7 @@ export class ServerlessDiscordRouter {
         if (instanceofDiscordInteractionApplicationCommand(interaction)) {
             return await this.handleApplicationCommand(interaction);
         }
-        if (instanceofDiscordInteractionMessageComponent(interaction)) {
-            throw new NotImplementedError();
-        }
-        if (interaction.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE) {
-            throw new NotImplementedError();
-        }
-        if (instanceofDiscordInteractionModalSubmit(interaction)) {
-            throw new NotImplementedError();
-        }
+        // TODO handle other interaction types
         throw new InvalidInteractionTypeError();
     }
 
@@ -108,29 +100,9 @@ export class ServerlessDiscordRouter {
     async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
         const command = this.getCommand(interaction.data.name);
         // Call the async handler if the command is async
-        if (command instanceof ServerlessDiscordCommandAsync) {
+        if (command instanceof ServerlessDiscordCommandChatInputAsync) {
             command.handleInteractionAsync(interaction);
         }
         return await command.handleInteraction(interaction);
-    }
-
-    /**
-     * Handle an interaction that was sent asynchronously. This is used for interactions that are sent after the initial response.
-     * 
-     * @param interaction Discord Application Command Interaction
-     */
-    async handleAsyncApplicationCommand({
-        interaction,
-    } : {
-        interaction: DiscordInteractionApplicationCommand, 
-    }): Promise<void> {
-        const command = this.commands.find(command => command.name === interaction.data.name);
-        if (command === undefined) {
-            throw new CommandNotFoundError(interaction.data.name);
-        }
-        if (!(command instanceof ServerlessDiscordCommandAsync)) {
-            throw new CommandNotFoundError(interaction.data.name);
-        }
-        command.handleInteractionAsync(interaction);
     }
 }

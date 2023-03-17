@@ -47,18 +47,6 @@ export abstract class ServerlessDiscordCommand {
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
 }
 
-export abstract class ServerlessDiscordCommandAsync extends ServerlessDiscordCommand {
-    handleInteraction(): Promise<DiscordInteractionResponse> {
-        return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({
-            data: {
-                content: "..."
-            }
-        }));
-    }
-
-    abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void>
-}
-
 /**
  * A ServerlessDiscordCommandChatInput is a slash command that can be executed by a Discord user.
  * 
@@ -153,4 +141,31 @@ export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordC
     }
     
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
+}
+
+
+export abstract class ServerlessDiscordCommandChatInputAsync extends ServerlessDiscordCommandChatInput {
+    constructor({
+        globalCommand,
+        guildCommand,
+        name,
+        options,
+    }: {
+        globalCommand?: boolean;
+        guildCommand?: boolean;
+        name: string;
+        options: DiscordCommandOption[];
+    }) {
+        super({ globalCommand, guildCommand, name, options });
+    }
+
+    handleInteraction(): Promise<DiscordInteractionResponse> {
+        return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({
+            data: {
+                content: "..."
+            }
+        }));
+    }
+
+    abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void>
 }

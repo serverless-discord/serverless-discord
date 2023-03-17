@@ -1,4 +1,4 @@
-import { DiscordInteractionApplicationCommand, DiscordInteractionPing, DiscordInteractionApplicationCommandAutocomplete, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionPing, instanceofDiscordInteractionApplicationCommandAutocomplete, DiscordInteractionResponsePong, DiscordInteractionResponseChannelMessageWithSource, DiscordInteractionResponseDeferredUpdateMessage, DiscordInteractionResponseDeferredChannelMessageWithSource, DiscordInteractionResponseUpdateMessage, DiscordInteractionResponseApplicationCommandAutocompleteResult, DiscordInteractionResponseModal } from "./interactions";
+import { DiscordInteractionApplicationCommand, DiscordInteractionPing, DiscordInteractionApplicationCommandAutocomplete, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionPing, instanceofDiscordInteractionApplicationCommandAutocomplete, DiscordInteractionResponsePong, DiscordInteractionResponseChannelMessageWithSource, DiscordInteractionResponseDeferredUpdateMessage, DiscordInteractionResponseDeferredChannelMessageWithSource, DiscordInteractionResponseUpdateMessage, DiscordInteractionResponseApplicationCommandAutocompleteResult, DiscordInteractionResponseModal, DiscordInteractionMessageComponent, instanceofDiscordInteractionMessageComponent, DiscordInteractionModalSubmit, instanceofDiscordInteractionModalSubmit } from "./interactions";
 
 describe("instanceofDiscordInteractionPing", () => {
   it("should return true for valid ping", () => {
@@ -161,5 +161,52 @@ describe("DiscordInteractionResponseModal", () => {
       }
     });
     expect(interaction).toBeDefined();
+  });
+});
+
+describe("instanceofDiscordInteractionMessageComponent", () => {
+  it("should return true for valid message component", () => {
+    const interaction = new DiscordInteractionMessageComponent({
+      id: "123",
+      application_id: "123",
+      token: "123",
+      version: 1,
+      data: {
+        custom_id: "123",
+        component_type: 2,
+        values: [],
+      }
+    });
+    expect(instanceofDiscordInteractionMessageComponent(interaction)).toBe(true);
+  });
+
+  it("should return false for invalid message component", () => {
+    const interaction = {
+      type: 999
+    };
+    expect(instanceofDiscordInteractionMessageComponent(interaction)).toBe(false);
+  });
+});
+
+describe("instanceofDiscordInteractionModalSubmit", () => {
+  it("should return true for valid modal submit", () => {
+    const interaction = new DiscordInteractionModalSubmit({
+      id: "123",
+      application_id: "123",
+      token: "123",
+      version: 1,
+      data: {
+        custom_id: "123",
+        components: [],
+      }
+    });
+    expect(instanceofDiscordInteractionModalSubmit(interaction)).toBe(true);
+  });
+
+  it("should return false for invalid modal submit", () => {
+    const interaction = {
+      type: 999
+    };
+    expect(instanceofDiscordInteractionModalSubmit(interaction)).toBe(false);
   });
 });

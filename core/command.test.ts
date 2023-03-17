@@ -1,5 +1,5 @@
 import { DiscordCommandTypes, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes } from "../discord";
-import { ServerlessDiscordCommand, ServerlessDiscordCommandAsync, ServerlessDiscordCommandChatInput, ServerlessDiscordCommandMessage, ServerlessDiscordCommandUser } from "./command";
+import { ServerlessDiscordCommand, ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync, ServerlessDiscordCommandMessage, ServerlessDiscordCommandUser } from "./command";
 
 describe("ServerlessDiscordCommand", () => {
     class TestCommand extends ServerlessDiscordCommand {
@@ -36,7 +36,7 @@ describe("ServerlessDiscordCommand", () => {
 });
 
 describe("ServerlessDiscordCommandAsync", () => {
-    class TestCommandAsync extends ServerlessDiscordCommandAsync {
+    class TestCommandAsync extends ServerlessDiscordCommandChatInputAsync {
         handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void> {
             return Promise.resolve();
         }
@@ -47,17 +47,17 @@ describe("ServerlessDiscordCommandAsync", () => {
             globalCommand: true,
             guildCommand: true,
             name: "test",
-            type: DiscordCommandTypes.USER,
+            options: [],
         });
         expect(command).toBeDefined();
         expect(command.globalCommand).toBe(true);
         expect(command.guildCommand).toBe(true);
         expect(command.name).toBe("test");
-        expect(command.type).toBe(DiscordCommandTypes.USER);
+        expect(command.type).toBe(DiscordCommandTypes.CHAT_INPUT);
 
         command = new TestCommandAsync({
             name: "test2",
-            type: DiscordCommandTypes.CHAT_INPUT,
+            options: [],
         });
 
         expect(command.globalCommand).toBe(false);
@@ -71,7 +71,7 @@ describe("ServerlessDiscordCommandAsync", () => {
             globalCommand: true,
             guildCommand: true,
             name: "test",
-            type: DiscordCommandTypes.USER,
+            options: [],
         });
         const interaction = new DiscordInteractionApplicationCommand({
             id: "123",

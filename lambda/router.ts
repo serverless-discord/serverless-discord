@@ -1,5 +1,5 @@
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { ServerlessDiscordCommand, ServerlessDiscordAuthorizationHandler, ServerlessDiscordRouter, UnauthorizedError, createServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandAsync } from "../core";
+import { ServerlessDiscordCommand, ServerlessDiscordAuthorizationHandler, ServerlessDiscordRouter, UnauthorizedError, createServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandChatInputAsync, CommandNotFoundError } from "../core";
 import { instanceOfDiscordAuthenticationRequestHeaders, DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord";
 
 export function initLambdaRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
@@ -82,7 +82,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
 
   async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
     const command = super.getCommand(interaction.data.name)
-    if (command instanceof ServerlessDiscordCommandAsync) {
+    if (command instanceof ServerlessDiscordCommandChatInputAsync) {
       // TODO invoke async command
     }
     return await command.handleInteraction(interaction);
@@ -95,6 +95,10 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
    * @param event Interaction from handleDiscordWebhook
    */
   async handleLambdaAsyncApplicationCommand(event: DiscordInteractionApplicationCommand) {
-    super.handleAsyncApplicationCommand({ interaction: event });
+    const command = super.getCommand(event.data.name);
+    if (!(command instanceof ServerlessDiscordCommandChatInputAsync)) {
+        throw new CommandNotFoundError(event.data.name);
+    }
+    command.handleInteractionAsync(event);
   }
 }

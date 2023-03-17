@@ -1,7 +1,7 @@
 import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
-import { ServerlessDiscordCommandChatInput } from "./command";
-import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionTypes } from "../discord/interactions";
-import { CommandNotFoundError, NotImplementedError, UnauthorizedError } from "./errors";
+import { ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync } from "./command";
+import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse } from "../discord/interactions";
+import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 import { MockProxy, mock } from "jest-mock-extended";
 import { ServerlessDiscordAuthorizationHandler } from "./auth";
 
@@ -168,7 +168,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 component_type: 1,
             }
         });
-        expect(router.handleInteraction(messageInteraction)).rejects.toThrowError(NotImplementedError);
+        expect(router.handleInteraction(messageInteraction)).rejects.toThrowError(InvalidInteractionTypeError);
         const modalInteraction = new DiscordInteractionModalSubmit({
             id: "123",
             application_id: "123",
@@ -179,7 +179,54 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
                 components: [],
             }
         });
-        expect(router.handleInteraction(modalInteraction)).rejects.toThrowError(NotImplementedError);
+        expect(router.handleInteraction(modalInteraction)).rejects.toThrowError(InvalidInteractionTypeError);
     });
 });
-        
+
+describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
+    class TestCommandAsync extends ServerlessDiscordCommandChatInputAsync {
+        constructor() {
+            super({
+                name: "test",
+                options: [],
+            });
+        }
+
+        async handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void> {
+            return;
+        }
+    }
+
+    let authHandler: MockProxy<ServerlessDiscordAuthorizationHandler>;
+
+    beforeEach(() => {
+        authHandler = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandler.handleAuthorization.mockReturnValue(true);
+    });
+
+    it("should handle async application command", async () => {
+        const command = new TestCommandAsync();
+        command.handleInteraction = jest.fn();
+        command.handleInteractionAsync = jest.fn();
+        expect(command instanceof ServerlessDiscordCommandChatInput).toBe(true);
+        const router = new ServerlessDiscordRouter({
+            commands: [command],
+            authHandler
+        });
+        const interaction = new DiscordInteractionApplicationCommand({
+            id: "123",
+            application_id: "123",
+            token: "123",
+            version: 1,
+            data: {
+                id: "123",
+                name: "test",
+                options: [],
+                type: 1,
+            },
+        });
+        const response = await router.handleApplicationCommand(interaction);
+        expect(command.handleInteraction).toBeCalledWith(interaction);
+        expect(command.handleInteractionAsync).toBeCalledWith(interaction);
+    });
+});
