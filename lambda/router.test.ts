@@ -1,7 +1,7 @@
 import { MockProxy, mock } from "jest-mock-extended";
 import { APIGatewayEvent } from "aws-lambda";
-import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse, MethodNotAllowedResponse } from "./router";
-import { ServerlessDiscordRouter, CommandNotFoundError, UnauthorizedError, ServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandChatInput } from "../core";
+import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse, MethodNotAllowedResponse, initLambdaRouter } from "./router";
+import { ServerlessDiscordRouter, CommandNotFoundError, UnauthorizedError, ServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync } from "../core";
 import { DiscordInteractionPing, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord";
 
 class TestCommand extends ServerlessDiscordCommandChatInput {
@@ -29,6 +29,28 @@ class TestCommand extends ServerlessDiscordCommandChatInput {
         }
     }
 }
+
+class TestCommandAsync extends ServerlessDiscordCommandChatInputAsync {
+    constructor() {
+        super({
+            name: "test",
+            options: [],
+        });
+    }
+    async handleInteractionAsync(): Promise<void> {
+        return;
+    }
+}
+
+describe("initLambdaRouter", () => {
+    it("should init router", () => {
+        const router = initLambdaRouter({
+            commands: [],
+            applicationPublicKey: "123",
+        });
+        expect(router).toBeInstanceOf(ServerlessDiscordLambdaRouter);
+    });
+});
 
 describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
     let lambdaEventMock: MockProxy<APIGatewayEvent>;
@@ -144,6 +166,27 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
       expect(result).toEqual(UnauthorizedResponse);
     });
 
+    it("should handle invalid headers", async () => {
+        const event: MockProxy<APIGatewayEvent> = mock<APIGatewayEvent>({ 
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify(new DiscordInteractionPing({
+                id: "123",
+                application_id: "123",
+                version: 1,
+                token: "123",
+            })),
+            httpMethod: "POST",
+        });
+        const router = new ServerlessDiscordLambdaRouter({
+            commands: [],
+            authHandler: authHandlerMock,
+        });
+        const result = await router.handleLambda(event);
+        expect(result).toEqual(UnauthorizedResponse);
+    });
+
     it("should handle invalid content type", async () => {
       lambdaEventMock.headers["content-type"] = "text/plain";
       const router = new ServerlessDiscordLambdaRouter({
@@ -162,5 +205,95 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
       });
       const result = await router.handleLambda(lambdaEventMock);
       expect(result).toEqual(MethodNotAllowedResponse);
+    });
+});
+
+describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", () => {
+    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+
+    beforeEach(() => {
+        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
+    });
+
+    it("should handle application command", async () => {
+        const command = new TestCommandAsync();
+        command.handleInteractionAsync = jest.fn();
+        const interaction = new DiscordInteractionApplicationCommand({
+            id: "123",
+            application_id: "123",
+            token: "123",
+            version: 1,
+            data: {
+                id: "123",
+                name: "test",
+                options: [],
+                type: 1,
+            },
+        });
+        const router = new ServerlessDiscordLambdaRouter({
+            commands: [command],
+            authHandler: authHandlerMock,
+        });
+        router.handleLambdaAsyncApplicationCommand(interaction);
+        expect(command.handleInteractionAsync).toBeCalledWith(interaction);
+    });
+
+    it("should throw error if no matching command", async () => {
+        const testCommandMock: MockProxy<TestCommand> = mock<TestCommand>({ name: "test", options: [] });
+        const interaction = new DiscordInteractionApplicationCommand({
+            id: "123",
+            application_id: "123",
+            token: "123",
+            version: 1,
+            data: {
+                id: "123",
+                name: "test",
+                options: [],
+                type: 1,
+            },
+        });
+        const router = new ServerlessDiscordLambdaRouter({
+            commands: [testCommandMock],
+            authHandler: authHandlerMock,
+        });
+        const result = router.handleLambdaAsyncApplicationCommand(interaction);
+        expect(result).rejects.toThrow(CommandNotFoundError);
+    });
+});
+
+describe("ServerlessDiscordLambdaRouter.handleApplicationCommand", () => {
+    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+
+    beforeEach(() => {
+        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
+    });
+
+    it("should handle async application command", async () => {
+        const command = new TestCommandAsync();
+        const router = new ServerlessDiscordLambdaRouter({
+            commands: [command],
+            authHandler: authHandlerMock,
+        });
+        const interaction = new DiscordInteractionApplicationCommand({
+            id: "123",
+            application_id: "123",
+            token: "123",
+            version: 1,
+            data: {
+                id: "123",
+                name: "test",
+                options: [],
+                type: 1,
+            },
+        });
+        const result = await router.handleApplicationCommand(interaction);
+        expect(result).toEqual({
+            type: 5,
+            data: {
+                content: "...",
+            },
+        });
     });
 });
