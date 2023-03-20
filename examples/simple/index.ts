@@ -1,10 +1,11 @@
-import { initRouter, ServerlessDiscordCommandChatInput } from "../../core";
 import { DiscordInteractionResponse, DiscordInteractionResponseTypes } from "../../discord/interactions";
 import * as http from "http";
+import { CommandChatInput } from "../../core/command";
+import { initRouter } from "../../core/router";
 
 const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY || "123";
 
-class HelloWorldCommand extends ServerlessDiscordCommandChatInput {
+class HelloWorldCommand extends CommandChatInput {
     constructor() {
         super({
             name: "hello-world",
