@@ -1,3 +1,6 @@
+import { discord } from '..';
+import { discordReq } from './api';
+import { DiscordCommand, DiscordCreateGlobalApplicationCommandParams } from './command';
 import { DiscordTeam } from './teams';
 import { DiscordUser } from './user';
 
@@ -28,7 +31,7 @@ import { DiscordUser } from './user';
  * 
  * @see https://discord.com/developers/docs/resources/application#application-object 
  */
-export type DiscordApplication = {
+export interface DiscordApplication {
     id: string;
     name: string;
     icon?: string;
@@ -51,6 +54,63 @@ export type DiscordApplication = {
     custom_install_url?: string;
     role_connections_verification_url?: string;
 }
+
+export class DiscordApplication implements DiscordApplication {
+    private apiRequest: discordReq;
+    
+    constructor({
+        id,
+        name,
+        description,
+        summary,
+        verify_key,
+        flags,
+        apiRequest
+    }: {
+        id: string,
+        name: string,
+        description: string,
+        summary: string,
+        verify_key: string,
+        flags: number,
+        apiRequest?: discordReq
+    }) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.summary = summary;
+        this.verify_key = verify_key;
+        this.flags = flags;
+        this.apiRequest = apiRequest || discordReq;
+    }
+
+    async getGlobalApplicationCommands(): Promise<DiscordCommand[]> {
+        const resp = await this.apiRequest({
+            path: `/applications/${this.id}/commands`,
+            method: "GET"
+        });
+        return await resp.json();
+    }
+
+    async createGlobalApplicationCommand(command: DiscordCreateGlobalApplicationCommandParams): Promise<DiscordCommand> {
+        const resp = await this.apiRequest({
+            path: `/applications/${this.id}/commands`,
+            method: "POST",
+            body: command
+        });
+        return await resp.json();
+    }
+
+    async bulkCreateGlobalApplicationCommand(commands: DiscordCreateGlobalApplicationCommandParams[]): Promise<DiscordCommand[]> {
+        const resp = await this.apiRequest({
+            path: `/applications/${this.id}/commands`,
+            method: "PUT",
+            body: commands
+        });
+        return await resp.json();
+    }
+}
+
 
 /**
  * DiscordApplicationFlags is the flags for a Discord application.
