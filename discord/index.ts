@@ -1,6 +1,4 @@
-export const DISCORD_API_VERSION = 9;
-export const DISCORD_API_BASE_URL = `https://discord.com/api/v${DISCORD_API_VERSION}`;
-
+export * as api from "./api";
 export * as application from "./application";
 export * as auth from "./auth";
 export * as channel from "./channel";

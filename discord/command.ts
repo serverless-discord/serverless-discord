@@ -294,3 +294,19 @@ export enum ApplicationCommandPermissionType {
     USER = 2,
     CHANNEL = 3,
 }
+
+/**
+ * @see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params
+ */
+export interface DiscordCreateApplicationCommandParams {
+    name: string;
+    name_localizations?: DiscordLocalesDictionary<string>;
+    description: string;
+    description_localizations?: DiscordLocalesDictionary<string>;
+    options?: DiscordCommandOption[];
+    default_member_permissions?: DiscordBitwisePermissionFlags;
+    default_permission?: boolean;
+    dm_permission?: boolean;
+    nsfw?: boolean;
+    type?: DiscordCommandTypes;
+}

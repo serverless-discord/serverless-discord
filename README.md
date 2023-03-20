@@ -10,7 +10,7 @@ Typescript library designed to facilitate the creation of serverless Discord bot
 To get started, install the serverless-discord package from npm:
 
 ```
-npm install serverless-discord serverless-discord-lambda
+npm install serverless-discord
 ```
 
 Next, create a simple command like this one:

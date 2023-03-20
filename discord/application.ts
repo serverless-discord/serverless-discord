@@ -28,7 +28,7 @@ import { DiscordUser } from './user';
  * 
  * @see https://discord.com/developers/docs/resources/application#application-object 
  */
-export type DiscordApplication = {
+export interface DiscordApplication {
     id: string;
     name: string;
     icon?: string;
@@ -51,6 +51,33 @@ export type DiscordApplication = {
     custom_install_url?: string;
     role_connections_verification_url?: string;
 }
+
+export class DiscordApplication implements DiscordApplication {
+    
+    constructor({
+        id,
+        name,
+        description,
+        summary,
+        verify_key,
+        flags,
+    }: {
+        id: string,
+        name: string,
+        description: string,
+        summary: string,
+        verify_key: string,
+        flags: number,
+    }) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.summary = summary;
+        this.verify_key = verify_key;
+        this.flags = flags;
+    }
+}
+
 
 /**
  * DiscordApplicationFlags is the flags for a Discord application.
