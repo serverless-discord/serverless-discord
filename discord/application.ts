@@ -1,6 +1,3 @@
-import { discord } from '..';
-import { discordReq } from './api';
-import { DiscordCommand, DiscordCreateGlobalApplicationCommandParams } from './command';
 import { DiscordTeam } from './teams';
 import { DiscordUser } from './user';
 
@@ -56,7 +53,6 @@ export interface DiscordApplication {
 }
 
 export class DiscordApplication implements DiscordApplication {
-    private apiRequest: discordReq;
     
     constructor({
         id,
@@ -65,7 +61,6 @@ export class DiscordApplication implements DiscordApplication {
         summary,
         verify_key,
         flags,
-        apiRequest
     }: {
         id: string,
         name: string,
@@ -73,7 +68,6 @@ export class DiscordApplication implements DiscordApplication {
         summary: string,
         verify_key: string,
         flags: number,
-        apiRequest?: discordReq
     }) {
         this.id = id;
         this.name = name;
@@ -81,33 +75,6 @@ export class DiscordApplication implements DiscordApplication {
         this.summary = summary;
         this.verify_key = verify_key;
         this.flags = flags;
-        this.apiRequest = apiRequest || discordReq;
-    }
-
-    async getGlobalApplicationCommands(): Promise<DiscordCommand[]> {
-        const resp = await this.apiRequest({
-            path: `/applications/${this.id}/commands`,
-            method: "GET"
-        });
-        return await resp.json();
-    }
-
-    async createGlobalApplicationCommand(command: DiscordCreateGlobalApplicationCommandParams): Promise<DiscordCommand> {
-        const resp = await this.apiRequest({
-            path: `/applications/${this.id}/commands`,
-            method: "POST",
-            body: command
-        });
-        return await resp.json();
-    }
-
-    async bulkCreateGlobalApplicationCommand(commands: DiscordCreateGlobalApplicationCommandParams[]): Promise<DiscordCommand[]> {
-        const resp = await this.apiRequest({
-            path: `/applications/${this.id}/commands`,
-            method: "PUT",
-            body: commands
-        });
-        return await resp.json();
     }
 }
 

@@ -298,7 +298,7 @@ export enum ApplicationCommandPermissionType {
 /**
  * @see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params
  */
-export interface DiscordCreateGlobalApplicationCommandParams {
+export interface DiscordCreateApplicationCommandParams {
     name: string;
     name_localizations?: DiscordLocalesDictionary<string>;
     description: string;
