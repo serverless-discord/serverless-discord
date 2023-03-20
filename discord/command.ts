@@ -2,12 +2,29 @@ import { DiscordChannelTypes } from "./channel";
 import { DiscordLocalesDictionary } from "./locales";
 import { DiscordBitwisePermissionFlags } from "./permissions";
 
+export interface DiscordCommand {
+    id: string;
+    type: DiscordCommandTypes | DiscordCommandTypes.CHAT_INPUT;
+    application_id: string;
+    guild_id?: string;
+    name: string;
+    name_localizations?: DiscordLocalesDictionary<string>;
+    description: string;
+    description_localizations?: DiscordLocalesDictionary<string>;
+    options?: DiscordCommandOption[];
+    default_member_permissions?: DiscordBitwisePermissionFlags;
+    dm_permission?: boolean;
+    default_permission?: boolean;
+    nsfw?: boolean;
+    version: string;
+}
+
 /**
  * A DiscordCommand is a command that can be executed on a Discord server.
  * 
  * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
  */
-export abstract class DiscordCommand {
+export abstract class DiscordCommand implements DiscordCommand {
     id: string;
     type: DiscordCommandTypes | DiscordCommandTypes.CHAT_INPUT;
     application_id: string;
@@ -41,12 +58,17 @@ export abstract class DiscordCommand {
     }
 }
 
+export interface DiscordCommandChatInput extends DiscordCommand {
+    type: DiscordCommandTypes.CHAT_INPUT;
+    options: DiscordCommandOption[];
+}
+
 /**
  * A DiscordCommandChatInput is a slash command that can be executed on a Discord server.
  * 
  * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
  */
-export class DiscordCommandChatInput extends DiscordCommand {
+export class DiscordCommandChatInput extends DiscordCommand implements DiscordCommandChatInput {
     type: DiscordCommandTypes.CHAT_INPUT;
     options: DiscordCommandOption[];
 
@@ -100,6 +122,10 @@ export class DiscordCommandChatInput extends DiscordCommand {
     }
 }
 
+export interface DiscordCommandMessage extends DiscordCommand {
+    type: DiscordCommandTypes.MESSAGE;
+}
+
 /**
  * A DiscordCommandUser is a user context menu command that can be executed on a Discord server.
  * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
@@ -137,6 +163,10 @@ export class DiscordCommandUser extends DiscordCommand {
         super({ id, type: DiscordCommandTypes.USER, application_id, guild_id, name, name_localizations, description, description_localizations, default_member_permissions, dm_permission, default_permission, nsfw, version});
         this.type = DiscordCommandTypes.USER;
     }
+}
+
+export interface DiscordCommandUser extends DiscordCommand {
+    type: DiscordCommandTypes.USER;
 }
 
 /**

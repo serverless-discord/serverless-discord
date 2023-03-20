@@ -6,6 +6,23 @@ import { DiscordRole } from "./permissions";
 import { DiscordUser } from "./user";
 
 
+export interface DiscordInteraction {
+    id: string;
+    application_id: string;
+    type: DiscordInteractionTypes;
+    data?: DiscordApplicationCommandInteractionData | Partial<DiscordApplicationCommandInteractionData> | DiscordMessageComponentInteractionData | DiscordModalInteractionData;
+    guild_id?: string;
+    channel_id?: string;
+    member?: DiscordGuildMember;
+    user?: DiscordUser;
+    token: string;
+    version: number;
+    message?: DiscordMessage;
+    app_permissions?: string;
+    locale?: string;
+    guild_locale?: string;
+}
+
 /**
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
@@ -41,6 +58,14 @@ export abstract class DiscordInteraction {
         this.locale = locale;
         this.guild_locale = guild_locale;
     }
+}
+
+export function instanceofDiscordInteraction(object: any): object is DiscordInteraction {
+    return object.id && object.application_id && object.type && object.token && object.version;
+}
+
+export interface DiscordInteractionPing extends DiscordInteraction {
+    type: DiscordInteractionTypes.PING;
 }
 
 /**
@@ -83,6 +108,11 @@ export class DiscordInteractionPing extends DiscordInteraction {
 
 export function instanceofDiscordInteractionPing(object: any): object is DiscordInteractionPing {
     return object.type === DiscordInteractionTypes.PING;
+}
+
+export interface DiscordInteractionApplicationCommand extends DiscordInteraction {
+    type: DiscordInteractionTypes.APPLICATION_COMMAND;
+    data: DiscordApplicationCommandInteractionData;
 }
 
 /**
@@ -131,6 +161,11 @@ export function instanceofDiscordInteractionApplicationCommand(object: any): obj
     return object.type === DiscordInteractionTypes.APPLICATION_COMMAND;
 }
 
+export interface DiscordInteractionMessageComponent extends DiscordInteraction {
+    type: DiscordInteractionTypes.MESSAGE_COMPONENT;
+    data: DiscordMessageComponentInteractionData;
+}
+
 /**
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
@@ -177,6 +212,11 @@ export function instanceofDiscordInteractionMessageComponent(object: any): objec
     return object.type === DiscordInteractionTypes.MESSAGE_COMPONENT;
 }
 
+export interface DiscordInteractionApplicationCommandAutocomplete extends DiscordInteraction {
+    type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+    data: Partial<DiscordApplicationCommandInteractionData>;
+}
+
 /**
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
@@ -221,6 +261,11 @@ export class DiscordInteractionApplicationCommandAutocomplete extends DiscordInt
 
 export function instanceofDiscordInteractionApplicationCommandAutocomplete(object: any): object is DiscordInteractionApplicationCommandAutocomplete {
     return object.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+}
+
+export interface DiscordInteractionModalSubmit extends DiscordInteraction {
+    type: DiscordInteractionTypes.MODAL_SUBMIT;
+    data: DiscordModalInteractionData;
 }
 
 /**
@@ -420,6 +465,11 @@ export enum DiscordInteractionResponseTypes {
     ACKNOWLEDGE_WITH_SOURCE
 }
 
+export interface DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes;
+    data?: DiscordInteractionResponseData | DiscordAutocompleteInteractionResponseData;
+}
+
 /**
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure
  */
@@ -433,6 +483,10 @@ export class DiscordInteractionResponse {
     }
 }
 
+export interface DiscordInteractionResponsePong extends DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes.PONG;
+}
+
 export class DiscordInteractionResponsePong extends DiscordInteractionResponse {
     type: DiscordInteractionResponseTypes.PONG;
 
@@ -440,6 +494,11 @@ export class DiscordInteractionResponsePong extends DiscordInteractionResponse {
         super({ type: DiscordInteractionResponseTypes.PONG });
         this.type = DiscordInteractionResponseTypes.PONG;
     }
+}
+
+export interface DiscordInteractionResponseChannelMessageWithSource extends DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE;
+    data: DiscordInteractionResponseData;
 }
 
 export class DiscordInteractionResponseChannelMessageWithSource extends DiscordInteractionResponse {
@@ -453,6 +512,11 @@ export class DiscordInteractionResponseChannelMessageWithSource extends DiscordI
     }
 }
 
+export interface DiscordInteractionResponseDeferredChannelMessageWithSource extends DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
+    data: DiscordInteractionResponseData;
+}
+
 export class DiscordInteractionResponseDeferredChannelMessageWithSource extends DiscordInteractionResponse {
     type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
     data: DiscordInteractionResponseData;
@@ -462,6 +526,11 @@ export class DiscordInteractionResponseDeferredChannelMessageWithSource extends 
         this.type = DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
         this.data = data;
     }
+}
+
+export interface DiscordInteractionResponseDeferredUpdateMessage extends DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes.DEFERRED_UPDATE_MESSAGE;
+    data: DiscordInteractionResponseData;
 }
 
 export class DiscordInteractionResponseDeferredUpdateMessage extends DiscordInteractionResponse {
@@ -475,6 +544,11 @@ export class DiscordInteractionResponseDeferredUpdateMessage extends DiscordInte
     }
 }
 
+export interface DiscordInteractionResponseUpdateMessage extends DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes.UPDATE_MESSAGE;
+    data: DiscordInteractionResponseData;
+}
+
 export class DiscordInteractionResponseUpdateMessage extends DiscordInteractionResponse {
     type: DiscordInteractionResponseTypes.UPDATE_MESSAGE;
     data: DiscordInteractionResponseData;
@@ -486,6 +560,11 @@ export class DiscordInteractionResponseUpdateMessage extends DiscordInteractionR
     }
 }
 
+export interface DiscordInteractionResponseApplicationCommandAutocompleteResult extends DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
+    data: DiscordAutocompleteInteractionResponseData;
+}
+
 export class DiscordInteractionResponseApplicationCommandAutocompleteResult extends DiscordInteractionResponse {
     type: DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
     data: DiscordAutocompleteInteractionResponseData;
@@ -495,6 +574,11 @@ export class DiscordInteractionResponseApplicationCommandAutocompleteResult exte
         this.type = DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
         this.data = data;
     }
+}
+
+export interface DiscordInteractionResponseModal extends DiscordInteractionResponse {
+    type: DiscordInteractionResponseTypes.MODAL;
+    data: DiscordInteractionResponseData;
 }
 
 export class DiscordInteractionResponseModal extends DiscordInteractionResponse {

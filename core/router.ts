@@ -1,8 +1,8 @@
 import { ServerlessDiscordCommand, ServerlessDiscordCommandChatInputAsync } from "./command";
-import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionMessageComponent, instanceofDiscordInteractionModalSubmit, instanceofDiscordInteractionPing } from "../discord/interactions";
+import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes, instanceofDiscordInteraction, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionMessageComponent, instanceofDiscordInteractionModalSubmit, instanceofDiscordInteractionPing } from "../discord/interactions";
 import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 import { createServerlessDiscordAuthorizationHandler, ServerlessDiscordAuthorizationHandler } from "./auth";
-import { DiscordAuthenticationRequestHeaders } from "../discord";
+import { DiscordAuthenticationRequestHeaders, instanceOfDiscordAuthenticationRequestHeaders } from "../discord";
 
 /**
  * Initializes a new ServerlessDiscordRouter.
@@ -47,9 +47,15 @@ export class ServerlessDiscordRouter {
         interaction,
         requestHeaders
     } : {
-        interaction: DiscordInteraction,
-        requestHeaders: DiscordAuthenticationRequestHeaders
+        interaction: unknown,
+        requestHeaders: unknown
     }) {
+        if (!instanceOfDiscordAuthenticationRequestHeaders(requestHeaders)) {
+            throw new UnauthorizedError();
+        }
+        if (!instanceofDiscordInteraction(interaction)) {
+            throw new InvalidInteractionTypeError();
+        }
         if (!this.authHandler.handleAuthorization({ body: interaction, headers: requestHeaders })) {
             throw new UnauthorizedError();
         }

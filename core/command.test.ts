@@ -1,4 +1,4 @@
-import { DiscordCommandTypes, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes } from "../discord";
+import { DiscordCommandTypes, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource, DiscordInteractionResponseTypes } from "../discord";
 import { ServerlessDiscordCommand, ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync, ServerlessDiscordCommandMessage, ServerlessDiscordCommandUser } from "./command";
 
 describe("ServerlessDiscordCommand", () => {
@@ -37,6 +37,16 @@ describe("ServerlessDiscordCommand", () => {
 
 describe("ServerlessDiscordCommandAsync", () => {
     class TestCommandAsync extends ServerlessDiscordCommandChatInputAsync {
+
+        handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseDeferredChannelMessageWithSource> {
+            return Promise.resolve({
+                type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+                data: {
+                    content: "..."
+                }
+            });
+        }
+
         handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void> {
             return Promise.resolve();
         }
@@ -85,7 +95,7 @@ describe("ServerlessDiscordCommandAsync", () => {
                 type: 1,
             }
         });
-        const response = await command.handleInteraction();
+        const response = await command.handleInteraction(interaction);
         expect(response).toEqual({
             type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
             data: {

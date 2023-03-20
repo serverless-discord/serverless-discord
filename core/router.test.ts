@@ -1,6 +1,6 @@
 import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync } from "./command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse } from "../discord/interactions";
+import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
 import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 import { MockProxy, mock } from "jest-mock-extended";
 import { ServerlessDiscordAuthorizationHandler } from "./auth";
@@ -73,6 +73,27 @@ describe("ServerlessDiscordRouter.handle", () => {
         const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
         router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
         await expect(router.handle({ interaction, requestHeaders: defaultMockHeaders })).rejects.toThrow(UnauthorizedError);
+    });
+
+    it("should handle invalid interaction type", async () => {
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
+        const router = new ServerlessDiscordRouter({
+            commands: [],
+            authHandler: authHandlerMock,
+        });
+        router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
+        await expect(router.handle({ interaction: {}, requestHeaders: defaultMockHeaders })).rejects.toThrow(InvalidInteractionTypeError);
+    });
+
+    it("should handle invalid request headers", async () => {
+        authHandlerMock.handleAuthorization.mockReturnValue(true);
+        const router = new ServerlessDiscordRouter({
+            commands: [],
+            authHandler: authHandlerMock,
+        });
+        const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
+        router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
+        await expect(router.handle({ interaction: interaction, requestHeaders: {} })).rejects.toThrow(UnauthorizedError);
     });
 });
 
@@ -190,6 +211,10 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
                 name: "test",
                 options: [],
             });
+        }
+
+        async handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseDeferredChannelMessageWithSource> {
+            return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({ data: { content: "test" } }));
         }
 
         async handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void> {
