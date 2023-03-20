@@ -159,12 +159,8 @@ export abstract class ServerlessDiscordCommandChatInputAsync extends ServerlessD
         super({ globalCommand, guildCommand, name, options });
     }
 
-    handleInteraction(): Promise<DiscordInteractionResponse> {
-        return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({
-            data: {
-                content: "..."
-            }
-        }));
+    handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseDeferredChannelMessageWithSource> {
+        return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({ data: { content: "..." } }));
     }
 
     abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void>

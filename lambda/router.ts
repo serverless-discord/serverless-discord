@@ -1,10 +1,12 @@
+import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ServerlessDiscordCommand, ServerlessDiscordAuthorizationHandler, ServerlessDiscordRouter, UnauthorizedError, createServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandChatInputAsync, CommandNotFoundError } from "../core";
 import { instanceOfDiscordAuthenticationRequestHeaders, DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord";
 
 export function initLambdaRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
     const authHandler = createServerlessDiscordAuthorizationHandler({ applicationPublicKey });
-    return new ServerlessDiscordLambdaRouter({ commands, authHandler });
+    const awsClient = new LambdaClient({});
+    return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
@@ -38,14 +40,23 @@ export type AsyncLambdaCommandEvent = {
  * interaction data as the event.
  */
 export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
+  asyncLambdaArn: string | undefined;
+  awsClient: LambdaClient;
+
   constructor({
     commands,
     authHandler,
+    asyncLambdaArn,
+    awsClient,
   }: {
     commands: ServerlessDiscordCommand[],
     authHandler: ServerlessDiscordAuthorizationHandler,
+    asyncLambdaArn?: string,
+    awsClient: LambdaClient,
   }) {
     super({ commands, authHandler });
+    this.asyncLambdaArn = asyncLambdaArn;
+    this.awsClient = awsClient;
   }
 
   /**
@@ -82,8 +93,16 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
 
   async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
     const command = super.getCommand(interaction.data.name)
-    if (command instanceof ServerlessDiscordCommandChatInputAsync) {
-      // TODO invoke async command
+    if (this.asyncLambdaArn != "" && command instanceof ServerlessDiscordCommandChatInputAsync) {
+      // Invoke the async lambda function
+      const payload = Uint8Array.from(JSON.stringify(interaction), c => c.charCodeAt(0));
+      const lambdaCommand = new InvokeCommand({
+        FunctionName: this.asyncLambdaArn,
+        Payload: payload,
+      });
+
+      // Don't wait for response from async lambda
+      this.awsClient.send(lambdaCommand);
     }
     return await command.handleInteraction(interaction);
   }
