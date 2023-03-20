@@ -1,5 +1,5 @@
-import { DiscordInteractionPing } from "../discord";
-import { createServerlessDiscordAuthorizationHandler, ServerlessDiscordAuthorizationHandler } from "./auth";
+import { DiscordInteractionPing } from "../discord/interactions";
+import { createAuthHandler, AuthHandler } from "./auth";
 import { ServerlessDiscordRouterRequestHeaders } from "./router";
 
 describe("ServerlessDiscordAuthorizationHandler", () => {
@@ -11,7 +11,7 @@ describe("ServerlessDiscordAuthorizationHandler", () => {
 
     it("should be able to handle authorization", () => {
         mockVerifyFunc.mockReturnValue(true);
-        const handler = new ServerlessDiscordAuthorizationHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
+        const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
         const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
         const headers: ServerlessDiscordRouterRequestHeaders = {
             "x-signature-ed25519": "123",
@@ -28,7 +28,7 @@ describe("ServerlessDiscordAuthorizationHandler", () => {
 
     it("should be able to handle invalid authorization", () => {
         mockVerifyFunc.mockReturnValue(false);
-        const handler = new ServerlessDiscordAuthorizationHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
+        const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
         const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
         const headers: ServerlessDiscordRouterRequestHeaders = {
             "x-signature-ed25519": "123",
@@ -46,7 +46,7 @@ describe("ServerlessDiscordAuthorizationHandler", () => {
 
 describe("createServerlessDiscordAuthorizationHandler", () => {
     it("should be able to create a default handler", () => {
-        const authHandler = createServerlessDiscordAuthorizationHandler({ applicationPublicKey: "test" });
-        expect(authHandler).toBeInstanceOf(ServerlessDiscordAuthorizationHandler);
+        const authHandler = createAuthHandler({ applicationPublicKey: "test" });
+        expect(authHandler).toBeInstanceOf(AuthHandler);
     });
 });

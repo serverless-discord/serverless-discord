@@ -1,11 +1,11 @@
 import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
-import { ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync } from "./command";
+import { CommandChatInput, CommandChatInputAsync } from "./command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
-import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
+import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { MockProxy, mock } from "jest-mock-extended";
-import { ServerlessDiscordAuthorizationHandler } from "./auth";
+import { AuthHandler } from "./auth";
 
-class TestCommand extends ServerlessDiscordCommandChatInput {
+class TestCommand extends CommandChatInput {
     constructor() {
         super({
             name: "test",
@@ -46,10 +46,10 @@ describe("ServerlessDiscordRouter.handle", () => {
         "x-signature-ed25519": "123",
         "x-signature-timestamp": "123",
     }
-    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+    let authHandlerMock: MockProxy<AuthHandler>;
 
     beforeEach(() => {
-        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock = mock<AuthHandler>();
     });
 
     it("should handle authenticated", async () => {
@@ -102,10 +102,10 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         "x-signature-ed25519": "123",
         "x-signature-timestamp": "123",
     }
-    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+    let authHandlerMock: MockProxy<AuthHandler>;
 
     beforeEach(() => {
-        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
     });
 
@@ -205,7 +205,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
 });
 
 describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
-    class TestCommandAsync extends ServerlessDiscordCommandChatInputAsync {
+    class TestCommandAsync extends CommandChatInputAsync {
         constructor() {
             super({
                 name: "test",
@@ -222,10 +222,10 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
         }
     }
 
-    let authHandler: MockProxy<ServerlessDiscordAuthorizationHandler>;
+    let authHandler: MockProxy<AuthHandler>;
 
     beforeEach(() => {
-        authHandler = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandler = mock<AuthHandler>();
         authHandler.handleAuthorization.mockReturnValue(true);
     });
 
@@ -233,7 +233,7 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
         const command = new TestCommandAsync();
         command.handleInteraction = jest.fn();
         command.handleInteractionAsync = jest.fn();
-        expect(command instanceof ServerlessDiscordCommandChatInput).toBe(true);
+        expect(command instanceof CommandChatInput).toBe(true);
         const router = new ServerlessDiscordRouter({
             commands: [command],
             authHandler

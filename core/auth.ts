@@ -1,13 +1,14 @@
 import { ServerlessDiscordRouterRequestHeaders } from "./router";
-import { DiscordAuthenticationVerificationFunction, DiscordInteraction } from "../discord";
 import nacl from "tweetnacl";
+import { DiscordAuthenticationVerificationFunction } from "../discord/auth";
+import { DiscordInteraction } from "../discord/interactions";
 
-export const createServerlessDiscordAuthorizationHandler = ({ 
+export const createAuthHandler = ({ 
     applicationPublicKey, 
 }: { 
     applicationPublicKey: string, 
 }) => {
-    return new ServerlessDiscordAuthorizationHandler({ applicationPublicKey, verifyFunc: nacl.sign.detached.verify });
+    return new AuthHandler({ applicationPublicKey, verifyFunc: nacl.sign.detached.verify });
 };
 
 /**
@@ -15,7 +16,7 @@ export const createServerlessDiscordAuthorizationHandler = ({
  * 
  * @param applicationPublicKey The public key of the Discord application
  */
-export class ServerlessDiscordAuthorizationHandler {
+export class AuthHandler {
     private applicationPublicKey: string;
     private verifyFunc: DiscordAuthenticationVerificationFunction
 

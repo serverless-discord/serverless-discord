@@ -1,8 +1,8 @@
-import { ServerlessDiscordCommand, ServerlessDiscordCommandChatInputAsync } from "./command";
-import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionTypes, instanceofDiscordInteraction, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionMessageComponent, instanceofDiscordInteractionModalSubmit, instanceofDiscordInteractionPing } from "../discord/interactions";
-import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
-import { createServerlessDiscordAuthorizationHandler, ServerlessDiscordAuthorizationHandler } from "./auth";
-import { DiscordAuthenticationRequestHeaders, instanceOfDiscordAuthenticationRequestHeaders } from "../discord";
+import { Command, CommandChatInputAsync } from "./command";
+import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, instanceofDiscordInteraction, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionPing } from "../discord/interactions";
+import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
+import { createAuthHandler, AuthHandler } from "./auth";
+import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 
 /**
  * Initializes a new ServerlessDiscordRouter.
@@ -10,8 +10,8 @@ import { DiscordAuthenticationRequestHeaders, instanceOfDiscordAuthenticationReq
  * @param applicationPublicKey The public key of the Discord application.
  * @returns ServerlessDiscordRouter
  */
-export function initRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordRouter {
-    const authHandler = createServerlessDiscordAuthorizationHandler({ applicationPublicKey });
+export function initRouter({ commands, applicationPublicKey }: { commands: Command[], applicationPublicKey: string }): ServerlessDiscordRouter {
+    const authHandler = createAuthHandler({ applicationPublicKey });
     return new ServerlessDiscordRouter({ commands, authHandler });
 }
 
@@ -29,15 +29,15 @@ export interface ServerlessDiscordRouterRequestHeaders {
  * @returns ServerlessDiscordRouter
  */
 export class ServerlessDiscordRouter {
-    protected commands: ServerlessDiscordCommand[];
-    protected authHandler: ServerlessDiscordAuthorizationHandler;
+    protected commands: Command[];
+    protected authHandler: AuthHandler;
 
     constructor({ 
         commands, 
         authHandler
     }: { 
-        commands: ServerlessDiscordCommand[], 
-        authHandler: ServerlessDiscordAuthorizationHandler,
+        commands: Command[], 
+        authHandler: AuthHandler,
     }) {
         this.commands = commands;
         this.authHandler = authHandler;
@@ -106,7 +106,7 @@ export class ServerlessDiscordRouter {
     async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
         const command = this.getCommand(interaction.data.name);
         // Call the async handler if the command is async
-        if (command instanceof ServerlessDiscordCommandChatInputAsync) {
+        if (command instanceof CommandChatInputAsync) {
             command.handleInteractionAsync(interaction);
         }
         return await command.handleInteraction(interaction);

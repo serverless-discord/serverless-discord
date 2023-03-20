@@ -1,10 +1,14 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
-import { ServerlessDiscordCommand, ServerlessDiscordAuthorizationHandler, ServerlessDiscordRouter, UnauthorizedError, createServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandChatInputAsync, CommandNotFoundError } from "../core";
-import { instanceOfDiscordAuthenticationRequestHeaders, DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord";
+import { AuthHandler, createAuthHandler } from "../core/auth";
+import { Command, CommandChatInputAsync } from "../core/command";
+import { UnauthorizedError, CommandNotFoundError } from "../core/errors";
+import { ServerlessDiscordRouter } from "../core/router";
+import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
+import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
 
-export function initLambdaRouter({ commands, applicationPublicKey }: { commands: ServerlessDiscordCommand[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
-    const authHandler = createServerlessDiscordAuthorizationHandler({ applicationPublicKey });
+export function initLambdaRouter({ commands, applicationPublicKey }: { commands: Command[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
+    const authHandler = createAuthHandler({ applicationPublicKey });
     const awsClient = new LambdaClient({});
     return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient });
 }
@@ -49,8 +53,8 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
     asyncLambdaArn,
     awsClient,
   }: {
-    commands: ServerlessDiscordCommand[],
-    authHandler: ServerlessDiscordAuthorizationHandler,
+    commands: Command[],
+    authHandler: AuthHandler,
     asyncLambdaArn?: string,
     awsClient: LambdaClient,
   }) {
@@ -93,7 +97,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
 
   async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
     const command = super.getCommand(interaction.data.name)
-    if (this.asyncLambdaArn != "" && command instanceof ServerlessDiscordCommandChatInputAsync) {
+    if (this.asyncLambdaArn != "" && command instanceof CommandChatInputAsync) {
       // Invoke the async lambda function
       const payload = Uint8Array.from(JSON.stringify(interaction), c => c.charCodeAt(0));
       const lambdaCommand = new InvokeCommand({
@@ -115,7 +119,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
    */
   async handleLambdaAsyncApplicationCommand(event: DiscordInteractionApplicationCommand) {
     const command = super.getCommand(event.data.name);
-    if (!(command instanceof ServerlessDiscordCommandChatInputAsync)) {
+    if (!(command instanceof CommandChatInputAsync)) {
         throw new CommandNotFoundError(event.data.name);
     }
     command.handleInteractionAsync(event);

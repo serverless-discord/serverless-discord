@@ -1,5 +1,5 @@
 import { initRouter, ServerlessDiscordCommandChatInput } from "../../core";
-import { DiscordInteractionResponse, DiscordInteractionResponseTypes } from "../../discord";
+import { DiscordInteractionResponse, DiscordInteractionResponseTypes } from "../../discord/interactions";
 import * as http from "http";
 
 const DISCORD_PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY || "123";

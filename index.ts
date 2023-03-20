@@ -1,3 +1,3 @@
-export * from "./discord";
-export * from "./core";
-export * from "./lambda";
+export * as discord from "./discord";
+export * as core from "./core";
+export * as lambda from "./lambda";

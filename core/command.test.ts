@@ -1,8 +1,9 @@
-import { DiscordCommandTypes, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource, DiscordInteractionResponseTypes } from "../discord";
-import { ServerlessDiscordCommand, ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync, ServerlessDiscordCommandMessage, ServerlessDiscordCommandUser } from "./command";
+import { DiscordCommandTypes } from "../discord/command";
+import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
+import { Command, CommandChatInput, CommandChatInputAsync, CommandMessage, CommandUser } from "./command";
 
 describe("ServerlessDiscordCommand", () => {
-    class TestCommand extends ServerlessDiscordCommand {
+    class TestCommand extends Command {
         handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
             return Promise.resolve({
                 type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -36,7 +37,7 @@ describe("ServerlessDiscordCommand", () => {
 });
 
 describe("ServerlessDiscordCommandAsync", () => {
-    class TestCommandAsync extends ServerlessDiscordCommandChatInputAsync {
+    class TestCommandAsync extends CommandChatInputAsync {
 
         handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseDeferredChannelMessageWithSource> {
             return Promise.resolve({
@@ -106,7 +107,7 @@ describe("ServerlessDiscordCommandAsync", () => {
 });
 
 describe("ServerlessDiscordCommandChatInput", () => {
-    class TestCommandChatInput extends ServerlessDiscordCommandChatInput {
+    class TestCommandChatInput extends CommandChatInput {
         handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
             return Promise.resolve({
                 type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -147,7 +148,7 @@ describe("ServerlessDiscordCommandChatInput", () => {
 });
 
 describe("ServerlessDiscordCommandUser", () => {
-    class TestCommandUser extends ServerlessDiscordCommandUser {
+    class TestCommandUser extends CommandUser {
         handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
             return Promise.resolve({
                 type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -187,7 +188,7 @@ describe("ServerlessDiscordCommandUser", () => {
 });
 
 describe("ServerlessDiscordCommandMessage", () => {
-    class TestCommandMessage extends ServerlessDiscordCommandMessage {
+    class TestCommandMessage extends CommandMessage {
         handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
             return Promise.resolve({
                 type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
