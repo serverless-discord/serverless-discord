@@ -16,7 +16,7 @@ import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, Disco
  * @param type The type of the command
  * @param name The name of the command
  */
-export abstract class ServerlessDiscordCommand {
+export abstract class Command {
     readonly globalCommand: boolean;
     readonly guildCommand: boolean;
     readonly type: DiscordCommandTypes;
@@ -57,7 +57,7 @@ export abstract class ServerlessDiscordCommand {
  * @param name The name of the command
  * @param options The options of the command
  */
-export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscordCommand {
+export abstract class CommandChatInput extends Command {
     readonly options: DiscordCommandOption[];
 
     constructor({
@@ -92,7 +92,7 @@ export abstract class ServerlessDiscordCommandChatInput extends ServerlessDiscor
  * @param guildCommand Whether the command is guild specific or not
  * @param name The name of the command
  */
-export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordCommand {
+export abstract class CommandUser extends Command {
     constructor({
         globalCommand,
         guildCommand,
@@ -122,7 +122,7 @@ export abstract class ServerlessDiscordCommandUser extends ServerlessDiscordComm
  * @param guildCommand Whether the command is guild specific or not
  * @param name The name of the command
  */
-export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordCommand {
+export abstract class CommandMessage extends Command {
     constructor({ 
         globalCommand,
         guildCommand,
@@ -144,7 +144,7 @@ export abstract class ServerlessDiscordCommandMessage extends ServerlessDiscordC
 }
 
 
-export abstract class ServerlessDiscordCommandChatInputAsync extends ServerlessDiscordCommandChatInput {
+export abstract class CommandChatInputAsync extends CommandChatInput {
     constructor({
         globalCommand,
         guildCommand,

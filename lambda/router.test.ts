@@ -1,11 +1,13 @@
 import { MockProxy, mock } from "jest-mock-extended";
 import { APIGatewayEvent } from "aws-lambda";
 import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse, MethodNotAllowedResponse, initLambdaRouter } from "./router";
-import { ServerlessDiscordRouter, CommandNotFoundError, UnauthorizedError, ServerlessDiscordAuthorizationHandler, ServerlessDiscordCommandChatInput, ServerlessDiscordCommandChatInputAsync } from "../core";
-import { DiscordInteractionPing, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord";
 import { LambdaClient } from "@aws-sdk/client-lambda";
+import { CommandChatInput, CommandChatInputAsync } from "../core/command";
+import { CommandNotFoundError } from "../core/errors";
+import { DiscordInteractionResponse, DiscordInteractionPing, DiscordInteractionApplicationCommand } from "../discord/interactions";
+import { AuthHandler } from "../core/auth";
 
-class TestCommand extends ServerlessDiscordCommandChatInput {
+class TestCommand extends CommandChatInput {
     constructor() {
         super({
             name: "test",
@@ -31,7 +33,7 @@ class TestCommand extends ServerlessDiscordCommandChatInput {
     }
 }
 
-class TestCommandAsync extends ServerlessDiscordCommandChatInputAsync {
+class TestCommandAsync extends CommandChatInputAsync {
     constructor() {
         super({
             name: "test",
@@ -55,7 +57,7 @@ describe("initLambdaRouter", () => {
 
 describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
     let lambdaEventMock: MockProxy<APIGatewayEvent>;
-    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+    let authHandlerMock: MockProxy<AuthHandler>;
     let awsClientMock: MockProxy<LambdaClient>;
 
     beforeEach(() => {
@@ -66,7 +68,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
             "x-signature-timestamp": "123", 
         }
         lambdaEventMock.httpMethod = "POST";
-        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
         awsClientMock = mock<LambdaClient>();
     });
@@ -219,11 +221,11 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
 });
 
 describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", () => {
-    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+    let authHandlerMock: MockProxy<AuthHandler>;
     let awsClientMock: MockProxy<LambdaClient>;
 
     beforeEach(() => {
-        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
         awsClientMock = mock<LambdaClient>();
     });
@@ -277,11 +279,11 @@ describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", ()
 });
 
 describe("ServerlessDiscordLambdaRouter.handleApplicationCommand", () => {
-    let authHandlerMock: MockProxy<ServerlessDiscordAuthorizationHandler>;
+    let authHandlerMock: MockProxy<AuthHandler>;
     let awsClientMock: MockProxy<LambdaClient>;
 
     beforeEach(() => {
-        authHandlerMock = mock<ServerlessDiscordAuthorizationHandler>();
+        authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
         awsClientMock = mock<LambdaClient>();
     });
