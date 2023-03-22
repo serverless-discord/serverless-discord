@@ -2,7 +2,7 @@ import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHead
 import { CommandChatInput, CommandChatInputAsync } from "./command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
 import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
-import { MockProxy, mock } from "jest-mock-extended";
+import { MockProxy, mock, DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { AuthHandler } from "./auth";
 import pino from "pino";
 
@@ -48,11 +48,12 @@ describe("ServerlessDiscordRouter.handle", () => {
     "x-signature-timestamp": "123",
   };
   let authHandlerMock: MockProxy<AuthHandler>;
-  let logHandlerMock: MockProxy<pino.Logger>;
+  let logHandlerMock: DeepMockProxy<pino.Logger>;
 
   beforeEach(() => {
     authHandlerMock = mock<AuthHandler>();
-    logHandlerMock = mock<pino.Logger>();
+    logHandlerMock = mockDeep<pino.Logger>();
+    logHandlerMock.child.mockReturnValue(logHandlerMock);
   });
 
   it("should handle authenticated", async () => {
@@ -105,17 +106,14 @@ describe("ServerlessDiscordRouter.handle", () => {
 });
 
 describe("ServerlessDiscordRouter.handleInteraction", () => {
-  const defaultMockHeaders: ServerlessDiscordRouterRequestHeaders = {
-    "x-signature-ed25519": "123",
-    "x-signature-timestamp": "123",
-  };
   let authHandlerMock: MockProxy<AuthHandler>;
-  let logHandlerMock: MockProxy<pino.Logger>;
+  let logHandlerMock: DeepMockProxy<pino.Logger>;
 
   beforeEach(() => {
     authHandlerMock = mock<AuthHandler>();
     authHandlerMock.handleAuthorization.mockReturnValue(true);
-    logHandlerMock = mock<pino.Logger>();
+    logHandlerMock = mockDeep<pino.Logger>();
+    logHandlerMock.child.mockReturnValue(logHandlerMock);
   });
 
   it("should handle ping", async () => {
@@ -236,12 +234,13 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
   }
 
   let authHandler: MockProxy<AuthHandler>;
-  let logHandler: MockProxy<pino.Logger>;
+  let logHandlerMock: DeepMockProxy<pino.Logger>;
 
   beforeEach(() => {
     authHandler = mock<AuthHandler>();
     authHandler.handleAuthorization.mockReturnValue(true);
-    logHandler = mock<pino.Logger>();
+    logHandlerMock = mockDeep<pino.Logger>();
+    logHandlerMock.child.mockReturnValue(logHandlerMock);
   });
 
   it("should handle async application command", async () => {
@@ -252,7 +251,7 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
     const router = new ServerlessDiscordRouter({
       commands: [command],
       authHandler,
-      logHandler,
+      logHandler: logHandlerMock,
     });
     const interaction = new DiscordInteractionApplicationCommand({
       id: "123",

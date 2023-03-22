@@ -74,6 +74,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
     authHandlerMock.handleAuthorization.mockReturnValue(true);
     awsClientMock = mock<LambdaClient>();
     logHandlerMock = mock<pino.Logger>();
+    logHandlerMock.child.mockReturnValue(logHandlerMock);
   });
 
   it("should handle ping", async () => {
@@ -252,6 +253,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", ()
     authHandlerMock.handleAuthorization.mockReturnValue(true);
     awsClientMock = mock<LambdaClient>();
     logHandlerMock = mock<pino.Logger>();
+    logHandlerMock.child.mockReturnValue(logHandlerMock);
   });
 
   it("should handle application command", async () => {
@@ -314,6 +316,7 @@ describe("ServerlessDiscordLambdaRouter.handleApplicationCommand", () => {
     authHandlerMock.handleAuthorization.mockReturnValue(true);
     awsClientMock = mock<LambdaClient>();
     logHandlerMock = mock<pino.Logger>();
+    logHandlerMock.child.mockReturnValue(logHandlerMock);
   });
 
   it("should handle async application command", async () => {
