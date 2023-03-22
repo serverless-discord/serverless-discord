@@ -1,16 +1,27 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import pino from "pino";
 import { AuthHandler, createAuthHandler } from "../core/auth";
 import { Command, CommandChatInputAsync } from "../core/command";
 import { UnauthorizedError, CommandNotFoundError } from "../core/errors";
+import { initLogger, LogLevels } from "../core/logging";
 import { ServerlessDiscordRouter } from "../core/router";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
 
-export function initLambdaRouter({ commands, applicationPublicKey }: { commands: Command[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
+export function initLambdaRouter({ 
+  commands, 
+  applicationPublicKey,
+  logLevel = "info"
+}: { 
+  commands: Command[], 
+  applicationPublicKey: string,
+  logLevel?: LogLevels
+}): ServerlessDiscordLambdaRouter {
     const authHandler = createAuthHandler({ applicationPublicKey });
     const awsClient = new LambdaClient({});
-    return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient });
+    const logHandler = initLogger({ logLevel });
+    return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
@@ -44,21 +55,23 @@ export type AsyncLambdaCommandEvent = {
  * interaction data as the event.
  */
 export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
-  asyncLambdaArn: string | undefined;
-  awsClient: LambdaClient;
+  protected asyncLambdaArn: string | undefined;
+  protected awsClient: LambdaClient;
 
   constructor({
     commands,
     authHandler,
+    logHandler,
     asyncLambdaArn,
     awsClient,
   }: {
     commands: Command[],
     authHandler: AuthHandler,
+    logHandler: pino.Logger,
     asyncLambdaArn?: string,
     awsClient: LambdaClient,
   }) {
-    super({ commands, authHandler });
+    super({ commands, authHandler, logHandler });
     this.asyncLambdaArn = asyncLambdaArn;
     this.awsClient = awsClient;
   }

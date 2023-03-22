@@ -6,6 +6,7 @@ import { CommandChatInput, CommandChatInputAsync } from "../core/command";
 import { CommandNotFoundError } from "../core/errors";
 import { DiscordInteractionResponse, DiscordInteractionPing, DiscordInteractionApplicationCommand } from "../discord/interactions";
 import { AuthHandler } from "../core/auth";
+import pino from "pino";
 
 class TestCommand extends CommandChatInput {
     constructor() {
@@ -59,6 +60,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
     let lambdaEventMock: MockProxy<APIGatewayEvent>;
     let authHandlerMock: MockProxy<AuthHandler>;
     let awsClientMock: MockProxy<LambdaClient>;
+    let logHandlerMock: MockProxy<pino.Logger>;
 
     beforeEach(() => {
         lambdaEventMock = mock<APIGatewayEvent>();
@@ -71,6 +73,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
         authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
         awsClientMock = mock<LambdaClient>();
+        logHandlerMock = mock<pino.Logger>();
     });
 
     it("should handle ping", async () => {
@@ -85,6 +88,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
             commands: [],
             authHandler: authHandlerMock,
             awsClient: awsClientMock,
+            logHandler: logHandlerMock,
         });
         const result = await router.handleLambda(lambdaEventMock);
         expect(result).toEqual({
@@ -125,6 +129,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
             commands: [testCommandMock],
             authHandler: authHandlerMock,
             awsClient: awsClientMock,
+            logHandler: logHandlerMock,
         });
         const result = await router.handleLambda(lambdaEventMock);
         expect(result).toEqual({
@@ -152,6 +157,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
         commands: [],
         authHandler: authHandlerMock,
         awsClient: awsClientMock,
+        logHandler: logHandlerMock, 
       });
       const result = router.handleLambda(lambdaEventMock);
       expect(result).rejects.toThrow(CommandNotFoundError);
@@ -170,6 +176,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
         commands: [],
         authHandler: authHandlerMock,
         awsClient: awsClientMock,
+        logHandler: logHandlerMock,
       });
       const result = await router.handleLambda(lambdaEventMock);
       expect(result).toEqual(UnauthorizedResponse);
@@ -192,6 +199,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
             commands: [],
             authHandler: authHandlerMock,
             awsClient: awsClientMock,
+            logHandler: logHandlerMock,
         });
         const result = await router.handleLambda(event);
         expect(result).toEqual(UnauthorizedResponse);
@@ -203,6 +211,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
         commands: [],
         authHandler: authHandlerMock,
         awsClient: awsClientMock,
+        logHandler: logHandlerMock,
       });
       const result = await router.handleLambda(lambdaEventMock);
       expect(result).toEqual(BadRequestResponse);
@@ -214,6 +223,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
         commands: [],
         authHandler: authHandlerMock,
         awsClient: awsClientMock,
+        logHandler: logHandlerMock,
       });
       const result = await router.handleLambda(lambdaEventMock);
       expect(result).toEqual(MethodNotAllowedResponse);
@@ -223,11 +233,13 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
 describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", () => {
     let authHandlerMock: MockProxy<AuthHandler>;
     let awsClientMock: MockProxy<LambdaClient>;
+    let logHandlerMock: MockProxy<pino.Logger>;
 
     beforeEach(() => {
         authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
         awsClientMock = mock<LambdaClient>();
+        logHandlerMock = mock<pino.Logger>();
     });
 
     it("should handle application command", async () => {
@@ -249,6 +261,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", ()
             commands: [command],
             authHandler: authHandlerMock,
             awsClient: awsClientMock,
+            logHandler: logHandlerMock,
         });
         router.handleLambdaAsyncApplicationCommand(interaction);
         expect(command.handleInteractionAsync).toBeCalledWith(interaction);
@@ -272,6 +285,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", ()
             commands: [testCommandMock],
             authHandler: authHandlerMock,
             awsClient: awsClientMock,
+            logHandler: logHandlerMock,
         });
         const result = router.handleLambdaAsyncApplicationCommand(interaction);
         expect(result).rejects.toThrow(CommandNotFoundError);
@@ -281,11 +295,13 @@ describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", ()
 describe("ServerlessDiscordLambdaRouter.handleApplicationCommand", () => {
     let authHandlerMock: MockProxy<AuthHandler>;
     let awsClientMock: MockProxy<LambdaClient>;
+    let logHandlerMock: MockProxy<pino.Logger>;
 
     beforeEach(() => {
         authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
         awsClientMock = mock<LambdaClient>();
+        logHandlerMock = mock<pino.Logger>();
     });
 
     it("should handle async application command", async () => {
@@ -294,6 +310,7 @@ describe("ServerlessDiscordLambdaRouter.handleApplicationCommand", () => {
             commands: [command],
             authHandler: authHandlerMock,
             awsClient: awsClientMock,
+            logHandler: logHandlerMock,
         });
         const interaction = new DiscordInteractionApplicationCommand({
             id: "123",

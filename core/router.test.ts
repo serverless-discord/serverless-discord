@@ -4,6 +4,7 @@ import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponen
 import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { MockProxy, mock } from "jest-mock-extended";
 import { AuthHandler } from "./auth";
+import pino from "pino";
 
 class TestCommand extends CommandChatInput {
     constructor() {
@@ -47,9 +48,11 @@ describe("ServerlessDiscordRouter.handle", () => {
         "x-signature-timestamp": "123",
     }
     let authHandlerMock: MockProxy<AuthHandler>;
+    let logHandlerMock: MockProxy<pino.Logger>;
 
     beforeEach(() => {
         authHandlerMock = mock<AuthHandler>();
+        logHandlerMock = mock<pino.Logger>();
     });
 
     it("should handle authenticated", async () => {
@@ -57,6 +60,7 @@ describe("ServerlessDiscordRouter.handle", () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
         const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
         router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
@@ -69,6 +73,7 @@ describe("ServerlessDiscordRouter.handle", () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
         const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
         router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
@@ -80,6 +85,7 @@ describe("ServerlessDiscordRouter.handle", () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
         router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
         await expect(router.handle({ interaction: {}, requestHeaders: defaultMockHeaders })).rejects.toThrow(InvalidInteractionTypeError);
@@ -90,6 +96,7 @@ describe("ServerlessDiscordRouter.handle", () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
         const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
         router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
@@ -103,16 +110,19 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         "x-signature-timestamp": "123",
     }
     let authHandlerMock: MockProxy<AuthHandler>;
+    let logHandlerMock: MockProxy<pino.Logger>;
 
     beforeEach(() => {
         authHandlerMock = mock<AuthHandler>();
         authHandlerMock.handleAuthorization.mockReturnValue(true);
+        logHandlerMock = mock<pino.Logger>();
     });
 
     it("should handle ping", async () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
             authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
         const interaction = new DiscordInteractionPing({ 
             id: "123",
@@ -147,6 +157,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
         const router = new ServerlessDiscordRouter({
             commands: [testCommandMock],
             authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
         const response = await router.handleInteraction(interaction);
         expect(testCommandMock.handleInteraction).toBeCalledWith(interaction);
@@ -155,7 +166,8 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
     it("should throw error if command not found", async () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
-            authHandler: authHandlerMock
+            authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
 
         const interaction = new DiscordInteractionApplicationCommand({
@@ -176,7 +188,8 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
     it("should throw error if interaction type is not supported", async () => {
         const router = new ServerlessDiscordRouter({
             commands: [],
-            authHandler: authHandlerMock
+            authHandler: authHandlerMock,
+            logHandler: logHandlerMock,
         });
 
         const messageInteraction = new DiscordInteractionMessageComponent({
@@ -223,10 +236,12 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
     }
 
     let authHandler: MockProxy<AuthHandler>;
+    let logHandler: MockProxy<pino.Logger>;
 
     beforeEach(() => {
         authHandler = mock<AuthHandler>();
         authHandler.handleAuthorization.mockReturnValue(true);
+        logHandler = mock<pino.Logger>();
     });
 
     it("should handle async application command", async () => {
@@ -236,7 +251,8 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
         expect(command instanceof CommandChatInput).toBe(true);
         const router = new ServerlessDiscordRouter({
             commands: [command],
-            authHandler
+            authHandler,
+            logHandler,
         });
         const interaction = new DiscordInteractionApplicationCommand({
             id: "123",
