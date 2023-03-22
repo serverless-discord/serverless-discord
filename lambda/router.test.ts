@@ -217,6 +217,18 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
       expect(result).toEqual(BadRequestResponse);
     });
 
+    it("should handle invalid body", async () => {
+      lambdaEventMock.body = null;
+      const router = new ServerlessDiscordLambdaRouter({
+        commands: [],
+        authHandler: authHandlerMock,
+        awsClient: awsClientMock,
+        logHandler: logHandlerMock,
+      });
+      const result = await router.handleLambda(lambdaEventMock);
+      expect(result).toEqual(BadRequestResponse);
+    });
+
     it("should handle invalid request method", async () => {
       lambdaEventMock.httpMethod = "GET";
       const router = new ServerlessDiscordLambdaRouter({

@@ -99,12 +99,30 @@ Linting is enforced and run on every pull request. Run the following command to 
 npm run lint
 ```
 
-### Testing
-
-Tests are run on every pull request and must pass before merging. Run the following command to execute the tests:
+Automatically fix linting errors:
 
 ```
-npm run tests
+npm run lint:fix
+```
+
+### Testing
+
+Tests are run on every pull request and must pass before merging. Run the following command to execute the unit tests:
+
+```
+npm run test
+```
+
+Run tests with coverage:
+
+```
+npm run test:coverage
+```
+
+Run the following to run integration tests which require more setup:
+
+```
+npm run test:integration
 ```
 
 ### Building
