@@ -27,41 +27,41 @@ export interface DiscordInteraction {
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
 export abstract class DiscordInteraction {
-    id: string;
-    application_id: string;
-    type: DiscordInteractionTypes;
-    data?: DiscordApplicationCommandInteractionData | Partial<DiscordApplicationCommandInteractionData> | DiscordMessageComponentInteractionData | DiscordModalInteractionData;
-    guild_id?: string;
-    channel_id?: string;
-    member?: DiscordGuildMember;
-    user?: DiscordUser;
-    token: string;
-    version: number;
-    message?: DiscordMessage;
-    app_permissions?: string;
-    locale?: string;
-    guild_locale?: string;
+  id: string;
+  application_id: string;
+  type: DiscordInteractionTypes;
+  data?: DiscordApplicationCommandInteractionData | Partial<DiscordApplicationCommandInteractionData> | DiscordMessageComponentInteractionData | DiscordModalInteractionData;
+  guild_id?: string;
+  channel_id?: string;
+  member?: DiscordGuildMember;
+  user?: DiscordUser;
+  token: string;
+  version: number;
+  message?: DiscordMessage;
+  app_permissions?: string;
+  locale?: string;
+  guild_locale?: string;
 
-    constructor({ id, application_id, type, data, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale }: DiscordInteraction) {
-        this.id = id;
-        this.application_id = application_id;
-        this.type = type;
-        this.data = data;
-        this.guild_id = guild_id;
-        this.channel_id = channel_id;
-        this.member = member;
-        this.user = user;
-        this.token = token;
-        this.version = version;
-        this.message = message;
-        this.app_permissions = app_permissions;
-        this.locale = locale;
-        this.guild_locale = guild_locale;
-    }
+  constructor({ id, application_id, type, data, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale }: DiscordInteraction) {
+    this.id = id;
+    this.application_id = application_id;
+    this.type = type;
+    this.data = data;
+    this.guild_id = guild_id;
+    this.channel_id = channel_id;
+    this.member = member;
+    this.user = user;
+    this.token = token;
+    this.version = version;
+    this.message = message;
+    this.app_permissions = app_permissions;
+    this.locale = locale;
+    this.guild_locale = guild_locale;
+  }
 }
 
 export function instanceofDiscordInteraction(object: any): object is DiscordInteraction {
-    return object.id && object.application_id && object.type && object.token && object.version;
+  return object.id && object.application_id && object.type && object.token && object.version;
 }
 
 export interface DiscordInteractionPing extends DiscordInteraction {
@@ -72,22 +72,22 @@ export interface DiscordInteractionPing extends DiscordInteraction {
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
 export class DiscordInteractionPing extends DiscordInteraction {
-    type: DiscordInteractionTypes.PING;
+  type: DiscordInteractionTypes.PING;
 
-    constructor({
-        id,
-        application_id,
-        guild_id,
-        channel_id,
-        member,
-        user,
-        token,
-        version,
-        message,
-        app_permissions,
-        locale,
-        guild_locale,
-    }: {
+  constructor({
+    id,
+    application_id,
+    guild_id,
+    channel_id,
+    member,
+    user,
+    token,
+    version,
+    message,
+    app_permissions,
+    locale,
+    guild_locale,
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -101,13 +101,13 @@ export class DiscordInteractionPing extends DiscordInteraction {
         locale?: string;
         guild_locale?: string;
     }) {
-        super({ id, application_id, type: DiscordInteractionTypes.PING, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
-        this.type = DiscordInteractionTypes.PING;
-    }
+    super({ id, application_id, type: DiscordInteractionTypes.PING, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+    this.type = DiscordInteractionTypes.PING;
+  }
 }
 
 export function instanceofDiscordInteractionPing(object: any): object is DiscordInteractionPing {
-    return object.type === DiscordInteractionTypes.PING;
+  return object.type === DiscordInteractionTypes.PING;
 }
 
 export interface DiscordInteractionApplicationCommand extends DiscordInteraction {
@@ -119,24 +119,24 @@ export interface DiscordInteractionApplicationCommand extends DiscordInteraction
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
 export class DiscordInteractionApplicationCommand extends DiscordInteraction {
-    type: DiscordInteractionTypes.APPLICATION_COMMAND;
-    data: DiscordApplicationCommandInteractionData
+  type: DiscordInteractionTypes.APPLICATION_COMMAND;
+  data: DiscordApplicationCommandInteractionData;
 
-    constructor({
-        id,
-        application_id,
-        guild_id,
-        channel_id,
-        member,
-        user,
-        token,
-        version,
-        message,
-        app_permissions,
-        locale,
-        guild_locale,
-        data,
-    }: {
+  constructor({
+    id,
+    application_id,
+    guild_id,
+    channel_id,
+    member,
+    user,
+    token,
+    version,
+    message,
+    app_permissions,
+    locale,
+    guild_locale,
+    data,
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -151,14 +151,14 @@ export class DiscordInteractionApplicationCommand extends DiscordInteraction {
         guild_locale?: string;
         data: DiscordApplicationCommandInteractionData;
      }) {
-        super({ id, application_id, type: DiscordInteractionTypes.APPLICATION_COMMAND, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
-        this.type = DiscordInteractionTypes.APPLICATION_COMMAND;
-        this.data = data;
-    }
+    super({ id, application_id, type: DiscordInteractionTypes.APPLICATION_COMMAND, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+    this.type = DiscordInteractionTypes.APPLICATION_COMMAND;
+    this.data = data;
+  }
 }
 
 export function instanceofDiscordInteractionApplicationCommand(object: any): object is DiscordInteractionApplicationCommand {
-    return object.type === DiscordInteractionTypes.APPLICATION_COMMAND;
+  return object.type === DiscordInteractionTypes.APPLICATION_COMMAND;
 }
 
 export interface DiscordInteractionMessageComponent extends DiscordInteraction {
@@ -170,24 +170,24 @@ export interface DiscordInteractionMessageComponent extends DiscordInteraction {
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
 export class DiscordInteractionMessageComponent extends DiscordInteraction {
-    type: DiscordInteractionTypes.MESSAGE_COMPONENT;
-    data: DiscordMessageComponentInteractionData;
+  type: DiscordInteractionTypes.MESSAGE_COMPONENT;
+  data: DiscordMessageComponentInteractionData;
 
-    constructor({
-        id,
-        application_id,
-        guild_id,
-        channel_id,
-        member,
-        user,
-        token,
-        version,
-        message,
-        app_permissions,
-        locale,
-        guild_locale,
-        data,
-    }: {
+  constructor({
+    id,
+    application_id,
+    guild_id,
+    channel_id,
+    member,
+    user,
+    token,
+    version,
+    message,
+    app_permissions,
+    locale,
+    guild_locale,
+    data,
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -202,14 +202,14 @@ export class DiscordInteractionMessageComponent extends DiscordInteraction {
         guild_locale?: string;
         data: DiscordMessageComponentInteractionData;
     }) {
-        super({ id, application_id, type: DiscordInteractionTypes.MESSAGE_COMPONENT, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
-        this.type = DiscordInteractionTypes.MESSAGE_COMPONENT;
-        this.data = data;
-    }
+    super({ id, application_id, type: DiscordInteractionTypes.MESSAGE_COMPONENT, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+    this.type = DiscordInteractionTypes.MESSAGE_COMPONENT;
+    this.data = data;
+  }
 }
 
 export function instanceofDiscordInteractionMessageComponent(object: any): object is DiscordInteractionMessageComponent {
-    return object.type === DiscordInteractionTypes.MESSAGE_COMPONENT;
+  return object.type === DiscordInteractionTypes.MESSAGE_COMPONENT;
 }
 
 export interface DiscordInteractionApplicationCommandAutocomplete extends DiscordInteraction {
@@ -221,24 +221,24 @@ export interface DiscordInteractionApplicationCommandAutocomplete extends Discor
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
 export class DiscordInteractionApplicationCommandAutocomplete extends DiscordInteraction {
-    type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
-    data: Partial<DiscordApplicationCommandInteractionData>;
+  type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+  data: Partial<DiscordApplicationCommandInteractionData>;
 
-    constructor({
-        id,
-        application_id,
-        guild_id,
-        channel_id,
-        member,
-        user,
-        token,
-        version,
-        message,
-        app_permissions,
-        locale,
-        guild_locale,
-        data,
-    }: {
+  constructor({
+    id,
+    application_id,
+    guild_id,
+    channel_id,
+    member,
+    user,
+    token,
+    version,
+    message,
+    app_permissions,
+    locale,
+    guild_locale,
+    data,
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -253,14 +253,14 @@ export class DiscordInteractionApplicationCommandAutocomplete extends DiscordInt
         guild_locale?: string;
         data: Partial<DiscordApplicationCommandInteractionData>;
     }) {
-        super({ id, application_id, type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
-        this.type = DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
-        this.data = data;
-    }
+    super({ id, application_id, type: DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+    this.type = DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+    this.data = data;
+  }
 }
 
 export function instanceofDiscordInteractionApplicationCommandAutocomplete(object: any): object is DiscordInteractionApplicationCommandAutocomplete {
-    return object.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
+  return object.type === DiscordInteractionTypes.APPLICATION_COMMAND_AUTOCOMPLETE;
 }
 
 export interface DiscordInteractionModalSubmit extends DiscordInteraction {
@@ -272,24 +272,24 @@ export interface DiscordInteractionModalSubmit extends DiscordInteraction {
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
  */
 export class DiscordInteractionModalSubmit extends DiscordInteraction {
-    type: DiscordInteractionTypes.MODAL_SUBMIT;
-    data: DiscordModalInteractionData;
+  type: DiscordInteractionTypes.MODAL_SUBMIT;
+  data: DiscordModalInteractionData;
 
-    constructor({
-        id,
-        application_id,
-        guild_id,
-        channel_id,
-        member,
-        user,
-        token,
-        version,
-        message,
-        app_permissions,
-        locale,
-        guild_locale,
-        data,
-    }: {
+  constructor({
+    id,
+    application_id,
+    guild_id,
+    channel_id,
+    member,
+    user,
+    token,
+    version,
+    message,
+    app_permissions,
+    locale,
+    guild_locale,
+    data,
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -304,14 +304,14 @@ export class DiscordInteractionModalSubmit extends DiscordInteraction {
         guild_locale?: string;
         data: DiscordModalInteractionData;
     }) {
-        super({ id, application_id, type: DiscordInteractionTypes.MODAL_SUBMIT, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
-        this.type = DiscordInteractionTypes.MODAL_SUBMIT;
-        this.data = data;
-    }
+    super({ id, application_id, type: DiscordInteractionTypes.MODAL_SUBMIT, guild_id, channel_id, member, user, token, version, message, app_permissions, locale, guild_locale});
+    this.type = DiscordInteractionTypes.MODAL_SUBMIT;
+    this.data = data;
+  }
 }
 
 export function instanceofDiscordInteractionModalSubmit(object: any): object is DiscordInteractionModalSubmit {
-    return object.type === DiscordInteractionTypes.MODAL_SUBMIT;
+  return object.type === DiscordInteractionTypes.MODAL_SUBMIT;
 }
 
 /**
@@ -474,13 +474,13 @@ export interface DiscordInteractionResponse {
  * @see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure
  */
 export class DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes;
-    data?: DiscordInteractionResponseData | DiscordAutocompleteInteractionResponseData;
+  type: DiscordInteractionResponseTypes;
+  data?: DiscordInteractionResponseData | DiscordAutocompleteInteractionResponseData;
 
-    constructor({ type, data }: { type: DiscordInteractionResponseTypes; data?: DiscordInteractionResponseData | DiscordAutocompleteInteractionResponseData }) {
-        this.type = type;
-        this.data = data;
-    }
+  constructor({ type, data }: { type: DiscordInteractionResponseTypes; data?: DiscordInteractionResponseData | DiscordAutocompleteInteractionResponseData }) {
+    this.type = type;
+    this.data = data;
+  }
 }
 
 export interface DiscordInteractionResponsePong extends DiscordInteractionResponse {
@@ -488,12 +488,12 @@ export interface DiscordInteractionResponsePong extends DiscordInteractionRespon
 }
 
 export class DiscordInteractionResponsePong extends DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes.PONG;
+  type: DiscordInteractionResponseTypes.PONG;
 
-    constructor() {
-        super({ type: DiscordInteractionResponseTypes.PONG });
-        this.type = DiscordInteractionResponseTypes.PONG;
-    }
+  constructor() {
+    super({ type: DiscordInteractionResponseTypes.PONG });
+    this.type = DiscordInteractionResponseTypes.PONG;
+  }
 }
 
 export interface DiscordInteractionResponseChannelMessageWithSource extends DiscordInteractionResponse {
@@ -502,14 +502,14 @@ export interface DiscordInteractionResponseChannelMessageWithSource extends Disc
 }
 
 export class DiscordInteractionResponseChannelMessageWithSource extends DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE;
-    data: DiscordInteractionResponseData;
+  type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE;
+  data: DiscordInteractionResponseData;
 
-    constructor({ data }: { data: DiscordInteractionResponseData }) {
-        super({ type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE, data });
-        this.type = DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE;
-        this.data = data;
-    }
+  constructor({ data }: { data: DiscordInteractionResponseData }) {
+    super({ type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE, data });
+    this.type = DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE;
+    this.data = data;
+  }
 }
 
 export interface DiscordInteractionResponseDeferredChannelMessageWithSource extends DiscordInteractionResponse {
@@ -518,14 +518,14 @@ export interface DiscordInteractionResponseDeferredChannelMessageWithSource exte
 }
 
 export class DiscordInteractionResponseDeferredChannelMessageWithSource extends DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
-    data: DiscordInteractionResponseData;
+  type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
+  data: DiscordInteractionResponseData;
 
-    constructor({ data }: { data: DiscordInteractionResponseData }) {
-        super({ type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data });
-        this.type = DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
-        this.data = data;
-    }
+  constructor({ data }: { data: DiscordInteractionResponseData }) {
+    super({ type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data });
+    this.type = DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE;
+    this.data = data;
+  }
 }
 
 export interface DiscordInteractionResponseDeferredUpdateMessage extends DiscordInteractionResponse {
@@ -534,14 +534,14 @@ export interface DiscordInteractionResponseDeferredUpdateMessage extends Discord
 }
 
 export class DiscordInteractionResponseDeferredUpdateMessage extends DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes.DEFERRED_UPDATE_MESSAGE;
-    data: DiscordInteractionResponseData;
+  type: DiscordInteractionResponseTypes.DEFERRED_UPDATE_MESSAGE;
+  data: DiscordInteractionResponseData;
 
-    constructor({ data }: { data: DiscordInteractionResponseData }) {
-        super({ type: DiscordInteractionResponseTypes.DEFERRED_UPDATE_MESSAGE, data });
-        this.type = DiscordInteractionResponseTypes.DEFERRED_UPDATE_MESSAGE;
-        this.data = data;
-    }
+  constructor({ data }: { data: DiscordInteractionResponseData }) {
+    super({ type: DiscordInteractionResponseTypes.DEFERRED_UPDATE_MESSAGE, data });
+    this.type = DiscordInteractionResponseTypes.DEFERRED_UPDATE_MESSAGE;
+    this.data = data;
+  }
 }
 
 export interface DiscordInteractionResponseUpdateMessage extends DiscordInteractionResponse {
@@ -550,14 +550,14 @@ export interface DiscordInteractionResponseUpdateMessage extends DiscordInteract
 }
 
 export class DiscordInteractionResponseUpdateMessage extends DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes.UPDATE_MESSAGE;
-    data: DiscordInteractionResponseData;
+  type: DiscordInteractionResponseTypes.UPDATE_MESSAGE;
+  data: DiscordInteractionResponseData;
 
-    constructor({ data }: { data: DiscordInteractionResponseData }) {
-        super({ type: DiscordInteractionResponseTypes.UPDATE_MESSAGE, data });
-        this.type = DiscordInteractionResponseTypes.UPDATE_MESSAGE;
-        this.data = data;
-    }
+  constructor({ data }: { data: DiscordInteractionResponseData }) {
+    super({ type: DiscordInteractionResponseTypes.UPDATE_MESSAGE, data });
+    this.type = DiscordInteractionResponseTypes.UPDATE_MESSAGE;
+    this.data = data;
+  }
 }
 
 export interface DiscordInteractionResponseApplicationCommandAutocompleteResult extends DiscordInteractionResponse {
@@ -566,14 +566,14 @@ export interface DiscordInteractionResponseApplicationCommandAutocompleteResult 
 }
 
 export class DiscordInteractionResponseApplicationCommandAutocompleteResult extends DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
-    data: DiscordAutocompleteInteractionResponseData;
+  type: DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
+  data: DiscordAutocompleteInteractionResponseData;
 
-    constructor({ data }: { data: DiscordAutocompleteInteractionResponseData }) {
-        super({ type: DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, data });
-        this.type = DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
-        this.data = data;
-    }
+  constructor({ data }: { data: DiscordAutocompleteInteractionResponseData }) {
+    super({ type: DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, data });
+    this.type = DiscordInteractionResponseTypes.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
+    this.data = data;
+  }
 }
 
 export interface DiscordInteractionResponseModal extends DiscordInteractionResponse {
@@ -582,14 +582,14 @@ export interface DiscordInteractionResponseModal extends DiscordInteractionRespo
 }
 
 export class DiscordInteractionResponseModal extends DiscordInteractionResponse {
-    type: DiscordInteractionResponseTypes.MODAL;
-    data: DiscordInteractionResponseData;
+  type: DiscordInteractionResponseTypes.MODAL;
+  data: DiscordInteractionResponseData;
 
-    constructor({ data }: { data: DiscordInteractionResponseData }) {
-        super({ type: DiscordInteractionResponseTypes.MODAL, data });
-        this.type = DiscordInteractionResponseTypes.MODAL;
-        this.data = data;
-    }
+  constructor({ data }: { data: DiscordInteractionResponseData }) {
+    super({ type: DiscordInteractionResponseTypes.MODAL, data });
+    this.type = DiscordInteractionResponseTypes.MODAL;
+    this.data = data;
+  }
 }
 
 /**

@@ -54,14 +54,14 @@ export interface DiscordApplication {
 
 export class DiscordApplication implements DiscordApplication {
     
-    constructor({
-        id,
-        name,
-        description,
-        summary,
-        verify_key,
-        flags,
-    }: {
+  constructor({
+    id,
+    name,
+    description,
+    summary,
+    verify_key,
+    flags,
+  }: {
         id: string,
         name: string,
         description: string,
@@ -69,13 +69,13 @@ export class DiscordApplication implements DiscordApplication {
         verify_key: string,
         flags: number,
     }) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.summary = summary;
-        this.verify_key = verify_key;
-        this.flags = flags;
-    }
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.summary = summary;
+    this.verify_key = verify_key;
+    this.flags = flags;
+  }
 }
 
 
