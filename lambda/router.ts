@@ -1,16 +1,27 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import pino from "pino";
 import { AuthHandler, createAuthHandler } from "../core/auth";
 import { Command, CommandChatInputAsync } from "../core/command";
 import { UnauthorizedError, CommandNotFoundError } from "../core/errors";
+import { initLogger, LogLevels } from "../core/logging";
 import { ServerlessDiscordRouter } from "../core/router";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
 
-export function initLambdaRouter({ commands, applicationPublicKey }: { commands: Command[], applicationPublicKey: string }): ServerlessDiscordLambdaRouter {
+export function initLambdaRouter({ 
+  commands, 
+  applicationPublicKey,
+  logLevel = "info"
+}: { 
+  commands: Command[], 
+  applicationPublicKey: string,
+  logLevel?: LogLevels
+}): ServerlessDiscordLambdaRouter {
     const authHandler = createAuthHandler({ applicationPublicKey });
     const awsClient = new LambdaClient({});
-    return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient });
+    const logHandler = initLogger({ logLevel });
+    return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
@@ -44,21 +55,23 @@ export type AsyncLambdaCommandEvent = {
  * interaction data as the event.
  */
 export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
-  asyncLambdaArn: string | undefined;
-  awsClient: LambdaClient;
+  protected asyncLambdaArn: string | undefined;
+  protected awsClient: LambdaClient;
 
   constructor({
     commands,
     authHandler,
+    logHandler,
     asyncLambdaArn,
     awsClient,
   }: {
     commands: Command[],
     authHandler: AuthHandler,
+    logHandler: pino.Logger,
     asyncLambdaArn?: string,
     awsClient: LambdaClient,
   }) {
-    super({ commands, authHandler });
+    super({ commands, authHandler, logHandler });
     this.asyncLambdaArn = asyncLambdaArn;
     this.awsClient = awsClient;
   }
@@ -70,32 +83,45 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
    * @returns APIGatewayProxyResult
    */
   async handleLambda(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
-      if (event.httpMethod !== "POST") {
-          return MethodNotAllowedResponse; 
+    this.logHandler.debug("Handling Lambda event", event);
+    if (event.httpMethod !== "POST") {
+      this.logHandler.info(`Method not allowed: ${event.httpMethod}`)
+      return MethodNotAllowedResponse; 
+    }
+    const headers = event.headers;
+    if (headers["content-type"] !== "application/json") {
+      this.logHandler.info(`Bad request\nExpected: application/json\nGot: content-type: ${headers["content-type"]}`);
+      return BadRequestResponse; 
+    }
+    if (event.body == null) {
+      this.logHandler.info("Bad request, no body");
+      return BadRequestResponse;
+    }
+    if (!instanceOfDiscordAuthenticationRequestHeaders(headers)) {
+      this.logHandler.info("Unauthorized request, missing headers");
+      return UnauthorizedResponse; 
+    }
+    const interaction = JSON.parse(event.body) as DiscordInteraction;
+    try {
+      const result = await super.handle({ interaction, requestHeaders: headers });
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(result),
+      };
+      this.logHandler.debug("Returning response", response);
+      return response;
+    } catch (e) {
+      if (e instanceof UnauthorizedError) {
+        this.logHandler.error("Unauthorized request", e)
+        return UnauthorizedResponse;
       }
-      const headers = event.headers;
-      if (headers["content-type"] !== "application/json" || event.body == null) {
-          return BadRequestResponse; 
-      }
-      if (!instanceOfDiscordAuthenticationRequestHeaders(headers)) {
-          return UnauthorizedResponse; 
-      }
-      const interaction = JSON.parse(event.body) as DiscordInteraction;
-      try {
-        const result = await super.handle({ interaction, requestHeaders: headers });
-        return {
-            statusCode: 200,
-            body: JSON.stringify(result),
-        }
-      } catch (e) {
-        if (e instanceof UnauthorizedError) {
-          return UnauthorizedResponse;
-        }
-        throw e;
-      }
+      this.logHandler.error("Error handling interaction", e);
+      throw e;
+    }
   }
 
   async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
+    this.logHandler.debug("Handling lambda application command", interaction);
     const command = super.getCommand(interaction.data.name)
     if (this.asyncLambdaArn != "" && command instanceof CommandChatInputAsync) {
       // Invoke the async lambda function
@@ -106,6 +132,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
       });
 
       // Don't wait for response from async lambda
+      this.logHandler.debug("Invoking async lambda", lambdaCommand);
       this.awsClient.send(lambdaCommand);
     }
     return await command.handleInteraction(interaction);
@@ -118,9 +145,12 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
    * @param event Interaction from handleDiscordWebhook
    */
   async handleLambdaAsyncApplicationCommand(event: DiscordInteractionApplicationCommand) {
+    this.logHandler.debug("Handling lambda async application command", event);
     const command = super.getCommand(event.data.name);
     if (!(command instanceof CommandChatInputAsync)) {
-        throw new CommandNotFoundError(event.data.name);
+      const error = new CommandNotFoundError(event.data.name);
+      this.logHandler.error("Command not found", error);
+      throw error;
     }
     command.handleInteractionAsync(event);
   }

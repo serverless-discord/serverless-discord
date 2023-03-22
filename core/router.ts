@@ -3,6 +3,8 @@ import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordIntera
 import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { createAuthHandler, AuthHandler } from "./auth";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
+import { initLogger, LogLevels } from "./logging";
+import pino from "pino";
 
 /**
  * Initializes a new ServerlessDiscordRouter.
@@ -10,9 +12,18 @@ import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
  * @param applicationPublicKey The public key of the Discord application.
  * @returns ServerlessDiscordRouter
  */
-export function initRouter({ commands, applicationPublicKey }: { commands: Command[], applicationPublicKey: string }): ServerlessDiscordRouter {
+export function initRouter({ 
+    commands, 
+    applicationPublicKey, 
+    logLevel
+}: { 
+    commands: Command[], 
+    applicationPublicKey: string 
+    logLevel?: LogLevels
+}): ServerlessDiscordRouter {
     const authHandler = createAuthHandler({ applicationPublicKey });
-    return new ServerlessDiscordRouter({ commands, authHandler });
+    const logHandler = initLogger({ logLevel });
+    return new ServerlessDiscordRouter({ commands, authHandler, logHandler });
 }
 
 export interface ServerlessDiscordRouterRequestHeaders {
@@ -31,16 +42,20 @@ export interface ServerlessDiscordRouterRequestHeaders {
 export class ServerlessDiscordRouter {
     protected commands: Command[];
     protected authHandler: AuthHandler;
+    protected logHandler: pino.Logger;
 
     constructor({ 
         commands, 
-        authHandler
+        authHandler,
+        logHandler
     }: { 
         commands: Command[], 
         authHandler: AuthHandler,
+        logHandler: pino.Logger 
     }) {
         this.commands = commands;
         this.authHandler = authHandler;
+        this.logHandler = logHandler;
     } 
 
     async handle({
@@ -50,14 +65,21 @@ export class ServerlessDiscordRouter {
         interaction: unknown,
         requestHeaders: unknown
     }) {
+        this.logHandler.debug("Handling Raw Interaction", { interaction, requestHeaders });
         if (!instanceOfDiscordAuthenticationRequestHeaders(requestHeaders)) {
-            throw new UnauthorizedError();
+            const error = new UnauthorizedError();
+            this.logHandler.error(error);
+            throw error;
         }
         if (!instanceofDiscordInteraction(interaction)) {
-            throw new InvalidInteractionTypeError();
+            const error = new InvalidInteractionTypeError();
+            this.logHandler.error(error);
+            throw error;
         }
         if (!this.authHandler.handleAuthorization({ body: interaction, headers: requestHeaders })) {
-            throw new UnauthorizedError();
+            const error = new UnauthorizedError();
+            this.logHandler.error(error);
+            throw error;
         }
         return await this.handleInteraction(interaction);
     }
@@ -70,6 +92,7 @@ export class ServerlessDiscordRouter {
      * @returns 
      */
     async handleInteraction(interaction: DiscordInteraction): Promise<DiscordInteractionResponse> {
+        this.logHandler.debug("Handling Interaction", { interaction });
         if (instanceofDiscordInteractionPing(interaction)) {
             return this.handlePing();
         }
@@ -77,7 +100,9 @@ export class ServerlessDiscordRouter {
             return await this.handleApplicationCommand(interaction);
         }
         // TODO handle other interaction types
-        throw new InvalidInteractionTypeError();
+        const error = new InvalidInteractionTypeError();
+        this.logHandler.error(error);
+        throw error;
     }
 
     /**
@@ -86,14 +111,18 @@ export class ServerlessDiscordRouter {
      * @returns pong response
      */
     private handlePing(): DiscordInteractionResponse {
+        this.logHandler.debug("Handling Ping");
         return { type: DiscordInteractionResponseTypes.PONG };
     }
 
     protected getCommand(name: string) {
         const command = this.commands.find(command => command.name === name);
         if (command === undefined) {
-            throw new CommandNotFoundError();
+            const error = new CommandNotFoundError();
+            this.logHandler.error(error);
+            throw error;
         }
+        this.logHandler.debug("Found Command", { command });
         return command;
     }
 
@@ -104,11 +133,14 @@ export class ServerlessDiscordRouter {
      * @returns response from command
      */
     async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
+        this.logHandler.debug("Handling Application Command", { interaction });
         const command = this.getCommand(interaction.data.name);
         // Call the async handler if the command is async
         if (command instanceof CommandChatInputAsync) {
+            this.logHandler.debug("Calling Async Handler", { command });
             command.handleInteractionAsync(interaction);
         }
+        this.logHandler.debug("Calling Handler", { command });
         return await command.handleInteraction(interaction);
     }
 }
