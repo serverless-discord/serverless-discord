@@ -23,7 +23,7 @@
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "removejs": "find . -name '*.map' -exec rm {} \\; && find . -name '*.js' -exec rm {} \\; && find . -name '*.d.ts' -exec rm {} \\;  && find . -name '*.tsbuildinfo' -exec rm {} \\;"
+    "removejs": "rm -rf nodes_modules && find . -name '*.map' -exec rm {} \\; && find . -name '*.js' -exec rm {} \\; && find . -name '*.d.ts' -exec rm {} \\;  && find . -name '*.tsbuildinfo' -exec rm {} \\;"
   },
   "repository": {
     "type": "git",

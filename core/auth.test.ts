@@ -3,50 +3,50 @@ import { createAuthHandler, AuthHandler } from "./auth";
 import { ServerlessDiscordRouterRequestHeaders } from "./router";
 
 describe("ServerlessDiscordAuthorizationHandler", () => {
-    let mockVerifyFunc: jest.Mock;
+  let mockVerifyFunc: jest.Mock;
 
-    beforeEach(() => {
-        mockVerifyFunc = jest.fn();
-    });
+  beforeEach(() => {
+    mockVerifyFunc = jest.fn();
+  });
 
-    it("should be able to handle authorization", () => {
-        mockVerifyFunc.mockReturnValue(true);
-        const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
-        const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
-        const headers: ServerlessDiscordRouterRequestHeaders = {
-            "x-signature-ed25519": "123",
-            "x-signature-timestamp": "123",
-        };
-        const result = handler.handleAuthorization({ body, headers })
-        expect(mockVerifyFunc).toBeCalledWith(
-            Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
-            Buffer.from(headers["x-signature-ed25519"], "hex"),
-            Buffer.from("test", "hex")
-        );
-        expect(result).toBe(true);
-    });
+  it("should be able to handle authorization", () => {
+    mockVerifyFunc.mockReturnValue(true);
+    const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
+    const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
+    const headers: ServerlessDiscordRouterRequestHeaders = {
+      "x-signature-ed25519": "123",
+      "x-signature-timestamp": "123",
+    };
+    const result = handler.handleAuthorization({ body, headers });
+    expect(mockVerifyFunc).toBeCalledWith(
+      Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
+      Buffer.from(headers["x-signature-ed25519"], "hex"),
+      Buffer.from("test", "hex")
+    );
+    expect(result).toBe(true);
+  });
 
-    it("should be able to handle invalid authorization", () => {
-        mockVerifyFunc.mockReturnValue(false);
-        const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
-        const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
-        const headers: ServerlessDiscordRouterRequestHeaders = {
-            "x-signature-ed25519": "123",
-            "x-signature-timestamp": "123",
-        };
-        const result = handler.handleAuthorization({ body, headers })
-        expect(mockVerifyFunc).toBeCalledWith(
-            Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
-            Buffer.from(headers["x-signature-ed25519"], "hex"),
-            Buffer.from("test", "hex")
-        );
-        expect(result).toBe(false);
-    });
+  it("should be able to handle invalid authorization", () => {
+    mockVerifyFunc.mockReturnValue(false);
+    const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
+    const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
+    const headers: ServerlessDiscordRouterRequestHeaders = {
+      "x-signature-ed25519": "123",
+      "x-signature-timestamp": "123",
+    };
+    const result = handler.handleAuthorization({ body, headers });
+    expect(mockVerifyFunc).toBeCalledWith(
+      Buffer.from(headers["x-signature-timestamp"] + JSON.stringify(body)),
+      Buffer.from(headers["x-signature-ed25519"], "hex"),
+      Buffer.from("test", "hex")
+    );
+    expect(result).toBe(false);
+  });
 });
 
 describe("createServerlessDiscordAuthorizationHandler", () => {
-    it("should be able to create a default handler", () => {
-        const authHandler = createAuthHandler({ applicationPublicKey: "test" });
-        expect(authHandler).toBeInstanceOf(AuthHandler);
-    });
+  it("should be able to create a default handler", () => {
+    const authHandler = createAuthHandler({ applicationPublicKey: "test" });
+    expect(authHandler).toBeInstanceOf(AuthHandler);
+  });
 });

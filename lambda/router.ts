@@ -18,26 +18,26 @@ export function initLambdaRouter({
   applicationPublicKey: string,
   logLevel?: LogLevels
 }): ServerlessDiscordLambdaRouter {
-    const authHandler = createAuthHandler({ applicationPublicKey });
-    const awsClient = new LambdaClient({});
-    const logHandler = initLogger({ logLevel });
-    return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler });
+  const authHandler = createAuthHandler({ applicationPublicKey });
+  const awsClient = new LambdaClient({});
+  const logHandler = initLogger({ logLevel });
+  return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
   statusCode: 400,
   body: "Bad Request",
-}
+};
 
 export const UnauthorizedResponse: APIGatewayProxyResult = {
   statusCode: 401,
   body: "Unauthorized",
-}
+};
 
 export const MethodNotAllowedResponse: APIGatewayProxyResult = {
   statusCode: 405,
   body: "Method Not Allowed",
-}
+};
 
 export type AsyncLambdaCommandEvent = {
   commandName: string,
@@ -57,6 +57,7 @@ export type AsyncLambdaCommandEvent = {
 export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
   protected asyncLambdaArn: string | undefined;
   protected awsClient: LambdaClient;
+  protected logHandler: pino.Logger;
 
   constructor({
     commands,
@@ -74,6 +75,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
     super({ commands, authHandler, logHandler });
     this.asyncLambdaArn = asyncLambdaArn;
     this.awsClient = awsClient;
+    this.logHandler = logHandler.child({ class: "ServerlessDiscordLambdaRouter" });
   }
 
   /**
@@ -85,7 +87,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
   async handleLambda(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
     this.logHandler.debug("Handling Lambda event", event);
     if (event.httpMethod !== "POST") {
-      this.logHandler.info(`Method not allowed: ${event.httpMethod}`)
+      this.logHandler.info(`Method not allowed: ${event.httpMethod}`);
       return MethodNotAllowedResponse; 
     }
     const headers = event.headers;
@@ -112,7 +114,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
       return response;
     } catch (e) {
       if (e instanceof UnauthorizedError) {
-        this.logHandler.error("Unauthorized request", e)
+        this.logHandler.error("Unauthorized request", e);
         return UnauthorizedResponse;
       }
       this.logHandler.error("Error handling interaction", e);
@@ -122,7 +124,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
 
   async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
     this.logHandler.debug("Handling lambda application command", interaction);
-    const command = super.getCommand(interaction.data.name)
+    const command = super.getCommand(interaction.data.name);
     if (this.asyncLambdaArn != "" && command instanceof CommandChatInputAsync) {
       // Invoke the async lambda function
       const payload = Uint8Array.from(JSON.stringify(interaction), c => c.charCodeAt(0));

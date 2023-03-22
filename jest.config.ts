@@ -9,6 +9,6 @@ const config: Config = {
     }
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
-}
+};
 
 export default config;

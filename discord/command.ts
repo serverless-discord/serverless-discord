@@ -25,37 +25,37 @@ export interface DiscordCommand {
  * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
  */
 export abstract class DiscordCommand implements DiscordCommand {
-    id: string;
-    type: DiscordCommandTypes | DiscordCommandTypes.CHAT_INPUT;
-    application_id: string;
-    guild_id?: string;
-    name: string;
-    name_localizations?: DiscordLocalesDictionary<string>;
-    description: string;
-    description_localizations?: DiscordLocalesDictionary<string>;
-    options?: DiscordCommandOption[];
-    default_member_permissions?: DiscordBitwisePermissionFlags;
-    dm_permission?: boolean;
-    default_permission?: boolean;
-    nsfw?: boolean;
-    version: string;
+  id: string;
+  type: DiscordCommandTypes | DiscordCommandTypes.CHAT_INPUT;
+  application_id: string;
+  guild_id?: string;
+  name: string;
+  name_localizations?: DiscordLocalesDictionary<string>;
+  description: string;
+  description_localizations?: DiscordLocalesDictionary<string>;
+  options?: DiscordCommandOption[];
+  default_member_permissions?: DiscordBitwisePermissionFlags;
+  dm_permission?: boolean;
+  default_permission?: boolean;
+  nsfw?: boolean;
+  version: string;
 
-    constructor({ id, type, application_id, guild_id, name, name_localizations, description, description_localizations, options, default_member_permissions, dm_permission, default_permission, nsfw, version }: DiscordCommand) {
-        this.id = id;
-        this.type = type;
-        this.application_id = application_id;
-        this.guild_id = guild_id;
-        this.name = name;
-        this.name_localizations = name_localizations;
-        this.description = description;
-        this.description_localizations = description_localizations;
-        this.options = options;
-        this.default_member_permissions = default_member_permissions;
-        this.dm_permission = dm_permission;
-        this.default_permission = default_permission;
-        this.nsfw = nsfw;
-        this.version = version;
-    }
+  constructor({ id, type, application_id, guild_id, name, name_localizations, description, description_localizations, options, default_member_permissions, dm_permission, default_permission, nsfw, version }: DiscordCommand) {
+    this.id = id;
+    this.type = type;
+    this.application_id = application_id;
+    this.guild_id = guild_id;
+    this.name = name;
+    this.name_localizations = name_localizations;
+    this.description = description;
+    this.description_localizations = description_localizations;
+    this.options = options;
+    this.default_member_permissions = default_member_permissions;
+    this.dm_permission = dm_permission;
+    this.default_permission = default_permission;
+    this.nsfw = nsfw;
+    this.version = version;
+  }
 }
 
 export interface DiscordCommandChatInput extends DiscordCommand {
@@ -69,24 +69,24 @@ export interface DiscordCommandChatInput extends DiscordCommand {
  * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
  */
 export class DiscordCommandChatInput extends DiscordCommand implements DiscordCommandChatInput {
-    type: DiscordCommandTypes.CHAT_INPUT;
-    options: DiscordCommandOption[];
+  type: DiscordCommandTypes.CHAT_INPUT;
+  options: DiscordCommandOption[];
 
-    constructor({ 
-        id, 
-        application_id, 
-        guild_id, 
-        name, 
-        name_localizations, 
-        description, 
-        description_localizations, 
-        options, 
-        default_member_permissions, 
-        dm_permission, 
-        default_permission, 
-        nsfw, 
-        version 
-    }: {
+  constructor({ 
+    id, 
+    application_id, 
+    guild_id, 
+    name, 
+    name_localizations, 
+    description, 
+    description_localizations, 
+    options, 
+    default_member_permissions, 
+    dm_permission, 
+    default_permission, 
+    nsfw, 
+    version 
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -101,25 +101,25 @@ export class DiscordCommandChatInput extends DiscordCommand implements DiscordCo
         nsfw?: boolean;
         version: string;
     }) {
-        super({ 
-            id, 
-            type: DiscordCommandTypes.CHAT_INPUT, 
-            application_id, 
-            guild_id, 
-            name, 
-            name_localizations, 
-            description, 
-            description_localizations, 
-            options, 
-            default_member_permissions, 
-            dm_permission, 
-            default_permission, 
-            nsfw, 
-            version
-         });
-        this.type = DiscordCommandTypes.CHAT_INPUT;
-        this.options = options;
-    }
+    super({ 
+      id, 
+      type: DiscordCommandTypes.CHAT_INPUT, 
+      application_id, 
+      guild_id, 
+      name, 
+      name_localizations, 
+      description, 
+      description_localizations, 
+      options, 
+      default_member_permissions, 
+      dm_permission, 
+      default_permission, 
+      nsfw, 
+      version
+    });
+    this.type = DiscordCommandTypes.CHAT_INPUT;
+    this.options = options;
+  }
 }
 
 export interface DiscordCommandMessage extends DiscordCommand {
@@ -131,22 +131,22 @@ export interface DiscordCommandMessage extends DiscordCommand {
  * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
  */
 export class DiscordCommandUser extends DiscordCommand {
-    type: DiscordCommandTypes.USER;
+  type: DiscordCommandTypes.USER;
 
-    constructor({
-        id,
-        application_id,
-        guild_id,
-        name,
-        name_localizations,
-        description,
-        description_localizations,
-        default_member_permissions,
-        dm_permission,
-        default_permission,
-        nsfw,
-        version
-    }: {
+  constructor({
+    id,
+    application_id,
+    guild_id,
+    name,
+    name_localizations,
+    description,
+    description_localizations,
+    default_member_permissions,
+    dm_permission,
+    default_permission,
+    nsfw,
+    version
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -160,9 +160,9 @@ export class DiscordCommandUser extends DiscordCommand {
         nsfw?: boolean;
         version: string;
     }) {
-        super({ id, type: DiscordCommandTypes.USER, application_id, guild_id, name, name_localizations, description, description_localizations, default_member_permissions, dm_permission, default_permission, nsfw, version});
-        this.type = DiscordCommandTypes.USER;
-    }
+    super({ id, type: DiscordCommandTypes.USER, application_id, guild_id, name, name_localizations, description, description_localizations, default_member_permissions, dm_permission, default_permission, nsfw, version});
+    this.type = DiscordCommandTypes.USER;
+  }
 }
 
 export interface DiscordCommandUser extends DiscordCommand {
@@ -175,22 +175,22 @@ export interface DiscordCommandUser extends DiscordCommand {
  * @see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure
  */
 export class DiscordCommandMessage extends DiscordCommand {
-    type: DiscordCommandTypes.MESSAGE;
+  type: DiscordCommandTypes.MESSAGE;
 
-    constructor({
-        id,
-        application_id,
-        guild_id,
-        name,
-        name_localizations,
-        description,
-        description_localizations,
-        default_member_permissions,
-        dm_permission,
-        default_permission,
-        nsfw,
-        version
-    }: {
+  constructor({
+    id,
+    application_id,
+    guild_id,
+    name,
+    name_localizations,
+    description,
+    description_localizations,
+    default_member_permissions,
+    dm_permission,
+    default_permission,
+    nsfw,
+    version
+  }: {
         id: string;
         application_id: string;
         guild_id?: string;
@@ -204,9 +204,9 @@ export class DiscordCommandMessage extends DiscordCommand {
         nsfw?: boolean;
         version: string;
     }) {
-        super({ id, type: DiscordCommandTypes.MESSAGE, application_id, guild_id, name, name_localizations, description, description_localizations, default_member_permissions, dm_permission, default_permission, nsfw, version});
-        this.type = DiscordCommandTypes.MESSAGE;
-    }
+    super({ id, type: DiscordCommandTypes.MESSAGE, application_id, guild_id, name, name_localizations, description, description_localizations, default_member_permissions, dm_permission, default_permission, nsfw, version});
+    this.type = DiscordCommandTypes.MESSAGE;
+  }
 }
 
 /**
