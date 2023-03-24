@@ -57,7 +57,6 @@ export type AsyncLambdaCommandEvent = {
 export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
   protected asyncLambdaArn: string | undefined;
   protected awsClient: LambdaClient;
-  protected logHandler: pino.Logger;
 
   constructor({
     commands,
