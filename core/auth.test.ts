@@ -1,17 +1,21 @@
+import { mock, MockProxy } from "jest-mock-extended";
+import pino from "pino";
 import { DiscordInteractionPing } from "../discord/interactions";
 import { createAuthHandler, AuthHandler } from "./auth";
 import { ServerlessDiscordRouterRequestHeaders } from "./router";
 
 describe("ServerlessDiscordAuthorizationHandler", () => {
   let mockVerifyFunc: jest.Mock;
+  let logHandler: MockProxy<pino.Logger>;
 
   beforeEach(() => {
     mockVerifyFunc = jest.fn();
+    logHandler = mock<pino.Logger>();
   });
 
   it("should be able to handle authorization", () => {
     mockVerifyFunc.mockReturnValue(true);
-    const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
+    const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc, logHandler });
     const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
     const headers: ServerlessDiscordRouterRequestHeaders = {
       "x-signature-ed25519": "123",
@@ -28,7 +32,7 @@ describe("ServerlessDiscordAuthorizationHandler", () => {
 
   it("should be able to handle invalid authorization", () => {
     mockVerifyFunc.mockReturnValue(false);
-    const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc });
+    const handler = new AuthHandler({ applicationPublicKey: "test", verifyFunc: mockVerifyFunc, logHandler });
     const body = new DiscordInteractionPing({ id: "123", application_id: "123", token: "123", version: 1 });
     const headers: ServerlessDiscordRouterRequestHeaders = {
       "x-signature-ed25519": "123",

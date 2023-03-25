@@ -21,6 +21,7 @@ export function initLambdaRouter({
   const authHandler = createAuthHandler({ applicationPublicKey });
   const awsClient = new LambdaClient({});
   const logHandler = initLogger({ logLevel });
+  logHandler.debug("Initializing Lambda router");
   return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler });
 }
 
