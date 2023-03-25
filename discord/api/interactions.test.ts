@@ -1,12 +1,21 @@
+import { mock, MockProxy } from "jest-mock-extended";
 import { DiscordApiResponseError } from "./errors";
 import { DiscordInteractionsApi } from "./interactions";
+import { AxiosInstance } from "axios";
 
 describe("DiscordInteractionApi.createInteractionResponse", () => {
+  let axiosInstance: MockProxy<AxiosInstance>;
+
+  beforeEach(() => {
+    axiosInstance = mock<AxiosInstance>();
+  });
+
   it("should return a response", async () => {
-    DiscordInteractionsApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      status: 204,
+    axiosInstance.post.mockResolvedValueOnce({
+      status: 204
     });
-    await DiscordInteractionsApi.createInteractionResponse({
+    const interactionsApi = new DiscordInteractionsApi({ axiosInstance });
+    await interactionsApi.createInteractionResponse({
       interactionId: "123",
       interactionToken: "123",
       body: {
@@ -16,26 +25,23 @@ describe("DiscordInteractionApi.createInteractionResponse", () => {
         }
       }
     });
-    expect(DiscordInteractionsApi.apiRequest).toHaveBeenCalledWith({
-      path: "/interactions/123/123/callback",
-      method: "POST",
-      body: {
-        type: 4,
-        data: {
-          content: "test"
-        }
+    expect(axiosInstance.post).toHaveBeenCalledWith("/interactions/123/123/callback", {
+      type: 4,
+      data: {
+        content: "test"
       }
     });
   });
 
   it("should throw an error if the status code is not 204", async () => {
-    DiscordInteractionsApi.apiRequest = jest.fn().mockResolvedValueOnce({
+    axiosInstance.post.mockResolvedValueOnce({
       status: 400,
-      json: () => Promise.resolve({
+      data: {
         message: "test"
-      })
+      }
     });
-    await expect(DiscordInteractionsApi.createInteractionResponse({
+    const interactionsApi = new DiscordInteractionsApi({ axiosInstance });
+    await expect(interactionsApi.createInteractionResponse({
       interactionId: "123",
       interactionToken: "123",
       body: {
@@ -49,20 +55,24 @@ describe("DiscordInteractionApi.createInteractionResponse", () => {
 });
 
 describe("DiscordInteractionApi.getInteractionResponse", () => {
+  let axiosInstance: MockProxy<AxiosInstance>;
+
+  beforeEach(() => {
+    axiosInstance = mock<AxiosInstance>();
+  });
+
   it("should return a response", async () => {
-    DiscordInteractionsApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve({
+    axiosInstance.get.mockResolvedValueOnce({
+      data: {
         id: "123"
-      })
+      }
     });
-    const response = await DiscordInteractionsApi.getInteractionResponse({
+    const interactionsApi = new DiscordInteractionsApi({ axiosInstance });
+    const response = await interactionsApi.getInteractionResponse({
       applicationId: "123",
       interactionToken: "123"
     });
-    expect(DiscordInteractionsApi.apiRequest).toHaveBeenCalledWith({
-      path: "/webhooks/123/123/messages/@original",
-      method: "GET"
-    });
+    expect(axiosInstance.get).toHaveBeenCalledWith("/webhooks/123/123/messages/@original");
     expect(response).toEqual({
       id: "123"
     });
@@ -70,13 +80,20 @@ describe("DiscordInteractionApi.getInteractionResponse", () => {
 });
 
 describe("DiscordInteractionApi.editInteractionResponse", () => {
+  let axiosInstance: MockProxy<AxiosInstance>;
+
+  beforeEach(() => {
+    axiosInstance = mock<AxiosInstance>();
+  });
+
   it("should return a response", async () => {
-    DiscordInteractionsApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve({
+    axiosInstance.patch.mockResolvedValueOnce({
+      data: {
         id: "123"
-      })
+      }
     });
-    const response = await DiscordInteractionsApi.editInteractionResponse({
+    const interactionsApi = new DiscordInteractionsApi({ axiosInstance });
+    const response = await interactionsApi.editInteractionResponse({
       applicationId: "123",
       interactionToken: "123",
       body: {
@@ -86,14 +103,10 @@ describe("DiscordInteractionApi.editInteractionResponse", () => {
         }
       }
     });
-    expect(DiscordInteractionsApi.apiRequest).toHaveBeenCalledWith({
-      path: "/webhooks/123/123/messages/@original",
-      method: "PATCH",
-      body: {
-        type: 4,
-        data: {
-          content: "test"
-        }
+    expect(axiosInstance.patch).toHaveBeenCalledWith("/webhooks/123/123/messages/@original", {
+      type: 4,
+      data: {
+        content: "test"
       }
     });
     expect(response).toEqual({

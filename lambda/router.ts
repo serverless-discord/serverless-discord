@@ -6,23 +6,29 @@ import { Command, CommandChatInputAsync } from "../core/command";
 import { UnauthorizedError, CommandNotFoundError } from "../core/errors";
 import { initLogger, LogLevels } from "../core/logging";
 import { ServerlessDiscordRouter } from "../core/router";
+import { DiscordApiClient } from "../discord/api";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
 
 export function initLambdaRouter({ 
   commands, 
   applicationPublicKey,
-  logLevel = "info"
+  applicationId,
+  logLevel = "info",
+  botToken,
 }: { 
   commands: Command[], 
   applicationPublicKey: string,
+  applicationId: string,
   logLevel?: LogLevels
+  botToken: string,
 }): ServerlessDiscordLambdaRouter {
-  const authHandler = createAuthHandler({ applicationPublicKey });
-  const awsClient = new LambdaClient({});
   const logHandler = initLogger({ logLevel });
   logHandler.debug("Initializing Lambda router");
-  return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler });
+  const authHandler = createAuthHandler({ applicationPublicKey });
+  const awsClient = new LambdaClient({});
+  const apiClient = new DiscordApiClient({ token: botToken });
+  return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler, applicationId, apiClient });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
@@ -65,14 +71,18 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
     logHandler,
     asyncLambdaArn,
     awsClient,
+    applicationId,
+    apiClient,
   }: {
     commands: Command[],
     authHandler: AuthHandler,
     logHandler: pino.Logger,
     asyncLambdaArn?: string,
     awsClient: LambdaClient,
+    applicationId: string,
+    apiClient: DiscordApiClient,
   }) {
-    super({ commands, authHandler, logHandler });
+    super({ commands, authHandler, logHandler, applicationId, apiClient });
     this.asyncLambdaArn = asyncLambdaArn;
     this.awsClient = awsClient;
     this.logHandler = logHandler.child({ class: "ServerlessDiscordLambdaRouter" });

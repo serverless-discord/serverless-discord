@@ -1,22 +1,8 @@
-import { DiscordApi } from ".";
+import { DiscordApiClient } from ".";
 
-describe("DiscordApi.apiRequest", () => {
-  it("should return a response", async () => {
-    global.fetch = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve([
-        {
-          id: "123",
-        }
-      ])
-    });
-    const response = await DiscordApi.apiRequest({
-      path: "/test",
-      method: "GET"
-    });
-    expect(response.json()).resolves.toEqual([
-      {
-        id: "123"
-      }
-    ]);
+describe("DiscordApiClient", () => {
+  it("should be able to initialize", () => {
+    const apiClient = new DiscordApiClient({ token: "test" });
+    expect(apiClient).toBeDefined();
   });
 });

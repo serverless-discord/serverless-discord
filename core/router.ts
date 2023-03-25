@@ -5,6 +5,7 @@ import { createAuthHandler, AuthHandler } from "./auth";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { initLogger, LogLevels } from "./logging";
 import pino from "pino";
+import { DiscordApiClient } from "../discord/api";
 
 /**
  * Initializes a new ServerlessDiscordRouter.
@@ -15,15 +16,20 @@ import pino from "pino";
 export function initRouter({ 
   commands, 
   applicationPublicKey, 
+  applicationId,
+  botToken,
   logLevel
 }: { 
     commands: Command[], 
     applicationPublicKey: string 
+    applicationId: string,
+    botToken: string,
     logLevel?: LogLevels
 }): ServerlessDiscordRouter {
   const authHandler = createAuthHandler({ applicationPublicKey });
   const logHandler = initLogger({ logLevel });
-  return new ServerlessDiscordRouter({ commands, authHandler, logHandler });
+  const apiClient = new DiscordApiClient({ token: botToken });
+  return new ServerlessDiscordRouter({ commands, authHandler, logHandler, applicationId, apiClient });
 }
 
 export interface ServerlessDiscordRouterRequestHeaders {
@@ -43,19 +49,27 @@ export class ServerlessDiscordRouter {
   protected commands: Command[];
   protected authHandler: AuthHandler;
   protected logHandler: pino.Logger;
+  protected applicationId: string;
+  protected apiClient: DiscordApiClient;
 
   constructor({ 
     commands, 
     authHandler,
-    logHandler
+    logHandler,
+    applicationId,
+    apiClient
   }: { 
         commands: Command[], 
         authHandler: AuthHandler,
-        logHandler: pino.Logger 
+        logHandler: pino.Logger,
+        applicationId: string
+        apiClient: DiscordApiClient
     }) {
     this.commands = commands;
     this.authHandler = authHandler;
     this.logHandler = logHandler.child({ class: "ServerlessDiscordRouter" });
+    this.applicationId = applicationId;
+    this.apiClient = apiClient;
   } 
 
   async handle({
@@ -142,5 +156,79 @@ export class ServerlessDiscordRouter {
     }
     this.logHandler.debug("Calling Handler", { command });
     return await command.handleInteraction(interaction);
+  }
+
+  /**
+   * Registers all of the commands with Discord.
+   */
+  async registerAllCommands({ botToken }: { botToken: string }) {
+    this.logHandler.debug("Registering all commands", { commands: this.commands });
+    // Register guild commands
+    const guildCommands = this.commands.filter(command => command.guilds.length > 0);
+    if (guildCommands.length > 0) {
+      await this.registerGuildCommands({ guildCommands, botToken });
+    }
+    // Register global commands
+    const globalCommands = this.commands.filter(command => command.guilds.length === 0);
+    if (globalCommands.length > 0) {
+      await this.registerGlobalCommands({ globalCommands, botToken });
+    }
+    this.logHandler.debug("Registered all commands", { commands: this.commands });
+  }
+
+  async registerGuildCommands({ guildCommands, botToken } : { guildCommands: Command[]; botToken: string }) {
+    this.logHandler.debug("Registering Guild Commands", { guildCommands });
+    // Group all commands by guild
+    const guildCommandMap = new Map<string, Command[]>(); // guildId -> commands
+    guildCommands.forEach(command => {
+      command.guilds.forEach(guildId => {
+        if (!guildCommandMap.has(guildId)) {
+          guildCommandMap.set(guildId, []);
+        }
+        guildCommandMap.get(guildId)?.push(command);
+      });
+    });
+    const results = await Promise.all(
+      Array.from(guildCommandMap.entries()).map(([guildId, commands]) => this.registerGuildCommandBatch({ commands, guildId, botToken }))
+    );
+    this.logHandler.debug("Registered Guild Commands", { guildCommands, results });
+  }
+
+  async registerGuildCommand({ command, botToken } : { command: Command; botToken: string }) {
+    this.logHandler.debug("Registering Guild Command", { command });
+    const api = new DiscordApiClient({ token: botToken });
+    const result = await api.commands.createGuildApplicationCommand({
+      applicationId: this.applicationId,
+      guildId: command.guilds[0],
+      command: command.toJSON(),
+    });
+    this.logHandler.debug("Registered Guild Command", { command, result });
+  }
+
+  async registerGuildCommandBatch({ commands, guildId, botToken } : { commands: Command[]; guildId: string; botToken: string }) {
+    this.logHandler.debug("Registering Guild Command Batch", { commands, guildId });
+    const api = new DiscordApiClient({ token: botToken });
+    const result = await api.commands.bulkCreateGuildApplicationCommand({
+      applicationId: this.applicationId,
+      guildId,
+      commands: commands.map(command => command.toJSON()),
+    });
+    this.logHandler.debug("Registered Guild Command Batch", { commands, guildId, result });
+  }
+
+  async registerGlobalCommands({ globalCommands, botToken } : { globalCommands: Command[]; botToken: string }) {
+    this.logHandler.debug("Registering Global Commands", { globalCommands });
+    const results = await Promise.all(globalCommands.map(command => this.registerGlobalCommand({ command, botToken })));
+    this.logHandler.debug("Registered Global Commands", { globalCommands, results });
+  }
+
+  async registerGlobalCommand({ command, botToken } : { command: Command; botToken: string }) {
+    this.logHandler.debug("Registering Global Command", { command });
+    const api = new DiscordApiClient({ token: botToken });
+    const result = await api.commands.createGlobalApplicationCommand({
+      applicationId: this.applicationId,
+      command: command.toJSON(),
+    });
+    this.logHandler.debug("Registered Global Command", { command, result });
   }
 }

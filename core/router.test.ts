@@ -5,12 +5,14 @@ import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } 
 import { MockProxy, mock, DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { AuthHandler } from "./auth";
 import pino from "pino";
+import { DiscordApiClient } from "../discord/api";
 
 class TestCommand extends CommandChatInput {
   constructor() {
     super({
       name: "test",
       options: [],
+      description: "test",
     });
   }
   async handleInteraction(): Promise<DiscordInteractionResponse> {
@@ -37,6 +39,8 @@ describe("initRouter", () => {
     const router = initRouter({
       commands: [],
       applicationPublicKey: "123",
+      applicationId: "123",
+      botToken: "123",
     });
     expect(router).toBeInstanceOf(ServerlessDiscordRouter);
   });
@@ -49,11 +53,13 @@ describe("ServerlessDiscordRouter.handle", () => {
   };
   let authHandlerMock: MockProxy<AuthHandler>;
   let logHandlerMock: DeepMockProxy<pino.Logger>;
+  let apiClientMock: MockProxy<DiscordApiClient>;
 
   beforeEach(() => {
     authHandlerMock = mock<AuthHandler>();
     logHandlerMock = mockDeep<pino.Logger>();
     logHandlerMock.child.mockReturnValue(logHandlerMock);
+    apiClientMock = mock<DiscordApiClient>();
   });
 
   it("should handle authenticated", async () => {
@@ -62,6 +68,8 @@ describe("ServerlessDiscordRouter.handle", () => {
       commands: [],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
     const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
     router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
@@ -75,6 +83,8 @@ describe("ServerlessDiscordRouter.handle", () => {
       commands: [],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
     const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
     router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
@@ -87,6 +97,8 @@ describe("ServerlessDiscordRouter.handle", () => {
       commands: [],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
     router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
     await expect(router.handle({ interaction: {}, requestHeaders: defaultMockHeaders })).rejects.toThrow(InvalidInteractionTypeError);
@@ -98,6 +110,8 @@ describe("ServerlessDiscordRouter.handle", () => {
       commands: [],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
     const interaction: MockProxy<DiscordInteractionPing> = mock<DiscordInteractionPing>();
     router.handleInteraction = jest.fn().mockResolvedValue({ type: 1 });
@@ -108,12 +122,14 @@ describe("ServerlessDiscordRouter.handle", () => {
 describe("ServerlessDiscordRouter.handleInteraction", () => {
   let authHandlerMock: MockProxy<AuthHandler>;
   let logHandlerMock: DeepMockProxy<pino.Logger>;
+  let apiClientMock: MockProxy<DiscordApiClient>;
 
   beforeEach(() => {
     authHandlerMock = mock<AuthHandler>();
     authHandlerMock.handleAuthorization.mockReturnValue(true);
     logHandlerMock = mockDeep<pino.Logger>();
     logHandlerMock.child.mockReturnValue(logHandlerMock);
+    apiClientMock = mock<DiscordApiClient>();
   });
 
   it("should handle ping", async () => {
@@ -121,6 +137,8 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
       commands: [],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
     const interaction = new DiscordInteractionPing({ 
       id: "123",
@@ -156,6 +174,8 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
       commands: [testCommandMock],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
     const response = await router.handleInteraction(interaction);
     expect(testCommandMock.handleInteraction).toBeCalledWith(interaction);
@@ -166,6 +186,8 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
       commands: [],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
 
     const interaction = new DiscordInteractionApplicationCommand({
@@ -188,6 +210,8 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
       commands: [],
       authHandler: authHandlerMock,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
 
     const messageInteraction = new DiscordInteractionMessageComponent({
@@ -221,6 +245,7 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
       super({
         name: "test",
         options: [],
+        description: "test",
       });
     }
 
@@ -235,12 +260,14 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
 
   let authHandler: MockProxy<AuthHandler>;
   let logHandlerMock: DeepMockProxy<pino.Logger>;
+  let apiClientMock: DeepMockProxy<DiscordApiClient>;
 
   beforeEach(() => {
     authHandler = mock<AuthHandler>();
     authHandler.handleAuthorization.mockReturnValue(true);
     logHandlerMock = mockDeep<pino.Logger>();
     logHandlerMock.child.mockReturnValue(logHandlerMock);
+    apiClientMock = mockDeep<DiscordApiClient>();
   });
 
   it("should handle async application command", async () => {
@@ -252,6 +279,8 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
       commands: [command],
       authHandler,
       logHandler: logHandlerMock,
+      applicationId: "123",
+      apiClient: apiClientMock,
     });
     const interaction = new DiscordInteractionApplicationCommand({
       id: "123",

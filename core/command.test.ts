@@ -16,23 +16,35 @@ describe("ServerlessDiscordCommand", () => {
 
   it("should be able to create a ServerlessDiscordCommand", () => {
     const command = new TestCommand({
-      globalCommand: true,
-      guildCommand: true,
+      guilds: ["123"],
       name: "test",
       type: DiscordCommandTypes.USER,
+      description: "test",
     });
     expect(command).toBeDefined();
-    expect(command.globalCommand).toBe(true);
-    expect(command.guildCommand).toBe(true);
+    expect(command.guilds).toEqual(["123"]);
     expect(command.name).toBe("test");
     expect(command.type).toBe(DiscordCommandTypes.USER);
 
     const command2 = new TestCommand({
       name: "test2",
-      type: DiscordCommandTypes.CHAT_INPUT,
+      type: DiscordCommandTypes.USER,
+      description: "test",
     });
-    expect(command2.globalCommand).toBe(false);
-    expect(command2.guildCommand).toBe(false);
+    expect(command2.guilds).toEqual([]);
+  });
+
+  it("should be able to turn into JSON", () => {
+    const command = new TestCommand({
+      name: "test",
+      type: DiscordCommandTypes.USER,
+      description: "test",
+    });
+    expect(command.toJSON()).toEqual({
+      name: "test",
+      type: DiscordCommandTypes.USER,
+      description: "test",
+    });
   });
 });
 
@@ -55,34 +67,30 @@ describe("ServerlessDiscordCommandAsync", () => {
 
   it("should be able to create a ServerlessDiscordCommandAsync", () => {
     let command = new TestCommandAsync({
-      globalCommand: true,
-      guildCommand: true,
+      guilds: ["123"],
       name: "test",
       options: [],
+      description: "test",
     });
     expect(command).toBeDefined();
-    expect(command.globalCommand).toBe(true);
-    expect(command.guildCommand).toBe(true);
+    expect(command.guilds).toEqual(["123"]);
     expect(command.name).toBe("test");
     expect(command.type).toBe(DiscordCommandTypes.CHAT_INPUT);
 
     command = new TestCommandAsync({
       name: "test2",
       options: [],
+      description: "test",
     });
 
-    expect(command.globalCommand).toBe(false);
-    expect(command.guildCommand).toBe(false);
-    expect(command.name).toBe("test2");
-    expect(command.type).toBe(DiscordCommandTypes.CHAT_INPUT);
+    expect(command.guilds).toEqual([]);
   });
 
   it("should be able to handle an interaction", async () => {
     const command = new TestCommandAsync({
-      globalCommand: true,
-      guildCommand: true,
       name: "test",
       options: [],
+      description: "test",
     });
     const interaction = new DiscordInteractionApplicationCommand({
       id: "123",
@@ -104,6 +112,20 @@ describe("ServerlessDiscordCommandAsync", () => {
       }
     });
   });
+
+  it("should be able to turn into JSON", () => {
+    const command = new TestCommandAsync({
+      name: "test",
+      options: [],
+      description: "test",
+    });
+    expect(command.toJSON()).toEqual({
+      name: "test",
+      type: DiscordCommandTypes.CHAT_INPUT,
+      description: "test",
+      options: [],
+    });
+  });
 });
 
 describe("ServerlessDiscordCommandChatInput", () => {
@@ -120,10 +142,9 @@ describe("ServerlessDiscordCommandChatInput", () => {
 
   it("should be able to handle an interaction", async () => {
     const command = new TestCommandChatInput({
-      globalCommand: true,
-      guildCommand: true,
       name: "test",
       options: [],
+      description: "test",
     });
     const interaction = new DiscordInteractionApplicationCommand({
       id: "123",
@@ -143,6 +164,20 @@ describe("ServerlessDiscordCommandChatInput", () => {
       data: {
         content: "Hello World!"
       }
+    });
+  });
+
+  it("should be able to turn into JSON", () => {
+    const command = new TestCommandChatInput({
+      name: "test",
+      options: [],
+      description: "test",
+    });
+    expect(command.toJSON()).toEqual({
+      name: "test",
+      type: DiscordCommandTypes.CHAT_INPUT,
+      description: "test",
+      options: [],
     });
   });
 });
@@ -161,9 +196,8 @@ describe("ServerlessDiscordCommandUser", () => {
 
   it("should be able to handle an interaction", async () => {
     const command = new TestCommandUser({
-      globalCommand: true,
-      guildCommand: true,
       name: "test",
+      description: "test",
     });
     const interaction = new DiscordInteractionApplicationCommand({
       id: "123",
@@ -185,6 +219,18 @@ describe("ServerlessDiscordCommandUser", () => {
       }
     });
   });
+
+  it("should be able to turn into JSON", () => {
+    const command = new TestCommandUser({
+      name: "test",
+      description: "test",
+    });
+    expect(command.toJSON()).toEqual({
+      name: "test",
+      type: DiscordCommandTypes.USER,
+      description: "test",
+    });
+  });
 });
 
 describe("ServerlessDiscordCommandMessage", () => {
@@ -201,9 +247,8 @@ describe("ServerlessDiscordCommandMessage", () => {
 
   it("should be able to handle an interaction", async () => {
     const command = new TestCommandMessage({
-      globalCommand: true,
-      guildCommand: true,
       name: "test",
+      description: "test",
     });
     const interaction = new DiscordInteractionApplicationCommand({
       id: "123",
@@ -223,6 +268,18 @@ describe("ServerlessDiscordCommandMessage", () => {
       data: {
         content: "Hello World!"
       }
+    });
+  });
+
+  it("should be able to turn into JSON", () => {
+    const command = new TestCommandMessage({
+      name: "test",
+      description: "test",
+    });
+    expect(command.toJSON()).toEqual({
+      name: "test",
+      type: DiscordCommandTypes.MESSAGE,
+      description: "test",
     });
   });
 });
