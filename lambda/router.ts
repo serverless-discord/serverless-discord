@@ -6,7 +6,7 @@ import { Command, CommandChatInputAsync } from "../core/command";
 import { UnauthorizedError, CommandNotFoundError } from "../core/errors";
 import { initLogger, LogLevels } from "../core/logging";
 import { ServerlessDiscordRouter } from "../core/router";
-import { DiscordApiClient } from "../discord/api";
+import { DiscordApiClient, initApiClient } from "../discord/api";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
 
@@ -27,7 +27,7 @@ export function initLambdaRouter({
   logHandler.debug("Initializing Lambda router");
   const authHandler = createAuthHandler({ applicationPublicKey });
   const awsClient = new LambdaClient({});
-  const apiClient = new DiscordApiClient({ token: botToken });
+  const apiClient = initApiClient({ token: botToken });
   return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler, applicationId, apiClient });
 }
 
