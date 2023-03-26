@@ -21,13 +21,16 @@ export function initLambdaRouter({
   applicationPublicKey: string,
   applicationId: string,
   logLevel?: LogLevels
-  botToken: string,
+  botToken?: string,
 }): ServerlessDiscordLambdaRouter {
   const logHandler = initLogger({ logLevel });
   logHandler.debug("Initializing Lambda router");
   const authHandler = createAuthHandler({ applicationPublicKey });
   const awsClient = new LambdaClient({});
-  const apiClient = initApiClient({ token: botToken });
+  let apiClient: DiscordApiClient | undefined;
+  if (botToken) {
+    apiClient = initApiClient({ token: botToken });
+  }
   return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler, applicationId, apiClient });
 }
 
@@ -80,7 +83,7 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
     asyncLambdaArn?: string,
     awsClient: LambdaClient,
     applicationId: string,
-    apiClient: DiscordApiClient,
+    apiClient?: DiscordApiClient,
   }) {
     super({ commands, authHandler, logHandler, applicationId, apiClient });
     this.asyncLambdaArn = asyncLambdaArn;
