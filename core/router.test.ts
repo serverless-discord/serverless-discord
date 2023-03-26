@@ -1,7 +1,7 @@
 import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { CommandChatInput, CommandChatInputAsync } from "./command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
-import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
+import { CommandNotFoundError, DiscordApiClientNotSetError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { MockProxy, mock, DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { AuthHandler } from "./auth";
 import pino from "pino";
@@ -424,6 +424,20 @@ describe("ServerlessDiscordRouter.registerGuildCommandBatch", () => {
       commands: [commandToJSONResult, command2ToJSONResult],
     });
   });
+
+  it("should throw error if apiClient is not set", async () => {
+    const command: MockProxy<TestCommand> = mock<TestCommand>({ name: "test", options: [], guilds: ["123"] });
+    const command2: MockProxy<TestCommand> = mock<TestCommand>({ name: "test2", options: [], guilds: ["123"] });
+    const router = new ServerlessDiscordRouter({
+      commands: [command, command2],
+      authHandler: authHandlerMock,
+      logHandler: logHandlerMock,
+      applicationId: "123",
+    });
+    await expect(router.registerGuildCommandBatch({ guildId: "123", commands: [command, command2] })).rejects.toThrow(
+      DiscordApiClientNotSetError
+    );
+  });
 });
 
 describe("ServerlessDiscordRouter.registerGlobalCommands", () => {
@@ -501,5 +515,16 @@ describe("ServerlessDiscordRouter.registerGlobalCommand", () => {
       applicationId: "123",
       command: commandToJson,
     });
+  });
+
+  it("should throw error if apiClient not defined", async () => {
+    const command: MockProxy<TestCommand> = mock<TestCommand>({ name: "test", options: [], guilds: [] });
+    const router = new ServerlessDiscordRouter({
+      commands: [command],
+      authHandler: authHandlerMock,
+      logHandler: logHandlerMock,
+      applicationId: "123",
+    });
+    await expect(router.registerGlobalCommand({ command })).rejects.toThrowError(DiscordApiClientNotSetError);
   });
 });

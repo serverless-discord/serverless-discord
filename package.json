@@ -1,6 +1,6 @@
 {
   "name": "serverless-discord",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "author": "Mitch McAffee <serverless.discord@mitchmcaffee.com>",
   "devDependencies": {
     "@types/jest": "^29.4.0",
