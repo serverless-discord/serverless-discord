@@ -1,6 +1,6 @@
 import { Command, CommandChatInputAsync } from "./command";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, instanceofDiscordInteraction, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionPing } from "../discord/interactions";
-import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
+import { CommandNotFoundError, DiscordApiClientNotSetError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { createAuthHandler, AuthHandler } from "./auth";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { initLogger, LogLevels } from "./logging";
@@ -23,12 +23,15 @@ export function initRouter({
     commands: Command[], 
     applicationPublicKey: string 
     applicationId: string,
-    botToken: string,
+    botToken?: string,
     logLevel?: LogLevels
 }): ServerlessDiscordRouter {
   const authHandler = createAuthHandler({ applicationPublicKey });
   const logHandler = initLogger({ logLevel });
-  const apiClient = initApiClient({ token: botToken });
+  let apiClient: DiscordApiClient | undefined;
+  if (botToken) {
+    apiClient = initApiClient({ token: botToken });
+  }
   return new ServerlessDiscordRouter({ commands, authHandler, logHandler, applicationId, apiClient });
 }
 
@@ -50,7 +53,7 @@ export class ServerlessDiscordRouter {
   protected authHandler: AuthHandler;
   protected logHandler: pino.Logger;
   protected applicationId: string;
-  protected apiClient: DiscordApiClient;
+  protected apiClient: DiscordApiClient | undefined;
 
   constructor({ 
     commands, 
@@ -63,7 +66,7 @@ export class ServerlessDiscordRouter {
         authHandler: AuthHandler,
         logHandler: pino.Logger,
         applicationId: string
-        apiClient: DiscordApiClient
+        apiClient?: DiscordApiClient
     }) {
     this.commands = commands;
     this.authHandler = authHandler;
@@ -195,6 +198,11 @@ export class ServerlessDiscordRouter {
 
   async registerGuildCommandBatch({ commands, guildId } : { commands: Command[]; guildId: string }) {
     this.logHandler.debug("Registering Guild Command Batch", { commands, guildId });
+    if (!this.apiClient) {
+      const error = new DiscordApiClientNotSetError();
+      this.logHandler.error(error);
+      throw error;
+    }
     const result = await this.apiClient.commands.bulkCreateGuildApplicationCommand({
       applicationId: this.applicationId,
       guildId,
@@ -215,6 +223,11 @@ export class ServerlessDiscordRouter {
 
   async registerGlobalCommand({ command } : { command: Command }) {
     this.logHandler.debug("Registering Global Command", { command });
+    if (!this.apiClient) {
+      const error = new DiscordApiClientNotSetError();
+      this.logHandler.error(error);
+      throw error;
+    }
     const result = await this.apiClient.commands.createGlobalApplicationCommand({
       applicationId: this.applicationId,
       command: command.toJSON(),

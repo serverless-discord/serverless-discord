@@ -34,3 +34,9 @@ export class UnauthorizedError extends Error {
     super("Unauthorized");
   }
 }
+
+export class DiscordApiClientNotSetError extends Error {
+  constructor() {
+    super("DiscordApiClient not set");
+  }
+}

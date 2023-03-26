@@ -1,4 +1,4 @@
-import { CommandNotFoundError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
+import { CommandNotFoundError, DiscordApiClientNotSetError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 
 describe("NotImplementedError", () => {
   it("should be able to create a NotImplementedError", () => {
@@ -35,5 +35,13 @@ describe("UnauthorizedError", () => {
     const error = new UnauthorizedError();
     expect(error).toBeDefined();
     expect(error.message).toBe("Unauthorized");
+  });
+});
+
+describe("DiscordApiClientNotSetError", () => {
+  it("should be able to create a DiscordApiClientNotSetError", () => {
+    const error = new DiscordApiClientNotSetError();
+    expect(error).toBeDefined();
+    expect(error.message).toBe("DiscordApiClient not set");
   });
 });
