@@ -1,6 +1,6 @@
-import { MockProxy } from "jest-mock-extended";
-import { DiscordApplication } from "../application";
+import { mock, MockProxy } from "jest-mock-extended";
 import { DiscordCommandApi } from "./commands";
+import { AxiosInstance } from "axios";
 
 const defaultApplication = {
   id: "123",
@@ -22,17 +22,16 @@ describe("DiscordCommandApi.getGuildApplicationCommands", () => {
         options: []
       }
     ];
-    DiscordCommandApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve(responseBody)
+    const axiosInstance: MockProxy<AxiosInstance> = mock<AxiosInstance>();
+    axiosInstance.get.mockResolvedValueOnce({
+      data: responseBody
     });
-    const commands = await DiscordCommandApi.getGuildApplicationCommands({
+    const commandApi = new DiscordCommandApi({ axiosInstance });
+    const commands = await commandApi.getGuildApplicationCommands({
       applicationId: "123",
       guildId: "123"
     });
-    expect(DiscordCommandApi.apiRequest).toHaveBeenCalledWith({
-      path: `/applications/${defaultApplication.id}/guilds/123/commands`,
-      method: "GET"
-    });
+    expect(axiosInstance.get).toHaveBeenCalledWith(`/applications/${defaultApplication.id}/guilds/123/commands`);
     expect(commands).toEqual(responseBody);
   });
 });
@@ -50,19 +49,19 @@ describe("DiscordCommandApi.createGuildApplicationCommand", () => {
       description: "test",
       options: []
     };
-    DiscordCommandApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve(responseBody)
+    const axiosInstance: MockProxy<AxiosInstance> = mock<AxiosInstance>();
+    axiosInstance.post.mockResolvedValueOnce({
+      data: responseBody
     });
-    const command = await DiscordCommandApi.createGuildApplicationCommand({
+    const commandApi = new DiscordCommandApi({ axiosInstance });
+    const command = await commandApi.createGuildApplicationCommand({
       applicationId: "123",
       guildId: "123",
       command: requestBody
     });
-    expect(DiscordCommandApi.apiRequest).toHaveBeenCalledWith({
-      path: `/applications/${defaultApplication.id}/guilds/123/commands`,
-      method: "POST",
-      body: requestBody
-    });
+    expect(axiosInstance.post).toHaveBeenCalledWith(`/applications/${defaultApplication.id}/guilds/123/commands`,
+      requestBody
+    );
     expect(command).toEqual(responseBody);
   });
 });
@@ -76,18 +75,17 @@ describe("DiscordCommandApi.getGuildApplicationCommand", () => {
       description: "test",
       options: []
     };
-    DiscordCommandApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve(responseBody)
+    const axiosInstance: MockProxy<AxiosInstance> = mock<AxiosInstance>();
+    axiosInstance.get.mockResolvedValueOnce({
+      data: responseBody
     });
-    const command = await DiscordCommandApi.getGuildApplicationCommand({
+    const commandApi = new DiscordCommandApi({ axiosInstance });
+    const command = await commandApi.getGuildApplicationCommand({
       applicationId: "123",
       guildId: "123",
       commandId: "123"
     });
-    expect(DiscordCommandApi.apiRequest).toHaveBeenCalledWith({
-      path: `/applications/${defaultApplication.id}/guilds/123/commands/123`,
-      method: "GET"
-    });
+    expect(axiosInstance.get).toHaveBeenCalledWith(`/applications/${defaultApplication.id}/guilds/123/commands/123`);
     expect(command).toEqual(responseBody);
   });
 });
@@ -109,19 +107,19 @@ describe("DiscordCommandApi.bulkCreateGuildApplicationCommand", () => {
         options: []
       }
     ];
-    DiscordCommandApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve(responseBody)
+    const axiosInstance: MockProxy<AxiosInstance> = mock<AxiosInstance>();
+    axiosInstance.put.mockResolvedValueOnce({
+      data: responseBody
     });
-    const commands = await DiscordCommandApi.bulkCreateGuildApplicationCommand({
+    const commandApi = new DiscordCommandApi({ axiosInstance });
+    const commands = await commandApi.bulkCreateGuildApplicationCommand({
       applicationId: "123",
       guildId: "123",
       commands: requestBody
     });
-    expect(DiscordCommandApi.apiRequest).toHaveBeenCalledWith({
-      path: `/applications/${defaultApplication.id}/guilds/123/commands`,
-      method: "PUT",
-      body: requestBody
-    });
+    expect(axiosInstance.put).toHaveBeenCalledWith(`/applications/${defaultApplication.id}/guilds/123/commands`,
+      requestBody
+    );
     expect(commands).toEqual(responseBody);
   });
 });
@@ -137,16 +135,15 @@ describe("DiscordCommandApi.getGlobalApplicationCommands", () => {
         options: []
       }
     ];
-    DiscordCommandApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve(responseBody)
+    const axiosInstance: MockProxy<AxiosInstance> = mock<AxiosInstance>();
+    axiosInstance.get.mockResolvedValueOnce({
+      data: responseBody
     });
-    const commands = await DiscordCommandApi.getGlobalApplicationCommands({
+    const commandApi = new DiscordCommandApi({ axiosInstance });
+    const commands = await commandApi.getGlobalApplicationCommands({
       applicationId: "123"
     });
-    expect(DiscordCommandApi.apiRequest).toHaveBeenCalledWith({
-      path: `/applications/${defaultApplication.id}/commands`,
-      method: "GET"
-    });
+    expect(axiosInstance.get).toHaveBeenCalledWith(`/applications/${defaultApplication.id}/commands`);
     expect(commands).toEqual(responseBody);
   });
 });
@@ -164,18 +161,51 @@ describe("DiscordCommandApi.createGlobalApplicationCommand", () => {
       description: "test",
       options: []
     };
-    DiscordCommandApi.apiRequest = jest.fn().mockResolvedValueOnce({
-      json: () => Promise.resolve(responseBody)
+    const axiosInstance: MockProxy<AxiosInstance> = mock<AxiosInstance>();
+    axiosInstance.post.mockResolvedValueOnce({
+      data: responseBody
     });
-    const command = await DiscordCommandApi.createGlobalApplicationCommand({
+    const commandApi = new DiscordCommandApi({ axiosInstance });
+    const command = await commandApi.createGlobalApplicationCommand({
       applicationId: "123",
       command: requestBody
     });
-    expect(DiscordCommandApi.apiRequest).toHaveBeenCalledWith({
-      path: `/applications/${defaultApplication.id}/commands`,
-      method: "POST",
-      body: requestBody
-    });
+    expect(axiosInstance.post).toHaveBeenCalledWith(`/applications/${defaultApplication.id}/commands`,
+      requestBody
+    );
     expect(command).toEqual(responseBody);
+  });
+});
+
+describe("DiscordCommandApi.bulkCreateGlobalApplicationCommand", () => {
+  it("should create a list of commands and return them", async () => {
+    const requestBody = [
+      {
+        name: "test",
+        description: "test"
+      }
+    ];
+    const responseBody = [
+      {
+        id: "123",
+        application_id: "123",
+        name: "test",
+        description: "test",
+        options: []
+      }
+    ];
+    const axiosInstance: MockProxy<AxiosInstance> = mock<AxiosInstance>();
+    axiosInstance.put.mockResolvedValueOnce({
+      data: responseBody
+    });
+    const commandApi = new DiscordCommandApi({ axiosInstance });
+    const commands = await commandApi.bulkCreateGlobalApplicationCommand({
+      applicationId: "123",
+      commands: requestBody
+    });
+    expect(axiosInstance.put).toHaveBeenCalledWith(`/applications/${defaultApplication.id}/commands`,
+      requestBody
+    );
+    expect(commands).toEqual(responseBody);
   });
 });

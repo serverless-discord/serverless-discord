@@ -1,45 +1,49 @@
-import { DiscordApi } from ".";
 import { DiscordCommand, DiscordCreateApplicationCommandParams } from "../command";
+import { AxiosInstance } from "axios";
 
-export class DiscordCommandApi extends DiscordApi {
+export class DiscordCommandApi {
+  private axiosInstance: AxiosInstance;
+
+  constructor({ axiosInstance }: { axiosInstance: AxiosInstance }) {
+    this.axiosInstance = axiosInstance;
+  }
+
   /**
      * @see https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
      */
-  static async getGlobalApplicationCommands({ applicationId } : { applicationId: string }): Promise<DiscordCommand[]> {
-    const resp = await this.apiRequest({
-      path: `/applications/${applicationId}/commands`,
-      method: "GET"
-    });
-    return await resp.json();
+  async getGlobalApplicationCommands({ applicationId } : { applicationId: string }): Promise<DiscordCommand[]> {
+    const resp = await this.axiosInstance.get(`/applications/${applicationId}/commands`);
+    return resp.data;
   }
 
   /**
      * @see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
     */
-  static async createGlobalApplicationCommand({ applicationId, command } : { applicationId: string, command: DiscordCreateApplicationCommandParams }): Promise<DiscordCommand> {
-    const resp = await this.apiRequest({
-      path: `/applications/${applicationId}/commands`,
-      method: "POST",
-      body: command
-    });
-    return await resp.json();
+  async createGlobalApplicationCommand({ applicationId, command } : { applicationId: string, command: DiscordCreateApplicationCommandParams }): Promise<DiscordCommand> {
+    const resp = await this.axiosInstance.post(`/applications/${applicationId}/commands`, command);
+    return resp.data;
+  }
+
+  /**
+   * @see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
+   */
+  async bulkCreateGlobalApplicationCommand({ applicationId, commands } : { applicationId: string, commands: DiscordCreateApplicationCommandParams[] }): Promise<DiscordCommand[]> {
+    const resp = await this.axiosInstance.put(`/applications/${applicationId}/commands`, commands);
+    return resp.data;
   }
 
   /**
      * @see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands 
      */
-  static async getGuildApplicationCommands({ applicationId, guildId } : {applicationId: string, guildId: string }): Promise<DiscordCommand[]> {
-    const resp = await this.apiRequest({
-      path: `/applications/${applicationId}/guilds/${guildId}/commands`,
-      method: "GET"
-    });
-    return await resp.json();
+  async getGuildApplicationCommands({ applicationId, guildId } : {applicationId: string, guildId: string }): Promise<DiscordCommand[]> {
+    const resp = await this.axiosInstance.get(`/applications/${applicationId}/guilds/${guildId}/commands`);
+    return resp.data;
   }
 
   /**
      * @see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command
      */
-  static async getGuildApplicationCommand({
+  async getGuildApplicationCommand({
     applicationId,
     guildId,
     commandId
@@ -48,17 +52,14 @@ export class DiscordCommandApi extends DiscordApi {
         guildId: string,
         commandId: string
     }): Promise<DiscordCommand> {
-    const resp = await this.apiRequest({
-      path: `/applications/${applicationId}/guilds/${guildId}/commands/${commandId}`,
-      method: "GET"
-    });
-    return await resp.json();
+    const resp = await this.axiosInstance.get(`/applications/${applicationId}/guilds/${guildId}/commands/${commandId}`);
+    return resp.data;
   }
 
   /**
      * @see https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
      */
-  static async createGuildApplicationCommand({
+  async createGuildApplicationCommand({
     applicationId,
     guildId,
     command
@@ -67,18 +68,14 @@ export class DiscordCommandApi extends DiscordApi {
         guildId: string,
         command: DiscordCreateApplicationCommandParams
     }): Promise<DiscordCommand> {
-    const resp = await this.apiRequest({
-      path: `/applications/${applicationId}/guilds/${guildId}/commands`,
-      method: "POST",
-      body: command
-    });
-    return await resp.json();
+    const resp = await this.axiosInstance.post(`/applications/${applicationId}/guilds/${guildId}/commands`, command);
+    return resp.data;
   }
 
   /**
      * @see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands
      */
-  static async bulkCreateGuildApplicationCommand({
+  async bulkCreateGuildApplicationCommand({
     applicationId,
     guildId,
     commands
@@ -87,11 +84,7 @@ export class DiscordCommandApi extends DiscordApi {
         guildId: string,
         commands: DiscordCreateApplicationCommandParams[]
     }): Promise<DiscordCommand[]> {
-    const resp = await this.apiRequest({
-      path: `/applications/${applicationId}/guilds/${guildId}/commands`,
-      method: "PUT",
-      body: commands
-    });
-    return await resp.json();
+    const resp = await this.axiosInstance.put(`/applications/${applicationId}/guilds/${guildId}/commands`, commands);
+    return resp.data;
   }
 }

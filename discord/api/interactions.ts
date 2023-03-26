@@ -1,12 +1,16 @@
-import { DiscordApi } from ".";
+import { AxiosInstance } from "axios";
 import { DiscordInteractionResponse } from "../interactions";
 import { DiscordApiResponseError } from "./errors";
 
-export class DiscordInteractionsApi extends DiscordApi {
+export class DiscordInteractionsApi {
+  private axiosInstance: AxiosInstance;
+  constructor({ axiosInstance }: { axiosInstance: AxiosInstance }) {
+    this.axiosInstance = axiosInstance;
+  }
   /**
      * @see https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
      */
-  static async createInteractionResponse({
+  async createInteractionResponse({
     interactionId,
     interactionToken,
     body
@@ -15,31 +19,24 @@ export class DiscordInteractionsApi extends DiscordApi {
         interactionToken: string,
         body: DiscordInteractionResponse
     }): Promise<void> {
-    const response = await this.apiRequest({
-      path: `/interactions/${interactionId}/${interactionToken}/callback`,
-      method: "POST",
-      body
-    });
+    const response = await this.axiosInstance.post(`/interactions/${interactionId}/${interactionToken}/callback`, body);
     if (response.status !== 204) {
       throw new DiscordApiResponseError({ response });
     }
   }
 
-  static async getInteractionResponse({
+  async getInteractionResponse({
     applicationId,
     interactionToken
   }: {
         applicationId: string,
         interactionToken: string
     }): Promise<DiscordInteractionResponse> {
-    const response = await this.apiRequest({
-      path: `/webhooks/${applicationId}/${interactionToken}/messages/@original`,
-      method: "GET"
-    });
-    return await response.json();
+    const response = await this.axiosInstance.get(`/webhooks/${applicationId}/${interactionToken}/messages/@original`);
+    return response.data;
   }
 
-  static async editInteractionResponse({
+  async editInteractionResponse({
     applicationId,
     interactionToken,
     body
@@ -48,11 +45,7 @@ export class DiscordInteractionsApi extends DiscordApi {
         interactionToken: string,
         body: DiscordInteractionResponse
     }): Promise<Response> {
-    const response = await this.apiRequest({
-      path: `/webhooks/${applicationId}/${interactionToken}/messages/@original`,
-      method: "PATCH",
-      body
-    });
-    return await response.json();
+    const response = await this.axiosInstance.patch(`/webhooks/${applicationId}/${interactionToken}/messages/@original`, body);
+    return response.data;
   }
 }

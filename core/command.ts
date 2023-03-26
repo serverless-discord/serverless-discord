@@ -1,4 +1,4 @@
-import { DiscordCommandTypes, DiscordCommandOption } from "../discord/command";
+import { DiscordCommandTypes, DiscordCommandOption, DiscordCreateApplicationCommandParams } from "../discord/command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
 
 /**
@@ -11,32 +11,31 @@ import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, Disco
  * 
  * A ServerlessDiscordCommand can be global or guild specific.
  * 
- * @param globalCommand Whether the command is global or not
  * @param guildCommand Whether the command is guild specific or not
  * @param type The type of the command
  * @param name The name of the command
  */
 export abstract class Command {
-  readonly globalCommand: boolean;
-  readonly guildCommand: boolean;
+  readonly guilds: string[];
   readonly type: DiscordCommandTypes;
   readonly name: string;
+  readonly description: string;
 
   constructor({
-    globalCommand,
-    guildCommand,
+    guilds,
     type,
     name,
+    description,
   }: {
-        globalCommand?: boolean;
-        guildCommand?: boolean;
+        guilds?: string[];
         type: DiscordCommandTypes;
         name: string;
+        description: string;
         }) {
-    this.globalCommand = globalCommand ? globalCommand : false;
-    this.guildCommand = guildCommand ? guildCommand : false;
+    this.guilds = guilds || [];
     this.type = type;
     this.name = name;
+    this.description = description;
   }
 
     /**
@@ -45,6 +44,14 @@ export abstract class Command {
      * @param interaction The interaction that was received
      */
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
+
+    toJSON(): DiscordCreateApplicationCommandParams {
+      return {
+        name: this.name,
+        type: this.type,
+        description: this.description,
+      };
+    }
 }
 
 /**
@@ -61,17 +68,17 @@ export abstract class CommandChatInput extends Command {
   readonly options: DiscordCommandOption[];
 
   constructor({
-    globalCommand,
-    guildCommand,
+    guilds,
     name,
     options,
+    description
   }: {
-        globalCommand?: boolean;
-        guildCommand?: boolean;
+    guilds?: string[];
         name: string;
         options: DiscordCommandOption[];
+        description: string;
     }) {
-    super({ globalCommand, guildCommand, type: DiscordCommandTypes.CHAT_INPUT, name });
+    super({ guilds, type: DiscordCommandTypes.CHAT_INPUT, name, description });
     this.options = options;
   }
 
@@ -81,6 +88,15 @@ export abstract class CommandChatInput extends Command {
      * @param interaction The interaction that was received
      */
     abstract handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
+
+    toJSON(): DiscordCreateApplicationCommandParams {
+      return {
+        name: this.name,
+        type: this.type,
+        description: this.description,
+        options: this.options,
+      };
+    }
 }
 
 /**
@@ -94,19 +110,19 @@ export abstract class CommandChatInput extends Command {
  */
 export abstract class CommandUser extends Command {
   constructor({
-    globalCommand,
-    guildCommand,
+    guilds,
     name,
+    description
   }: {
-        globalCommand?: boolean;
-        guildCommand?: boolean;
+    guilds?: string[];
         name: string;
+        description: string;
     }) {
     super({
-      globalCommand,
-      guildCommand,
+      guilds,
       type: DiscordCommandTypes.USER,
       name,
+      description
     });
   }
 
@@ -124,19 +140,19 @@ export abstract class CommandUser extends Command {
  */
 export abstract class CommandMessage extends Command {
   constructor({ 
-    globalCommand,
-    guildCommand,
+    guilds,
     name,
+    description
   }: {
-        globalCommand?: boolean;
-        guildCommand?: boolean;
+    guilds?: string[];
         name: string;
+        description: string;
     }) {
     super({
-      globalCommand,
-      guildCommand,
+      guilds,
       type: DiscordCommandTypes.MESSAGE,
       name,
+      description
     });
   }
     
@@ -146,22 +162,31 @@ export abstract class CommandMessage extends Command {
 
 export abstract class CommandChatInputAsync extends CommandChatInput {
   constructor({
-    globalCommand,
-    guildCommand,
+    guilds,
     name,
     options,
+    description
   }: {
-        globalCommand?: boolean;
-        guildCommand?: boolean;
+    guilds?: string[];
         name: string;
         options: DiscordCommandOption[];
+        description: string;
     }) {
-    super({ globalCommand, guildCommand, name, options });
+    super({ guilds, name, options, description });
   }
 
   handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseDeferredChannelMessageWithSource> {
     return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({ data: { content: "..." } }));
   }
 
-    abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void>
+  abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void>
+
+  toJSON(): DiscordCreateApplicationCommandParams {
+    return {
+      name: this.name,
+      type: this.type,
+      description: this.description,
+      options: this.options,
+    };
+  }
 }
