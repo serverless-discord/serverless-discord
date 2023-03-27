@@ -15,7 +15,7 @@ npm install serverless-discord
 
 Next, create a simple command like this one:
 
-```
+```ts
 import { ServerlessDiscordCommandChatInput, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes } from "serverless-discord";
 import { initLambdaRouter } from "serverless-discord-lambda";
 
@@ -60,7 +60,7 @@ To get started, install the serverless-discord npm package:
 npm install serverless-discord
 ```
 
-```
+```ts
 import { ServerlessDiscordCommandChatInput, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, initRouter } from "serverless-discord";
 
 // You can get this from the Discord Developer Portal
