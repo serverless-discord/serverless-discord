@@ -16,19 +16,21 @@ export function initLambdaRouter({
   applicationId,
   logLevel = "info",
   botToken,
+  asyncLambdaArn,
 }: { 
   commands: Command[], 
   applicationPublicKey: string,
   applicationId: string,
   botToken: string,
-  logLevel?: LogLevels
+  logLevel?: LogLevels,
+  asyncLambdaArn?: string
 }): ServerlessDiscordLambdaRouter {
   const logHandler = initLogger({ logLevel });
   logHandler.debug("Initializing Lambda router");
   const authHandler = createAuthHandler({ applicationPublicKey });
   const awsClient = new LambdaClient({});
   const apiClient = initApiClient({ token: botToken });
-  return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler, applicationId, apiClient });
+  return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler, applicationId, apiClient, asyncLambdaArn });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
