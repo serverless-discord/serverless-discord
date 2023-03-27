@@ -44,8 +44,13 @@ class TestCommandAsync extends CommandChatInputAsync {
       description: "test",
     });
   }
-  async handleInteractionAsync(): Promise<void> {
-    return;
+  async handleInteractionAsync(): Promise<DiscordInteractionResponse> {
+    return new DiscordInteractionResponse({
+      type: 1,
+      data: {
+        content: "test",
+      },
+    });
   }
 }
 

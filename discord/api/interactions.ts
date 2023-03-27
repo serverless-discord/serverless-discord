@@ -25,6 +25,9 @@ export class DiscordInteractionsApi {
     }
   }
 
+  /**
+   * @see https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response 
+   */
   async getInteractionResponse({
     applicationId,
     interactionToken
@@ -36,6 +39,9 @@ export class DiscordInteractionsApi {
     return response.data;
   }
 
+  /**
+   * @see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response 
+   */
   async editInteractionResponse({
     applicationId,
     interactionToken,
