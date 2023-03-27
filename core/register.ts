@@ -89,15 +89,15 @@ export class CommandRegistrar {
       return;
     }
     await Promise.all(globalCommands.map(command => this.registerGlobalCommand({ command })));
-    this.logHandler.debug("Registered Global Commands", { globalCommands });
+    this.logHandler.debug(`Registered ${globalCommands.length} Global Commands`, { globalCommands });
   }
 
   async registerGlobalCommand({ command } : { command: Command }) {
-    this.logHandler.debug("Registering Global Command", { command });
+    this.logHandler.debug(`Registering Global Command: ${command.name}`, { command });
     const result = await this.apiClient.commands.createGlobalApplicationCommand({
       applicationId: this.applicationId,
       command: command.toJSON(),
     });
-    this.logHandler.debug("Registered Global Command", { command, result });
+    this.logHandler.debug(`Registered Global Command: ${command.name}`, { command, result });
   }
 }
