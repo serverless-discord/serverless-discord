@@ -1,6 +1,23 @@
 import { Logger } from "pino";
-import { DiscordApiClient } from "../discord/api";
+import { DiscordApiClient, initApiClient } from "../discord/api";
 import { Command } from "./command";
+import { initLogger, LogLevels } from "./logging";
+
+export const initRegistrar = ({
+  commands,
+  applicationId,
+  botToken,
+  logLevel = "info",
+} : {
+  commands: Command[];
+  applicationId: string;
+  botToken: string;
+  logLevel?: LogLevels;
+}) => {
+  const apiClient = initApiClient({ token: botToken });
+  const logHandler = initLogger({ logLevel });
+  return new CommandRegistrar({ commands, applicationId, apiClient, logHandler });
+};
 
 export class CommandRegistrar {
   protected commands: Command[];
