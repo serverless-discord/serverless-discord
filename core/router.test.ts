@@ -1,7 +1,7 @@
 import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { CommandChatInput, CommandChatInputAsync } from "./command";
 import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
-import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
+import { AsyncFeatureDisabledError, CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { MockProxy, mock, DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { AuthHandler } from "./auth";
 import pino from "pino";
@@ -34,6 +34,19 @@ class TestCommand extends CommandChatInput {
     };
   }
 }
+
+const DEFAULT_INTERACTION = {
+  id: "123",
+  application_id: "123",
+  token: "123",
+  version: 1,
+  data: {
+    id: "123",
+    name: "test",
+    options: [],
+    type: 1,
+  },
+};
 
 describe("initRouter", () => {
   it("should init router", () => {
@@ -151,18 +164,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
     expect(response).toEqual({ type: 1 });
   });
   it("should handle application command", async () => {
-    const interaction = new DiscordInteractionApplicationCommand({
-      id: "123",
-      application_id: "123",
-      token: "123",
-      version: 1,
-      data: {
-        id: "123",
-        name: "test",
-        options: [],
-        type: 1,
-      },
-    });
+    const interaction = new DiscordInteractionApplicationCommand(DEFAULT_INTERACTION);
     const testCommandMock: MockProxy<TestCommand> = mock<TestCommand>({ name: "test", options: [] });
     const interactionResponse = {
       type: 1,
@@ -191,18 +193,7 @@ describe("ServerlessDiscordRouter.handleInteraction", () => {
       apiClient: apiClientMock,
     });
 
-    const interaction = new DiscordInteractionApplicationCommand({
-      id: "123",
-      application_id: "123",
-      token: "123",
-      version: 1,
-      data: {
-        id: "123",
-        name: "test",
-        options: [],
-        type: 1,
-      },
-    });
+    const interaction = new DiscordInteractionApplicationCommand(DEFAULT_INTERACTION);
     // Test that the CommandNotFoundError is thrown
     expect(router.handleInteraction(interaction)).rejects.toThrowError(CommandNotFoundError);
   });
@@ -283,21 +274,21 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
       applicationId: "123",
       apiClient: apiClientMock,
     });
-    const interaction = new DiscordInteractionApplicationCommand({
-      id: "123",
-      application_id: "123",
-      token: "123",
-      version: 1,
-      data: {
-        id: "123",
-        name: "test",
-        options: [],
-        type: 1,
-      },
-    });
+    const interaction = new DiscordInteractionApplicationCommand(DEFAULT_INTERACTION);
     const response = await router.handleApplicationCommand(interaction);
     expect(command.handleInteraction).toBeCalledWith(interaction);
     expect(command.handleInteractionAsync).toBeCalledWith(interaction);
+  });
+
+  it("should throw error if apiClient is not set", async () => {
+    const command = new TestCommandAsync();
+    const router = new ServerlessDiscordRouter({
+      commands: [command],
+      logHandler: logHandlerMock,
+      applicationId: "123",
+    });
+    const interaction = new DiscordInteractionApplicationCommand(DEFAULT_INTERACTION);
+    expect(router.handleApplicationCommand(interaction)).rejects.toThrowError(AsyncFeatureDisabledError);
   });
 });
 
