@@ -1,5 +1,4 @@
-import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
-import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayEvent, APIGatewayProxyResult, SQSEvent } from "aws-lambda";
 import pino from "pino";
 import { AuthHandler, createAuthHandler } from "../core/auth";
 import { Command, CommandChatInputAsync } from "../core/command";
@@ -9,6 +8,8 @@ import { ServerlessDiscordRouter } from "../core/router";
 import { DiscordApiClient, initApiClient } from "../discord/api";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse } from "../discord/interactions";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { SQSNotSetupError } from "./errors";
 
 export function initLambdaRouter({ 
   commands, 
@@ -16,21 +17,21 @@ export function initLambdaRouter({
   applicationId,
   logLevel = "info",
   botToken,
-  asyncLambdaArn,
+  queueUrl,
 }: { 
   commands: Command[], 
   applicationPublicKey: string,
   applicationId: string,
   botToken: string,
   logLevel?: LogLevels,
-  asyncLambdaArn?: string
+  queueUrl?: string
 }): ServerlessDiscordLambdaRouter {
   const logHandler = initLogger({ logLevel });
   logHandler.debug("Initializing Lambda router");
   const authHandler = createAuthHandler({ applicationPublicKey });
-  const awsClient = new LambdaClient({});
   const apiClient = initApiClient({ token: botToken });
-  return new ServerlessDiscordLambdaRouter({ commands, authHandler, awsClient, logHandler, applicationId, apiClient, asyncLambdaArn });
+  const sqsClient = new SQSClient({ region: process.env.AWS_REGION });
+  return new ServerlessDiscordLambdaRouter({ commands, authHandler, logHandler, applicationId, apiClient, sqsClient, queueUrl });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
@@ -64,29 +65,29 @@ export type AsyncLambdaCommandEvent = {
  * interaction data as the event.
  */
 export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
-  protected asyncLambdaArn: string | undefined;
-  protected awsClient: LambdaClient;
+  protected sqsClient?: SQSClient;
+  protected queueUrl?: string;
 
   constructor({
     commands,
     authHandler,
     logHandler,
-    asyncLambdaArn,
-    awsClient,
     applicationId,
     apiClient,
+    sqsClient,
+    queueUrl
   }: {
     commands: Command[],
     authHandler: AuthHandler,
     logHandler: pino.Logger,
-    asyncLambdaArn?: string,
-    awsClient: LambdaClient,
     applicationId: string,
     apiClient: DiscordApiClient,
+    sqsClient?: SQSClient,
+    queueUrl?: string,
   }) {
     super({ commands, authHandler, logHandler, applicationId, apiClient });
-    this.asyncLambdaArn = asyncLambdaArn;
-    this.awsClient = awsClient;
+    this.sqsClient = sqsClient;
+    this.queueUrl = queueUrl;
     this.logHandler = logHandler.child({ class: "ServerlessDiscordLambdaRouter" });
   }
 
@@ -134,20 +135,33 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
     }
   }
 
+  /**
+   * Adds an interaction to an SQS queue to be processed by an async lambda function
+   */
+  private async addInteractionToQueue(interaction: DiscordInteractionApplicationCommand): Promise<void> {
+    if (this.sqsClient == null || this.queueUrl == null) {
+      const err = new SQSNotSetupError();
+      this.logHandler.error(err);
+      throw err;
+    }
+    // Invoke the async lambda function by adding to an SQS queue
+    const sqsCommand = new SendMessageCommand({
+      MessageBody: JSON.stringify(interaction),
+      QueueUrl: this.queueUrl,
+    });
+    this.logHandler.debug("Adding interaction to queue", sqsCommand);
+    const data = await this.sqsClient.send(sqsCommand);
+    this.logHandler.debug("Added interaction to queue", data);
+  }
+
+  /**
+   * Handler for AWS Lambda that handles Discord bot interactions 
+   */
   async handleApplicationCommand(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
     this.logHandler.debug("Handling lambda application command", interaction);
     const command = super.getCommand(interaction.data.name);
-    if (this.asyncLambdaArn != "" && command instanceof CommandChatInputAsync) {
-      // Invoke the async lambda function
-      const payload = Uint8Array.from(JSON.stringify(interaction), c => c.charCodeAt(0));
-      const lambdaCommand = new InvokeCommand({
-        FunctionName: this.asyncLambdaArn,
-        Payload: payload,
-      });
-
-      // Don't wait for response from async lambda
-      this.logHandler.debug("Invoking async lambda", lambdaCommand);
-      this.awsClient.send(lambdaCommand);
+    if (command instanceof CommandChatInputAsync) {
+      await this.addInteractionToQueue(interaction);
     }
     return await command.handleInteraction(interaction);
   }
@@ -167,5 +181,16 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
       throw error;
     }
     await command.handleInteractionAsyncWrapper({ apiClient: this.apiClient, interaction: event });
+  }
+
+  /**
+   * Handles an SQS event that contains Discord interactions 
+   */
+  async handleSqsEvent(event: SQSEvent) {
+    this.logHandler.debug("Handling SQS event", event);
+    for (const record of event.Records) {
+      const interaction = JSON.parse(record.body) as DiscordInteractionApplicationCommand;
+      await this.handleLambdaAsyncApplicationCommand(interaction);
+    }
   }
 }
