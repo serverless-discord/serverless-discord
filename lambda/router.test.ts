@@ -1,9 +1,9 @@
 import { MockProxy, mock } from "jest-mock-extended";
 import { APIGatewayEvent, SQSEvent, SQSRecord } from "aws-lambda";
-import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse, MethodNotAllowedResponse, initLambdaRouter } from "./router";
+import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse, MethodNotAllowedResponse, initLambdaRouter, initAsyncLambdaRouter } from "./router";
 import { LambdaClient } from "@aws-sdk/client-lambda";
 import { CommandChatInput, CommandChatInputAsync } from "../core/command";
-import { CommandNotFoundError } from "../core/errors";
+import { AsyncFeatureDisabledError, CommandNotFoundError } from "../core/errors";
 import { DiscordInteractionResponse, DiscordInteractionPing, DiscordInteractionApplicationCommand } from "../discord/interactions";
 import { AuthHandler } from "../core/auth";
 import pino from "pino";
@@ -75,6 +75,17 @@ describe("initLambdaRouter", () => {
     const router = initLambdaRouter({
       commands: [],
       applicationPublicKey: "123",
+      applicationId: "123",
+      queueUrl: "123",
+    });
+    expect(router).toBeInstanceOf(ServerlessDiscordLambdaRouter);
+  });
+});
+
+describe("initAsyncLambdaRouter", () => {
+  it("should init router", () => {
+    const router = initAsyncLambdaRouter({
+      commands: [],
       applicationId: "123",
       botToken: "123",
     });
@@ -311,6 +322,17 @@ describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", ()
     });
     const result = router.handleLambdaAsyncApplicationCommand(interaction);
     expect(result).rejects.toThrow(CommandNotFoundError);
+  });
+
+  it("should throw error if apiClient is not set", async () => {
+    const command = new TestCommandAsync();
+    const interaction = new DiscordInteractionApplicationCommand(DEFAULT_INTERACTION);
+    const router = new ServerlessDiscordLambdaRouter({
+      commands: [command],
+      logHandler: logHandlerMock,
+      applicationId: "123",
+    });
+    await expect(router.handleLambdaAsyncApplicationCommand(interaction)).rejects.toThrow(AsyncFeatureDisabledError);
   });
 });
 

@@ -1,6 +1,6 @@
 import { Command, CommandChatInputAsync } from "./command";
 import { DiscordInteraction, DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, instanceofDiscordInteraction, instanceofDiscordInteractionApplicationCommand, instanceofDiscordInteractionPing } from "../discord/interactions";
-import { CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
+import { AsyncFeatureDisabledError, CommandNotFoundError, DiscordApiClientNotSetError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { createAuthHandler, AuthHandler } from "./auth";
 import { instanceOfDiscordAuthenticationRequestHeaders } from "../discord/auth";
 import { initLogger, LogLevels } from "./logging";
@@ -23,12 +23,12 @@ export function initRouter({
     commands: Command[], 
     applicationPublicKey: string 
     applicationId: string,
-    botToken: string,
+    botToken?: string,
     logLevel?: LogLevels
 }): ServerlessDiscordRouter {
   const authHandler = createAuthHandler({ applicationPublicKey });
   const logHandler = initLogger({ logLevel });
-  const apiClient = initApiClient({ token: botToken });
+  const apiClient = botToken ? initApiClient({ token: botToken }) : undefined;
   return new ServerlessDiscordRouter({ commands, authHandler, logHandler, applicationId, apiClient });
 }
 
@@ -47,10 +47,10 @@ export interface ServerlessDiscordRouterRequestHeaders {
  */
 export class ServerlessDiscordRouter {
   protected commands: Command[];
-  protected authHandler: AuthHandler;
+  protected authHandler?: AuthHandler;
   protected logHandler: pino.Logger;
   protected applicationId: string;
-  protected apiClient: DiscordApiClient;
+  protected apiClient?: DiscordApiClient;
 
   constructor({ 
     commands, 
@@ -59,12 +59,12 @@ export class ServerlessDiscordRouter {
     applicationId,
     apiClient,
   }: { 
-        commands: Command[], 
-        authHandler: AuthHandler,
-        logHandler: pino.Logger,
-        applicationId: string
-        apiClient: DiscordApiClient
-    }) {
+    commands: Command[], 
+    authHandler?: AuthHandler,
+    logHandler: pino.Logger,
+    applicationId: string
+    apiClient?: DiscordApiClient
+  }) {
     // TODO: make sure none of the commands have the same name
     this.commands = commands;
     this.authHandler = authHandler;
@@ -91,7 +91,7 @@ export class ServerlessDiscordRouter {
       this.logHandler.error(error);
       throw error;
     }
-    if (!this.authHandler.handleAuthorization({ body: interaction, headers: requestHeaders })) {
+    if (this.authHandler && !this.authHandler.handleAuthorization({ body: interaction, headers: requestHeaders })) {
       const error = new UnauthorizedError();
       this.logHandler.error(error);
       throw error;
@@ -152,6 +152,11 @@ export class ServerlessDiscordRouter {
     const command = this.getCommand(interaction.data.name);
     // Call the async handler if the command is async
     if (command instanceof CommandChatInputAsync) {
+      if (!this.apiClient) {
+        const error = new AsyncFeatureDisabledError();
+        this.logHandler.error(error);
+        throw error;
+      }
       this.logHandler.debug("Calling Async Handler", { command });
       command.handleInteractionAsyncWrapper({ apiClient: this.apiClient, interaction });
     }

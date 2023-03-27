@@ -2,7 +2,7 @@ import { APIGatewayEvent, APIGatewayProxyResult, SQSEvent } from "aws-lambda";
 import pino from "pino";
 import { AuthHandler, createAuthHandler } from "../core/auth";
 import { Command, CommandChatInputAsync } from "../core/command";
-import { UnauthorizedError, CommandNotFoundError } from "../core/errors";
+import { UnauthorizedError, CommandNotFoundError, AsyncFeatureDisabledError } from "../core/errors";
 import { initLogger, LogLevels } from "../core/logging";
 import { ServerlessDiscordRouter } from "../core/router";
 import { DiscordApiClient, initApiClient } from "../discord/api";
@@ -16,22 +16,36 @@ export function initLambdaRouter({
   applicationPublicKey,
   applicationId,
   logLevel = "info",
-  botToken,
   queueUrl,
 }: { 
   commands: Command[], 
   applicationPublicKey: string,
   applicationId: string,
-  botToken: string,
   logLevel?: LogLevels,
   queueUrl?: string
 }): ServerlessDiscordLambdaRouter {
   const logHandler = initLogger({ logLevel });
   logHandler.debug("Initializing Lambda router");
   const authHandler = createAuthHandler({ applicationPublicKey });
-  const apiClient = initApiClient({ token: botToken });
   const sqsClient = new SQSClient({ region: process.env.AWS_REGION });
-  return new ServerlessDiscordLambdaRouter({ commands, authHandler, logHandler, applicationId, apiClient, sqsClient, queueUrl });
+  return new ServerlessDiscordLambdaRouter({ commands, authHandler, logHandler, applicationId, sqsClient, queueUrl });
+}
+
+export function initAsyncLambdaRouter({
+  commands,
+  applicationId,
+  logLevel = "info",
+  botToken,
+}: {
+  commands: Command[],
+  applicationId: string,
+  logLevel?: LogLevels,
+  botToken: string,
+}): ServerlessDiscordLambdaRouter {
+  const logHandler = initLogger({ logLevel });
+  logHandler.debug("Initializing Async Lambda router");
+  const apiClient = initApiClient({ token: botToken });
+  return new ServerlessDiscordLambdaRouter({ commands, logHandler, applicationId, apiClient });
 }
 
 export const BadRequestResponse: APIGatewayProxyResult = {
@@ -78,10 +92,10 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
     queueUrl
   }: {
     commands: Command[],
-    authHandler: AuthHandler,
+    authHandler?: AuthHandler,
     logHandler: pino.Logger,
     applicationId: string,
-    apiClient: DiscordApiClient,
+    apiClient?: DiscordApiClient,
     sqsClient?: SQSClient,
     queueUrl?: string,
   }) {
@@ -174,6 +188,11 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
    */
   async handleLambdaAsyncApplicationCommand(event: DiscordInteractionApplicationCommand) {
     this.logHandler.debug("Handling lambda async application command", event);
+    if (!this.apiClient) {
+      const err = new AsyncFeatureDisabledError();
+      this.logHandler.error(err);
+      throw err;
+    }
     const command = super.getCommand(event.data.name);
     if (!(command instanceof CommandChatInputAsync)) {
       const error = new CommandNotFoundError(event.data.name);

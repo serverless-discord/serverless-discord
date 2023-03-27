@@ -1,4 +1,4 @@
-import { CommandNotFoundError, DiscordApiClientNotSetError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
+import { AsyncFeatureDisabledError, CommandNotFoundError, DiscordApiClientNotSetError, InvalidInteractionTypeError, NotImplementedError, UnauthorizedError } from "./errors";
 
 describe("NotImplementedError", () => {
   it("should be able to create a NotImplementedError", () => {
@@ -43,5 +43,13 @@ describe("DiscordApiClientNotSetError", () => {
     const error = new DiscordApiClientNotSetError();
     expect(error).toBeDefined();
     expect(error.message).toBe("DiscordApiClient not set");
+  });
+});
+
+describe("AsyncFeatureDisabledError", () => {
+  it("should be able to create a AsyncFeatureDisabledError", () => {
+    const error = new AsyncFeatureDisabledError();
+    expect(error).toBeDefined();
+    expect(error.message).toBe("Async features are disabled. Set the botToken property when initializing the router to enable them.");
   });
 });

@@ -40,3 +40,9 @@ export class DiscordApiClientNotSetError extends Error {
     super("DiscordApiClient not set");
   }
 }
+
+export class AsyncFeatureDisabledError extends Error {
+  constructor() {
+    super("Async features are disabled. Set the botToken property when initializing the router to enable them.");
+  }
+}

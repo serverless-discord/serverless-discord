@@ -32,6 +32,7 @@ export class CommandRegistrar {
     applicationId: string;
   }) {
     this.logHandler = logHandler;
+    // TODO make sure that the commands are unique
     this.commands = commands;
     this.apiClient = apiClient;
     this.applicationId = applicationId;
