@@ -41,10 +41,10 @@ export class CommandRegistrar {
    * Registers both guild command and global commands with Discord.
    */
   async registerAllCommands() {
-    this.logHandler.debug("Registering all commands", { commands: this.commands });
+    this.logHandler.debug(`Registering all commands (${this.commands.length})`, { commands: this.commands });
     await this.registerGuildCommands();
     await this.registerGlobalCommands();
-    this.logHandler.debug("Registered all commands", { commands: this.commands });
+    this.logHandler.debug(`Registered all commands (${this.commands.length})`, { commands: this.commands });
   }
 
   async registerGuildCommands() {
@@ -54,7 +54,7 @@ export class CommandRegistrar {
       this.logHandler.info("No guild commands to register");
       return;
     }
-    this.logHandler.debug("Registering Guild Commands", { guildCommands });
+    this.logHandler.debug(`Registering ${guildCommands.length} Guild Commands`, { guildCommands });
     // Group all commands by guild
     const guildCommandMap = new Map<string, Command[]>(); // guildId -> commands
     guildCommands.forEach(command => {
@@ -69,7 +69,7 @@ export class CommandRegistrar {
     await Promise.all(
       Array.from(guildCommandMap.entries()).map(([guildId, commands]) => this.registerGuildCommandBatch({ commands, guildId }))
     );
-    this.logHandler.debug("Registered Guild Commands", { guildCommands });
+    this.logHandler.debug(`Registered ${guildCommands.length} Guild Commands`, { guildCommands });
   }
 
   async registerGuildCommandBatch({ commands, guildId } : { commands: Command[]; guildId: string }) {
@@ -86,18 +86,19 @@ export class CommandRegistrar {
     this.logHandler.debug("Registering Global Commands");
     const globalCommands = this.commands.filter(command => command.guilds.length <= 0);
     if (globalCommands.length === 0) {
+      this.logHandler.debug("No global commands to register");
       return;
     }
     await Promise.all(globalCommands.map(command => this.registerGlobalCommand({ command })));
-    this.logHandler.debug("Registered Global Commands", { globalCommands });
+    this.logHandler.debug(`Registered ${globalCommands.length} Global Commands`, { globalCommands });
   }
 
   async registerGlobalCommand({ command } : { command: Command }) {
-    this.logHandler.debug("Registering Global Command", { command });
+    this.logHandler.debug(`Registering Global Command: ${command.name}`, { command });
     const result = await this.apiClient.commands.createGlobalApplicationCommand({
       applicationId: this.applicationId,
       command: command.toJSON(),
     });
-    this.logHandler.debug("Registered Global Command", { command, result });
+    this.logHandler.debug(`Registered Global Command: ${command.name}`, { command, result });
   }
 }
