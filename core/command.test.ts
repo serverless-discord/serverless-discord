@@ -51,17 +51,22 @@ describe("ServerlessDiscordCommand", () => {
 describe("ServerlessDiscordCommandAsync", () => {
   class TestCommandAsync extends CommandChatInputAsync {
 
-    handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseDeferredChannelMessageWithSource> {
-      return Promise.resolve({
+    async handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseDeferredChannelMessageWithSource> {
+      return {
         type: DiscordInteractionResponseTypes.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           content: "..."
         }
-      });
+      };
     }
 
-    handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<void> {
-      return Promise.resolve();
+    async handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
+      return new DiscordInteractionResponse({
+        type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: "Hello World!"
+        }
+      });
     }
   }
 

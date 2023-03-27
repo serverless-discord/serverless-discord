@@ -8,6 +8,7 @@ import { DiscordInteractionResponse, DiscordInteractionPing, DiscordInteractionA
 import { AuthHandler } from "../core/auth";
 import pino from "pino";
 import { DiscordApiClient } from "../discord/api";
+import { DiscordInteractionsApi } from "../discord/api/interactions";
 
 class TestCommand extends CommandChatInput {
   constructor() {
@@ -44,8 +45,13 @@ class TestCommandAsync extends CommandChatInputAsync {
       description: "test",
     });
   }
-  async handleInteractionAsync(): Promise<void> {
-    return;
+  async handleInteractionAsync(): Promise<DiscordInteractionResponse> {
+    return new DiscordInteractionResponse({
+      type: 1,
+      data: {
+        content: "test",
+      },
+    });
   }
 }
 
@@ -82,6 +88,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambda", () => {
     logHandlerMock = mock<pino.Logger>();
     logHandlerMock.child.mockReturnValue(logHandlerMock);
     apiClientMock = mock<DiscordApiClient>();
+    apiClientMock.interactions = mock<DiscordInteractionsApi>();
   });
 
   it("should handle ping", async () => {
@@ -279,6 +286,7 @@ describe("ServerlessDiscordLambdaRouter.handleLambdaAsyncApplicationCommand", ()
     logHandlerMock = mock<pino.Logger>();
     logHandlerMock.child.mockReturnValue(logHandlerMock);
     apiClientMock = mock<DiscordApiClient>();
+    apiClientMock.interactions = mock<DiscordInteractionsApi>();
   });
 
   it("should handle application command", async () => {
@@ -348,6 +356,7 @@ describe("ServerlessDiscordLambdaRouter.handleApplicationCommand", () => {
     logHandlerMock = mock<pino.Logger>();
     logHandlerMock.child.mockReturnValue(logHandlerMock);
     apiClientMock = mock<DiscordApiClient>();
+    apiClientMock.interactions = mock<DiscordInteractionsApi>();
   });
 
   it("should handle async application command", async () => {
