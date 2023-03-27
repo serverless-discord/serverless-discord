@@ -5,7 +5,7 @@ import { DiscordCommandApi } from "../discord/api/commands";
 import { DiscordInteractionResponse } from "../discord/interactions";
 import { CommandChatInput } from "./command";
 import { DiscordApiClientNotSetError } from "./errors";
-import { CommandRegistrar } from "./register";
+import { CommandRegistrar, initRegistrar } from "./register";
 
 class TestCommand extends CommandChatInput {
   constructor({ guilds = [], name = "test"} : { guilds?: string[]; name?: string; }) {
@@ -212,5 +212,16 @@ describe("CommandRegistrar.registerGlobalCommand", () => {
       applicationId: "123",
       command: commandToJson,
     });
+  });
+});
+
+describe("initRegistrar", () => {
+  it("should init registrar", () => {
+    const registrar = initRegistrar({
+      commands: [],
+      applicationId: "123",
+      botToken: "123",
+    });
+    expect(registrar).toBeInstanceOf(CommandRegistrar);
   });
 });
