@@ -1,4 +1,5 @@
 import { AxiosInstance } from "axios";
+import { DiscordMessage } from "../channel";
 import { DiscordInteractionResponse } from "../interactions";
 import { DiscordApiResponseError } from "./errors";
 
@@ -25,9 +26,6 @@ export class DiscordInteractionsApi {
     }
   }
 
-  /**
-   * @see https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response 
-   */
   async getInteractionResponse({
     applicationId,
     interactionToken
@@ -39,9 +37,6 @@ export class DiscordInteractionsApi {
     return response.data;
   }
 
-  /**
-   * @see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response 
-   */
   async editInteractionResponse({
     applicationId,
     interactionToken,
@@ -50,7 +45,7 @@ export class DiscordInteractionsApi {
         applicationId: string,
         interactionToken: string,
         body: DiscordInteractionResponse
-    }): Promise<Response> {
+    }): Promise<DiscordMessage> {
     const response = await this.axiosInstance.patch(`/webhooks/${applicationId}/${interactionToken}/messages/@original`, body);
     return response.data;
   }
