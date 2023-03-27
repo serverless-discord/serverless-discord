@@ -184,7 +184,7 @@ export abstract class CommandChatInputAsync extends CommandChatInput {
     apiClient: DiscordApiClient,
     interaction: DiscordInteractionApplicationCommand,
   }): Promise<void> {
-    apiClient.interactions.editInteractionResponse({
+    const response = await apiClient.interactions.editInteractionResponse({
       applicationId: interaction.application_id,
       interactionToken: interaction.token,
       body: await this.handleInteractionAsync(interaction),

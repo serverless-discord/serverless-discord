@@ -164,6 +164,6 @@ export class ServerlessDiscordLambdaRouter extends ServerlessDiscordRouter {
       this.logHandler.error("Command not found", error);
       throw error;
     }
-    command.handleInteractionAsync(event);
+    await command.handleInteractionAsyncWrapper({ apiClient: this.apiClient, interaction: event });
   }
 }
