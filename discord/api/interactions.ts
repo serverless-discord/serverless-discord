@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 import { DiscordMessage } from "../channel";
-import { DiscordInteractionResponse } from "../interactions";
+import { DiscordInteractionResponse, DiscordInteractionResponseData } from "../interactions";
 import { DiscordApiResponseError } from "./errors";
 
 export class DiscordInteractionsApi {
@@ -18,12 +18,9 @@ export class DiscordInteractionsApi {
   }: {
         interactionId: string,
         interactionToken: string,
-        body: DiscordInteractionResponse
+        body: DiscordInteractionResponseData
     }): Promise<void> {
-    const response = await this.axiosInstance.post(`/interactions/${interactionId}/${interactionToken}/callback`, body);
-    if (response.status !== 204) {
-      throw new DiscordApiResponseError({ response });
-    }
+    const response = await this.axiosInstance.post(`/interactions/${interactionId}/${interactionToken}`, body);
   }
 
   async getInteractionResponse({
@@ -32,7 +29,7 @@ export class DiscordInteractionsApi {
   }: {
         applicationId: string,
         interactionToken: string
-    }): Promise<DiscordInteractionResponse> {
+    }): Promise<DiscordInteractionResponseData> {
     const response = await this.axiosInstance.get(`/webhooks/${applicationId}/${interactionToken}/messages/@original`);
     return response.data;
   }
@@ -44,7 +41,7 @@ export class DiscordInteractionsApi {
   }: {
         applicationId: string,
         interactionToken: string,
-        body: DiscordInteractionResponse
+        body: DiscordInteractionResponseData
     }): Promise<DiscordMessage> {
     const response = await this.axiosInstance.patch(`/webhooks/${applicationId}/${interactionToken}/messages/@original`, body);
     return response.data;
