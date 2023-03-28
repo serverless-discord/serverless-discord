@@ -8,27 +8,21 @@
 
 Typescript library designed to facilitate the creation of serverless Discord bots with slash commands.
 
-```
-npm install serverless-discord
-```
+## Features
 
-## Features 
-
-- Fully typed
-- Object Oriented API
-- Integrates directly with AWS Lambda
-- Asynchronous handlers using SQS
+ * Fully typed for improved code reliability
+ * Object-oriented API for ease of use
+ * Integrates directly with AWS Lambda for scalable, serverless computing
+ * Asynchronous handlers using SQS for efficient message processing
 
 ## Getting Started
 
-Get started with a easy to use template:
-
-https://github.com/serverless-discord/serverless-discord-template
+To get started quickly and easily, we recommend using our pre-built template available at: https://github.com/serverless-discord/serverless-discord-template. This template includes all necessary dependencies and file structure to start building your own Discord bot with serverless-discord.
 
 ## Documentation
 
-Please see https://serverlessdiscord.com
+Detailed documentation can be found at https://serverlessdiscord.com. Our documentation covers installation and setup, as well as detailed information on the serverless-discord API and its usage.
 
 ## Contributing
 
-Please see [CONTRIBUTING.md]() for more.
+We welcome contributions to serverless-discord. Please see [CONTRIBUTING.md](https://github.com/serverless-discord/serverless-discord/blob/main/.github/CONTRIBUTING.md) for more information on how to get started. Thank you for considering contributing to our project!

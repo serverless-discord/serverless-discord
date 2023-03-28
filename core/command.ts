@@ -17,9 +17,13 @@ import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, Disco
  * @param name The name of the command
  */
 export abstract class Command {
+  // The guilds the command is available in. Setting this to an empty array will make the command global.
   readonly guilds: string[];
+  // The type of the command
   readonly type: DiscordCommandTypes;
+  // The name of the command
   readonly name: string;
+  // The description of the command
   readonly description: string;
 
   constructor({
