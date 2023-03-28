@@ -35,3 +35,4 @@ bower_components
 .DS_Store
 Thumbs.db
 tsconfig.tsbuildinfo
+docs/

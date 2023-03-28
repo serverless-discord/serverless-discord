@@ -1,7 +1,6 @@
 import { MockProxy, mock } from "jest-mock-extended";
 import { APIGatewayEvent, SQSEvent, SQSRecord } from "aws-lambda";
 import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse, MethodNotAllowedResponse, initLambdaRouter, initAsyncLambdaRouter } from "./router";
-import { LambdaClient } from "@aws-sdk/client-lambda";
 import { CommandChatInput, CommandChatInputAsync } from "../core/command";
 import { AsyncFeatureDisabledError, CommandNotFoundError } from "../core/errors";
 import { DiscordInteractionResponse, DiscordInteractionPing, DiscordInteractionApplicationCommand, DiscordInteractionResponseData } from "../discord/interactions";
