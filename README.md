@@ -4,11 +4,13 @@
 [![codecov](https://codecov.io/gh/themcaffee/serverless-discord/branch/main/graph/badge.svg?token=I3FDGC9S8R)](https://codecov.io/gh/themcaffee/serverless-discord)
 ![npm](https://img.shields.io/npm/v/serverless-discord)
 
-**Please note that this library is still in pre-release status and is not production-ready. We are still making large changes to the API, so please come back for a more polished project.**
+> **Please note that this library is still in pre-release status and is not production-ready. We are still making large changes to the API, so please come back for a more polished project.**
 
 Typescript library designed to facilitate the creation of serverless Discord bots with slash commands.
 
-> npm install serverless-discord
+```
+npm install serverless-discord
+```
 
 ## Features 
 
