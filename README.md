@@ -23,11 +23,11 @@ npm install serverless-discord
 
 Get started with a easy to use template:
 
-https://github.com/themcaffee/serverless-discord-template
+https://github.com/serverless-discord/serverless-discord-template
 
 ## Documentation
 
-Please see https://themcaffee.github.io/serverless-discord/
+Please see https://serverlessdiscord.com
 
 ## Contributing
 
