@@ -4,7 +4,7 @@ import { ServerlessDiscordLambdaRouter, UnauthorizedResponse, BadRequestResponse
 import { LambdaClient } from "@aws-sdk/client-lambda";
 import { CommandChatInput, CommandChatInputAsync } from "../core/command";
 import { AsyncFeatureDisabledError, CommandNotFoundError } from "../core/errors";
-import { DiscordInteractionResponse, DiscordInteractionPing, DiscordInteractionApplicationCommand } from "../discord/interactions";
+import { DiscordInteractionResponse, DiscordInteractionPing, DiscordInteractionApplicationCommand, DiscordInteractionResponseData } from "../discord/interactions";
 import { AuthHandler } from "../core/auth";
 import pino from "pino";
 import { DiscordApiClient } from "../discord/api";
@@ -47,13 +47,8 @@ class TestCommandAsync extends CommandChatInputAsync {
       description: "test",
     });
   }
-  async handleInteractionAsync(): Promise<DiscordInteractionResponse> {
-    return new DiscordInteractionResponse({
-      type: 1,
-      data: {
-        content: "test",
-      },
-    });
+  async handleInteractionAsync(): Promise<DiscordInteractionResponseData> {
+    return { content: "test" };
   }
 }
 

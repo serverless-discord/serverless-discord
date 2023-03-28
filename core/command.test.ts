@@ -1,5 +1,5 @@
 import { DiscordCommandTypes } from "../discord/command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
+import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseTypes, DiscordInteractionResponseDeferredChannelMessageWithSource, DiscordInteractionResponseData } from "../discord/interactions";
 import { Command, CommandChatInput, CommandChatInputAsync, CommandMessage, CommandUser } from "./command";
 
 describe("ServerlessDiscordCommand", () => {
@@ -60,13 +60,10 @@ describe("ServerlessDiscordCommandAsync", () => {
       };
     }
 
-    async handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
-      return new DiscordInteractionResponse({
-        type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: "Hello World!"
-        }
-      });
+    async handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseData> {
+      return {
+        content: "Hello World!"
+      };
     }
   }
 
