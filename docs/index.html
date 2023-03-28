@@ -3,7 +3,7 @@
 <div class="table-cell" id="tsd-search" data-base=".">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
 <div class="field">
-<div id="tsd-toolbar-links"></div></div>
+<div id="tsd-toolbar-links"><a href="https://github.com/themcaffee/serverless-discord">Github</a></div></div>
 <ul class="results">
 <li class="state loading">Preparing search index...</li>
 <li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">serverless-discord</a></div>
@@ -16,71 +16,39 @@
 <a href="#serverless-discord" id="serverless-discord" style="color: inherit; text-decoration: none;">
   <h1>serverless-discord</h1>
 </a>
+<p><img src="https://img.shields.io/github/license/themcaffee/serverless-discord" alt="GitHub">
+<img src="https://img.shields.io/npm/v/serverless-discord" alt="npm"></p>
 <p><strong>Please note that this library is still in pre-release status and is not production-ready. We are still making large changes to the API, so please come back for a more polished project.</strong></p>
-<p>Typescript library designed to facilitate the creation of serverless Discord bots with slash commands. Check it out on <a href="https://www.npmjs.com/package/serverless-discord">npm</a>.</p>
+<p>Typescript library designed to facilitate the creation of serverless Discord bots with slash commands.</p>
+<blockquote>
+<p>npm install serverless-discord</p>
+</blockquote>
 
-<a href="#quickstart---aws-lambda" id="quickstart---aws-lambda" style="color: inherit; text-decoration: none;">
-  <h2>Quickstart - AWS Lambda</h2>
+<a href="#features" id="features" style="color: inherit; text-decoration: none;">
+  <h2>Features</h2>
 </a>
-<p>To get started, install the serverless-discord package from npm:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">install</span><span class="hl-1"> </span><span class="hl-0">serverless</span><span class="hl-1">-</span><span class="hl-0">discord</span>
-</code></pre>
-<p>Next, create a simple command like this one:</p>
-<pre><code><span class="hl-2">import</span><span class="hl-1"> { </span><span class="hl-0">ServerlessDiscordCommandChatInput</span><span class="hl-1">, </span><span class="hl-0">DiscordInteractionApplicationCommand</span><span class="hl-1">, </span><span class="hl-0">DiscordInteractionResponse</span><span class="hl-1">, </span><span class="hl-0">DiscordInteractionResponseTypes</span><span class="hl-1"> } </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&quot;serverless-discord&quot;</span><span class="hl-1">;</span><br/><span class="hl-2">import</span><span class="hl-1"> { </span><span class="hl-0">initLambdaRouter</span><span class="hl-1"> } </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&quot;serverless-discord-lambda&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">// You can get this from the Discord Developer Portal</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">DISCORD_PUBLIC_KEY</span><span class="hl-1"> = </span><span class="hl-0">process</span><span class="hl-1">.</span><span class="hl-0">env</span><span class="hl-1">?.</span><span class="hl-6">DISCORD_PUBLIC_KEY</span><span class="hl-1"> || </span><span class="hl-3">&quot;&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">class</span><span class="hl-1"> </span><span class="hl-7">HelloWorldCommand</span><span class="hl-1"> </span><span class="hl-5">extends</span><span class="hl-1"> </span><span class="hl-7">ServerlessDiscordCommandChatInput</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-5">constructor</span><span class="hl-1">() {</span><br/><span class="hl-1">        </span><span class="hl-5">super</span><span class="hl-1">({</span><br/><span class="hl-1">            </span><span class="hl-0">name:</span><span class="hl-1"> </span><span class="hl-3">&quot;test&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">            </span><span class="hl-0">options:</span><span class="hl-1"> [],</span><br/><span class="hl-1">        });</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">    </span><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-8">handleInteraction</span><span class="hl-1">(</span><span class="hl-0">interaction</span><span class="hl-1">: </span><span class="hl-7">DiscordInteractionApplicationCommand</span><span class="hl-1">): </span><span class="hl-7">Promise</span><span class="hl-1">&lt;</span><span class="hl-7">DiscordInteractionResponse</span><span class="hl-1">&gt; {</span><br/><span class="hl-1">        </span><span class="hl-2">return</span><span class="hl-1"> {</span><br/><span class="hl-1">            </span><span class="hl-0">type:</span><span class="hl-1"> </span><span class="hl-0">DiscordInteractionResponseTypes</span><span class="hl-1">.</span><span class="hl-6">CHANNEL_MESSAGE_WITH_SOURCE</span><span class="hl-1">,</span><br/><span class="hl-1">            </span><span class="hl-0">data:</span><span class="hl-1"> {</span><br/><span class="hl-1">                </span><span class="hl-0">content:</span><span class="hl-1"> </span><span class="hl-3">&quot;Hello World!&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">            },</span><br/><span class="hl-1">        }</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">router</span><span class="hl-1"> = </span><span class="hl-8">initLambdaRouter</span><span class="hl-1">({ </span><span class="hl-0">commands:</span><span class="hl-1"> [</span><span class="hl-5">new</span><span class="hl-1"> </span><span class="hl-8">HelloWorldCommand</span><span class="hl-1">()], </span><span class="hl-0">applicationPublicKey:</span><span class="hl-1"> </span><span class="hl-6">DISCORD_PUBLIC_KEY</span><span class="hl-1"> });</span>
-</code></pre>
-<p>Replace <code>DISCORD_PUBLIC_KEY</code> with a secure credential handling method of your choice, such as an environment variable. You can obtain this key by creating a new bot on the Discord Developer Portal. The key is necessary to authenticate requests and ensure that they are coming from Discord servers.</p>
-<p>You can now host this on Lambda behind an ApiGateway to create a fully functioning Discord bot.</p>
-<p>For a complete example that can be used as a template, see <a href="https://github.com/themcaffee/serverless-discord-template">here</a>.</p>
-<p>For more information about the Lambda integration, see <a href="https://github.com/themcaffee/serverless-discord-lambda">serverless-discord-lambda</a>.</p>
+<ul>
+<li>Fully typed</li>
+<li>Object Oriented API</li>
+<li>Integrates directly with AWS Lambda</li>
+<li>Asynchronous handlers using SQS</li>
+</ul>
 
-<a href="#quickstart---roll-your-own" id="quickstart---roll-your-own" style="color: inherit; text-decoration: none;">
-  <h2>Quickstart - Roll your own</h2>
+<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
+  <h2>Getting Started</h2>
 </a>
-<p>It is also possible to run <code>serverless-discord</code> on it&#39;s own to handle routing in any way you please.</p>
-<p>To get started, install the serverless-discord npm package:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">install</span><span class="hl-1"> </span><span class="hl-0">serverless</span><span class="hl-1">-</span><span class="hl-0">discord</span>
-</code></pre>
-<pre><code><span class="hl-2">import</span><span class="hl-1"> { </span><span class="hl-0">ServerlessDiscordCommandChatInput</span><span class="hl-1">, </span><span class="hl-0">DiscordInteractionApplicationCommand</span><span class="hl-1">, </span><span class="hl-0">DiscordInteractionResponse</span><span class="hl-1">, </span><span class="hl-0">DiscordInteractionResponseTypes</span><span class="hl-1">, </span><span class="hl-0">initRouter</span><span class="hl-1"> } </span><span class="hl-2">from</span><span class="hl-1"> </span><span class="hl-3">&quot;serverless-discord&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">// You can get this from the Discord Developer Portal</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">DISCORD_PUBLIC_KEY</span><span class="hl-1"> = </span><span class="hl-0">process</span><span class="hl-1">.</span><span class="hl-0">env</span><span class="hl-1">?.</span><span class="hl-6">DISCORD_PUBLIC_KEY</span><span class="hl-1"> || </span><span class="hl-3">&quot;&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">class</span><span class="hl-1"> </span><span class="hl-7">HelloWorldCommand</span><span class="hl-1"> </span><span class="hl-5">extends</span><span class="hl-1"> </span><span class="hl-7">ServerlessDiscordCommandChatInput</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-5">constructor</span><span class="hl-1">() {</span><br/><span class="hl-1">        </span><span class="hl-5">super</span><span class="hl-1">({</span><br/><span class="hl-1">            </span><span class="hl-0">name:</span><span class="hl-1"> </span><span class="hl-3">&quot;test&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">            </span><span class="hl-0">options:</span><span class="hl-1"> [],</span><br/><span class="hl-1">        });</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">    </span><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-8">handleInteraction</span><span class="hl-1">(</span><span class="hl-0">interaction</span><span class="hl-1">: </span><span class="hl-7">DiscordInteractionApplicationCommand</span><span class="hl-1">): </span><span class="hl-7">Promise</span><span class="hl-1">&lt;</span><span class="hl-7">DiscordInteractionResponse</span><span class="hl-1">&gt; {</span><br/><span class="hl-1">        </span><span class="hl-2">return</span><span class="hl-1"> {</span><br/><span class="hl-1">            </span><span class="hl-0">type:</span><span class="hl-1"> </span><span class="hl-0">DiscordInteractionResponseTypes</span><span class="hl-1">.</span><span class="hl-6">CHANNEL_MESSAGE_WITH_SOURCE</span><span class="hl-1">,</span><br/><span class="hl-1">            </span><span class="hl-0">data:</span><span class="hl-1"> {</span><br/><span class="hl-1">                </span><span class="hl-0">content:</span><span class="hl-1"> </span><span class="hl-3">&quot;Hello World!&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">            },</span><br/><span class="hl-1">        }</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">router</span><span class="hl-1"> = </span><span class="hl-8">initRouter</span><span class="hl-1">({ </span><span class="hl-0">commands:</span><span class="hl-1"> [</span><span class="hl-5">new</span><span class="hl-1"> </span><span class="hl-8">HelloWorldCommand</span><span class="hl-1">()], </span><span class="hl-0">applicationPublicKey:</span><span class="hl-1"> </span><span class="hl-6">DISCORD_PUBLIC_KEY</span><span class="hl-1"> });</span><br/><span class="hl-4">// Get an interaction and request headers</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">result</span><span class="hl-1"> = </span><span class="hl-0">router</span><span class="hl-1">.</span><span class="hl-8">handleInteraction</span><span class="hl-1">(</span><span class="hl-0">interaction</span><span class="hl-1">, </span><span class="hl-0">requestHeaders</span><span class="hl-1">);</span><br/><span class="hl-4">// Return the result back to the Discord request in any you like</span>
-</code></pre>
+<p>Get started with a easy to use template:</p>
+<p><a href="https://github.com/themcaffee/serverless-discord-template">https://github.com/themcaffee/serverless-discord-template</a></p>
 
-<a href="#development" id="development" style="color: inherit; text-decoration: none;">
-  <h2>Development</h2>
+<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
+  <h2>Documentation</h2>
 </a>
+<p>Please see <a href="https://themcaffee.github.io/serverless-discord/">https://themcaffee.github.io/serverless-discord/</a></p>
 
-<a href="#linting" id="linting" style="color: inherit; text-decoration: none;">
-  <h3>Linting</h3>
+<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+  <h2>Contributing</h2>
 </a>
-<p>Linting is enforced and run on every pull request. Run the following command to lint the code:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-0">lint</span>
-</code></pre>
-<p>Automatically fix linting errors:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-9">lint</span><span class="hl-1">:</span><span class="hl-0">fix</span>
-</code></pre>
-
-<a href="#testing" id="testing" style="color: inherit; text-decoration: none;">
-  <h3>Testing</h3>
-</a>
-<p>Tests are run on every pull request and must pass before merging. Run the following command to execute the unit tests:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-0">test</span>
-</code></pre>
-<p>Run tests with coverage:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-9">test</span><span class="hl-1">:</span><span class="hl-0">coverage</span>
-</code></pre>
-<p>Run the following to run integration tests which require more setup:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-9">test</span><span class="hl-1">:</span><span class="hl-0">integration</span>
-</code></pre>
-
-<a href="#building" id="building" style="color: inherit; text-decoration: none;">
-  <h3>Building</h3>
-</a>
-<p>The Typescript files are built with sourcemaps for the npm package. Run the following command to build to javascript:</p>
-<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-0">build</span>
-</code></pre>
-
-<a href="#versioning-and-publishing" id="versioning-and-publishing" style="color: inherit; text-decoration: none;">
-  <h3>Versioning and Publishing</h3>
-</a>
-<p>Versioning follows normal semantic versioning, and it&#39;s handled by running the appropriate npm version <level> command. Publishing is done via GitHub releases, where each release triggers a GitHub action that deploys to npm.</p>
+<p>Please see <a href="">CONTRIBUTING.md</a> for more.</p>
 </div></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
