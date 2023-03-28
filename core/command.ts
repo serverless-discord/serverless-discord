@@ -1,6 +1,6 @@
 import { DiscordApiClient } from "../discord/api";
 import { DiscordCommandTypes, DiscordCommandOption, DiscordCreateApplicationCommandParams } from "../discord/command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource, DiscordInteractionResponseUpdateMessage } from "../discord/interactions";
+import { DiscordInteractionApplicationCommand, DiscordInteractionResponse, DiscordInteractionResponseData, DiscordInteractionResponseDeferredChannelMessageWithSource, DiscordInteractionResponseUpdateMessage } from "../discord/interactions";
 
 /**
  * A ServerlessDiscordCommand is a command that can be executed by a Discord user.
@@ -184,14 +184,15 @@ export abstract class CommandChatInputAsync extends CommandChatInput {
     apiClient: DiscordApiClient,
     interaction: DiscordInteractionApplicationCommand,
   }): Promise<void> {
+    const interactionResponse = await this.handleInteractionAsync(interaction);
     const response = await apiClient.interactions.editInteractionResponse({
       applicationId: interaction.application_id,
       interactionToken: interaction.token,
-      body: await this.handleInteractionAsync(interaction),
+      body: interactionResponse,
     });
   }
 
-  abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse>
+  abstract handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseData>
 
   toJSON(): DiscordCreateApplicationCommandParams {
     return {

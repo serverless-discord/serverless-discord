@@ -1,7 +1,6 @@
 import { AxiosInstance } from "axios";
 import { DiscordMessage } from "../channel";
-import { DiscordInteractionResponse, DiscordInteractionResponseData } from "../interactions";
-import { DiscordApiResponseError } from "./errors";
+import { DiscordInteractionResponseData } from "../interactions";
 
 export class DiscordInteractionsApi {
   private axiosInstance: AxiosInstance;

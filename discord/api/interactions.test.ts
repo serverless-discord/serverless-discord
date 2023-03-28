@@ -18,39 +18,13 @@ describe("DiscordInteractionApi.createInteractionResponse", () => {
     await interactionsApi.createInteractionResponse({
       interactionId: "123",
       interactionToken: "123",
-      body: {
-        type: 4,
-        data: {
-          content: "test"
-        }
-      }
-    });
-    expect(axiosInstance.post).toHaveBeenCalledWith("/interactions/123/123/callback", {
-      type: 4,
-      data: {
+      body:  {
         content: "test"
       }
     });
-  });
-
-  it("should throw an error if the status code is not 204", async () => {
-    axiosInstance.post.mockResolvedValueOnce({
-      status: 400,
-      data: {
-        message: "test"
-      }
+    expect(axiosInstance.post).toHaveBeenCalledWith("/interactions/123/123", {
+      content: "test"
     });
-    const interactionsApi = new DiscordInteractionsApi({ axiosInstance });
-    await expect(interactionsApi.createInteractionResponse({
-      interactionId: "123",
-      interactionToken: "123",
-      body: {
-        type: 4,
-        data: {
-          content: "test"
-        }
-      }
-    })).rejects.toThrow(DiscordApiResponseError);
   });
 });
 
@@ -97,17 +71,11 @@ describe("DiscordInteractionApi.editInteractionResponse", () => {
       applicationId: "123",
       interactionToken: "123",
       body: {
-        type: 4,
-        data: {
-          content: "test"
-        }
+        content: "test"
       }
     });
     expect(axiosInstance.patch).toHaveBeenCalledWith("/webhooks/123/123/messages/@original", {
-      type: 4,
-      data: {
-        content: "test"
-      }
+      content: "test"
     });
     expect(response).toEqual({
       id: "123"

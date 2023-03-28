@@ -1,6 +1,6 @@
 import { initRouter, ServerlessDiscordRouter, ServerlessDiscordRouterRequestHeaders } from "./router";
 import { CommandChatInput, CommandChatInputAsync } from "./command";
-import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
+import { DiscordInteractionApplicationCommand, DiscordInteractionMessageComponent, DiscordInteractionModalSubmit, DiscordInteractionPing, DiscordInteractionResponse, DiscordInteractionResponseData, DiscordInteractionResponseDeferredChannelMessageWithSource } from "../discord/interactions";
 import { AsyncFeatureDisabledError, CommandNotFoundError, InvalidInteractionTypeError, UnauthorizedError } from "./errors";
 import { MockProxy, mock, DeepMockProxy, mockDeep } from "jest-mock-extended";
 import { AuthHandler } from "./auth";
@@ -245,8 +245,8 @@ describe("ServerlessDiscordRouter.handleApplicationCommand", () => {
       return Promise.resolve(new DiscordInteractionResponseDeferredChannelMessageWithSource({ data: { content: "test" } }));
     }
 
-    async handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
-      return new DiscordInteractionResponse({ data: { content: "test" }, type: 1 });
+    async handleInteractionAsync(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponseData> {
+      return { content: "test" };
     }
   }
 
