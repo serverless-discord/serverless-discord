@@ -1,6 +1,7 @@
 # serverless-discord
 
 ![GitHub](https://img.shields.io/github/license/themcaffee/serverless-discord)
+[![codecov](https://codecov.io/gh/themcaffee/serverless-discord/branch/main/graph/badge.svg?token=I3FDGC9S8R)](https://codecov.io/gh/themcaffee/serverless-discord)
 ![npm](https://img.shields.io/npm/v/serverless-discord)
 
 **Please note that this library is still in pre-release status and is not production-ready. We are still making large changes to the API, so please come back for a more polished project.**
