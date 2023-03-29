@@ -1,44 +1,33 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-  <title>{{.Title}}</title>
-</head>
-<body>
-<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item" href="https://serverlessdiscord.com">
-      <img src="/images/serverless_discord_logo_sm.png" width="64" height="64">
-    </a>
-
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-
-  <div id="navbar" class="navbar-menu">
-    <div class="navbar-start">
-      <a class="navbar-item">
-        Home
-      </a>
-
-      <a class="navbar-item" href="/api">
-        API Docs
-      </a>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/languages/typescript.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <link rel="stylesheet" href="/style.css">
+    <title>{{.Title}}</title>
+  </head>
+  <body>
+    <div id="nes">
+      <nav class="container-fluid">
+        <ul>
+          <li><a href="/" class="contrast" onclick="event.preventDefault()"></a><strong>serverless-discord</strong></a></li>
+        </ul>
+        <ul>
+          <li><a href="/api">API</a></li>
+          <li><a href="https://github.com/serverless-discord/serverless-discord">
+            <i class="nes-icon github is-large"></i>
+          </a></li>
+        </ul>
+      </nav>
+      {{.Body}}
+      </main>
     </div>
-    <div class="navbar-end">
-      <a class="navbar-item" href="https://github.com/serverless-discord/serverless-discord">
-        Github
-      </a>
-    </div>
-  </div>
-</nav>
-
-{{.Body}}
-
-</body>
+  </body>
 </html>
