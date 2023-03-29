@@ -45,3 +45,5 @@ yarn.locks
 dist/
 
 tsconfig.tsbuildinfo
+
+api_docs/
