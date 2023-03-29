@@ -6,7 +6,6 @@
   <br>
 
   <h1>serverless-discord</h1>
-  <p>Typescript library designed to facilitate the creation of serverless Discord bots with slash commands.</p>
 
   <section class="nes-container is-dark">
     <section class="message-list">
@@ -41,78 +40,10 @@
 
   <div class="nes-container with-title is-centered is-dark">
     <p class="title">Choose your adventure</p>
-    <a class="nes-btn is-success" href="">Easy: Check out the template</a>
-    <a class="nes-btn is-primary" href="">Medium: Quick start guide</a>
-    <a class="nes-btn is-error" href="">Hard: API Reference</a>
+    <a class="nes-btn is-success" href="https://github.com/serverless-discord/serverless-discord-template">Easy: Check out the template</a>
+    <a class="nes-btn is-primary" href="/quickstart">Medium: Quick start guide</a>
+    <a class="nes-btn is-error" href="/api">Hard: API Reference</a>
   </div>
-
-  <h3>Quick Start - AWS Lambda</h3>
-
-  <p>This guide assumes that you already have an AWS account setup and a Discord application created with a bot token.</p>
-
-  <p>First, you will want to create your command:</p>
-
-  <pre>
-    <code class="hljs language-typescript">
-// This is a simple command that replies with "Hello World!" when the command is executed.
-export class HelloWorldCommand extends CommandChatInput {
-  constructor() {
-    super({
-      name: "test",
-      description: "Test command",
-      options: [],
-    });
-  }
-
-  async handleInteraction(interaction: DiscordInteractionApplicationCommand): Promise<DiscordInteractionResponse> {
-    return {
-      type: DiscordInteractionResponseTypes.CHANNEL_MESSAGE_WITH_SOURCE,
-      data: {
-        content: "Hello World!",
-      },
-    };
-  }
-}
-    </code>
-  </pre>
-
-  <p>This is a very basic global Discord slash command that simply responds with "Hello World!" from the slash command <code>/test</code>.</p>
-
-  <p>Next, you will want to register the commands with the serverless-discord router using <code>initLambdaRouter</code>. Here is
-an example:</p>
-
-  <pre>
-    <code class="hljs">
-const applicationPublicKey = process.env.APPLICATION_PUBLIC_KEY;
-const applicationId = process.env.APPLICATION_ID;
-
-export const lambdaHandler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
-  const commands = [HelloWorldCommand()];
-  const router = initLambdaRouter({ applicationPublicKey, applicationId, commands });
-  return router.handleLambda(event);
-};
-    </code>
-  </pre>
-
-<p>Then just point your lambda to the lambdaHandler from above! You will need to let Discord know about your commands so create a script to register them like the following:</p>
-
-<pre>
-  <code class="hljs">
-import { initRegistrar } from "serverless-discord/core/register";
-import { commands } from "../src";
-
-const applicationId = process.env.DISCORD_APPLICATION_ID || "";
-const botToken = process.env.DISCORD_BOT_TOKEN || "";
-
-const commands = [HelloWorldCommand()];
-
-const registrar = initRegistrar({ commands, applicationId, botToken });
-registrar.registerAllCommands();
-  </code>
-</pre>
-
-<p>Run the script you just created to register all of the Discord commands. Once you have your lambda deployed, 
-just paste it's URL (usually from an API gateway in front of it) in to the Discord developer portal.</p>
-
-  {{.Body}}
+  <br>
+</div>
 </main>
