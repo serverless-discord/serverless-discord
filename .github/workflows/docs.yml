@@ -29,6 +29,7 @@ jobs:
         uses: themcaffee/GoSquatch@1.0.28-beta
         with:
           srcDir: 'docs'
+      - run: sudo chown -R $USER:$USER dist
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
