@@ -11,6 +11,12 @@ permissions:
   pages: write
   id-token: write
 
+# We only care about the latest commit on the main branch
+# so we cancel any previous runs that are still in progress
+concurrency:
+  group: "deploy"
+  cancel-in-progress: true
+
 jobs:
   docs:
     environment:
@@ -19,6 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Build pages
+        uses: themcaffee/GoSquatch@1.0.28-beta
+        with:
+          srcDir: 'docs'
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
