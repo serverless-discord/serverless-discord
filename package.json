@@ -25,7 +25,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "removejs": "rm -rf nodes_modules && find . -name '*.map' -exec rm {} \\; && find . -name '*.js' -exec rm {} \\; && find . -name '*.d.ts' -exec rm {} \\;  && find . -name '*.tsbuildinfo' -exec rm {} \\;",
-    "docs": "npx typedoc index.ts"
+    "docs": "npx typedoc index.ts",
+    "docs:local": "concurrently \"gosquatch -live-server -port 8080 -src-dir docs\" \"npx http-server dist -p 8081\""
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
     "@aws-sdk/client-sqs": "^3.299.0",
     "@types/aws-lambda": "^8.10.113",
     "axios": "^1.3.4",
+    "concurrently": "^8.0.1",
     "pino": "^8.11.0",
     "tweetnacl": "^1.0.3"
   }

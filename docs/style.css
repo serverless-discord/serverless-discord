@@ -1,5 +1,6 @@
 #nes h1,h2,h3,h4,h5,h6,html, body, pre, kbd, samp {
   font-family: "Press Start 2P";
+  color: black;
 }
 
 .normal-text p {
@@ -8,4 +9,26 @@
 
 #nes h1,h2,h3,h4,h5,h6 {
   padding-top: 1em;
+}
+
+html {
+  min-height: 100%;
+  background-color: deepskyblue;
+}
+
+body {
+  min-height: 100%;
+  background-color: deepskyblue;
+}
+
+.nes-container {
+  background-color: #fff;
+}
+
+.header-link {
+  color: darkblue;
+}
+
+.header-title {
+  color: white;
 }
